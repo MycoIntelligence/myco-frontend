@@ -27,3 +27,6 @@
 .finding::after{bottom:auto;height:34px}
 .hypothesis::before,.finding::before{z-index:1}
 @media(max-width:540px){.evidence-record{--spine-offset:19px}}
+.footer-links{display:flex;align-items:center;flex-wrap:wrap;gap:8px 24px}
+.footer-links .text-link{display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:540px){.footer-links{flex-basis:100%}}
