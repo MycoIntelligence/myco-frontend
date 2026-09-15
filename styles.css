@@ -30,3 +30,39 @@
 .footer-links{display:flex;align-items:center;flex-wrap:wrap;gap:8px 24px}
 .footer-links .text-link{display:inline-flex;align-items:center;min-height:44px}
 @media(max-width:540px){.footer-links{flex-basis:100%}}
+
+/* Hero motion: highlight relationships, never hide or move readable content. */
+.hero-trace-caption{display:flex;align-items:center;flex-wrap:wrap;gap:0 18px}
+.hero-replay{border:0;background:transparent;padding:0;min-height:44px;color:var(--dim);font-size:11px;white-space:nowrap}
+.hero-replay[aria-disabled=true]{cursor:default}
+.hero-trace .hero-connector{position:absolute;left:5px;top:20px;bottom:-20px;width:1px;background:var(--dim);transform-origin:top;pointer-events:none}
+.hero-trace .trace-node{--branch-delay:0s;--highlight-delay:0s;--travel-delay:.5s;--travel-duration:.45s}
+.hero-trace .trace-node:nth-child(2){--branch-delay:.95s;--highlight-delay:1s;--travel-delay:1.2s;--travel-duration:.6s}
+.hero-trace .trace-node:nth-child(3){--branch-delay:1.8s;--highlight-delay:1.8s;--travel-delay:2.1s;--travel-duration:.4s}
+.hero-trace .trace-node:nth-child(4){--branch-delay:2.5s}
+.hero-trace .trace-node:not(.signal)::after{border-color:var(--dim)}
+.hero-trace.hero-waiting .context-mark{background:transparent}
+.hero-trace.hero-waiting .hero-connector{transform:scaleY(0)}
+.hero-trace.hero-waiting .trace-node::after{border-color:var(--line)}
+.hero-trace.hero-waiting .signal>.label{color:var(--dim)}
+.hero-trace.hero-waiting .signal>.label::before{background:var(--paper);border-color:var(--dim)}
+.hero-trace.hero-waiting .signal-mark{background:transparent;color:var(--ink)}
+.hero-playing .context-mark{animation:hero-context .4s cubic-bezier(.2,0,.2,1) var(--highlight-delay) both}
+.hero-playing .hero-connector{animation:hero-connect var(--travel-duration) linear var(--travel-delay) both}
+.hero-playing .trace-node::after{transform-origin:left;animation:hero-branch .2s linear var(--branch-delay) both}
+.hero-playing .signal>.label{animation:hero-label .2s ease 2.55s both}
+.hero-playing .signal>.label::before{animation:hero-resolve .2s ease 2.55s both}
+.hero-playing .signal-mark{animation:hero-finding .3s ease 2.7s both}
+@keyframes hero-context{from{background-color:transparent}to{background-color:var(--surface)}}
+@keyframes hero-connect{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes hero-branch{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes hero-label{from{color:var(--dim)}to{color:var(--signal)}}
+@keyframes hero-resolve{from{background-color:var(--paper);border-color:var(--dim)}to{background-color:var(--signal);border-color:var(--signal)}}
+@keyframes hero-finding{from{background-color:transparent;color:var(--ink)}to{background-color:var(--signal-wash);color:var(--signal)}}
+@media(prefers-reduced-motion:reduce){
+  .hero-trace.hero-waiting .context-mark{background:var(--surface)}
+  .hero-trace.hero-waiting .hero-connector{transform:none}
+  .hero-trace.hero-waiting .signal>.label{color:var(--signal)}
+  .hero-trace.hero-waiting .signal>.label::before{background:var(--signal);border-color:var(--signal)}
+  .hero-trace.hero-waiting .signal-mark{background:var(--signal-wash);color:var(--signal)}
+}

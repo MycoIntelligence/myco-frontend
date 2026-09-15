@@ -32,6 +32,8 @@ On mobile, preserve reading order and stack branches. Do not shrink a desktop di
 
 ## Motion and interaction
 
+The hero highlights a single illustrative trace once when the complete figure comfortably fits in view. A three-second sequence connects the changed assignment, requirement, and dependency before resolving the finding in teal. Text remains fully readable and stationary. A quiet replay control repeats the sequence only on request. Short viewports, skipped traces, and reduced-motion preferences retain the completed state. Never imply a live analysis or use looping activity indicators.
+
 Evidence is visible initially. A user-requested replay reveals change, context, hypothesis, validation, and finding once, in order. No continuous scanning or simulated live analysis. Honor reduced motion. Native disclosures reveal scope and stage details with keyboard and touch support.
 
 ## Truth and assets
