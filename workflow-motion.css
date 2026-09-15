@@ -1,0 +1,64 @@
+#myco-sequence{--ms-ink:#12151a;--ms-dim:#4a515b;--ms-line:#c0c6cc;--ms-paper:#f0f2f4;--ms-teal:#0e8e7e;background:var(--ms-paper);color:var(--ms-ink);font:400 14px/1.5 'IBM Plex Sans',sans-serif;padding:24px;position:relative;color-scheme:light}
+#myco-sequence *{box-sizing:border-box}
+#myco-sequence .ms-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+#myco-sequence .ms-mono{font:400 11px/1.5 'JetBrains Mono',monospace;color:var(--ms-dim)}
+#myco-sequence .ms-kicker{letter-spacing:.06em;text-transform:uppercase}
+#myco-sequence .ms-actions{display:flex;gap:18px}
+#myco-sequence button{font:400 13px/1.4 'IBM Plex Sans',sans-serif;min-height:44px;border:0;color:var(--ms-dim);background:transparent;cursor:pointer;padding:6px 0}
+#myco-sequence button:hover{color:var(--ms-teal)}
+#myco-sequence button:disabled{cursor:default;opacity:.5}
+#myco-sequence h2{font:400 30px/1.16 'IBM Plex Sans',sans-serif;letter-spacing:-.04em;margin:8px 0 23px;color:var(--ms-ink)}
+#myco-sequence .ms-trigger{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--ms-line);border-bottom:1px solid var(--ms-line)}
+#myco-sequence .ms-trigger-marker{width:8px;height:8px;background:var(--ms-ink);display:inline-block}
+#myco-sequence .ms-trigger-name{font-weight:500}
+#myco-sequence .ms-trigger-note{margin-left:auto}
+#myco-sequence .ms-map{position:relative;height:265px;margin-top:22px}
+#myco-sequence canvas{position:absolute;inset:0;width:100%;height:100%}
+#myco-sequence .ms-stage{position:absolute;top:0;width:25%;text-align:center;pointer-events:none}
+#myco-sequence .ms-stage:nth-of-type(1){left:0}
+#myco-sequence .ms-stage:nth-of-type(2){left:25%}
+#myco-sequence .ms-stage:nth-of-type(3){left:50%}
+#myco-sequence .ms-stage:nth-of-type(4){left:75%}
+#myco-sequence .ms-stage-name{font-size:16px;font-weight:500;display:block}
+#myco-sequence .ms-stage-number{font:400 11px/1.4 'JetBrains Mono',monospace;color:var(--ms-dim);display:block;margin-bottom:6px}
+#myco-sequence .ms-scope{position:absolute;top:162px;width:100%;font:400 11px/1.55 'JetBrains Mono',monospace;color:var(--ms-dim)}
+#myco-sequence .ms-scope strong{font-weight:400;color:var(--ms-ink);display:block}
+#myco-sequence .ms-scope small{font-size:11px;display:block}
+#myco-sequence .ms-stage[data-active=true] .ms-stage-number{color:var(--ms-ink)}
+#myco-sequence .ms-stage[data-active=true] .ms-stage-name{text-decoration:underline;text-underline-offset:8px;text-decoration-thickness:1px}
+#myco-sequence .ms-record{border:1px solid var(--ms-line);background:#f8f9fa;min-height:236px;position:relative}
+#myco-sequence .ms-record-head{padding:13px 18px;border-bottom:1px solid var(--ms-line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#myco-sequence .ms-record-body{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+#myco-sequence .ms-record-title{font-size:18px;font-weight:500;line-height:1.3;margin:6px 0 10px;color:var(--ms-ink)}
+#myco-sequence .ms-record-summary{font-size:13px;color:var(--ms-dim);margin:0}
+#myco-sequence pre{font:400 11px/1.8 'JetBrains Mono',monospace;color:var(--ms-dim);margin:0;white-space:pre-wrap;overflow-wrap:anywhere;background:transparent;padding:0}
+#myco-sequence .ms-record[data-terminal=true]{border-color:var(--ms-teal);background:#e9f2f0}
+#myco-sequence .ms-record[data-terminal=true] .ms-record-head{border-color:#aacfc7}
+#myco-sequence .ms-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px}
+#myco-sequence .ms-status{color:var(--ms-ink)}
+#myco-sequence .ms-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(max-width:800px){
+ #myco-sequence{padding:18px}
+ #myco-sequence h2{font-size:27px;max-width:270px}
+ #myco-sequence .ms-trigger-note{margin-left:18px;width:100%}
+ #myco-sequence .ms-map{height:440px;margin-top:24px}
+ #myco-sequence .ms-stage{width:calc(100% - 91px);text-align:left;left:91px!important}
+ #myco-sequence .ms-stage:nth-of-type(1){top:0}
+ #myco-sequence .ms-stage:nth-of-type(2){top:110px}
+ #myco-sequence .ms-stage:nth-of-type(3){top:220px}
+ #myco-sequence .ms-stage:nth-of-type(4){top:330px}
+ #myco-sequence .ms-stage-number{display:inline;margin-right:7px}
+ #myco-sequence .ms-stage-name{display:inline;font-size:16px}
+ #myco-sequence .ms-scope{top:38px}
+ #myco-sequence .ms-record-body{grid-template-columns:1fr;gap:16px;padding:16px}
+ #myco-sequence .ms-record{min-height:336px}
+ #myco-sequence .ms-record-head{padding:12px 16px}
+}
+@media(prefers-reduced-motion:reduce){#myco-sequence *{transition:none!important}}
+
+#myco-sequence{padding:0;background:var(--paper)}
+.how-intro{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:end;margin-bottom:44px}.how-intro .lede{max-width:510px}.how-intro .text-link{display:inline-block;margin-top:18px}
+#myco-sequence .ms-record{min-height:245px}#myco-sequence .ms-actions[hidden]{display:none}#myco-sequence .ms-record-body{grid-template-columns:1fr 1fr}#myco-sequence .ms-record-title{max-width:460px}
+@media(max-width:800px){.how-intro{grid-template-columns:1fr;gap:8px;margin-bottom:32px}#myco-sequence .ms-record-body{grid-template-columns:1fr}#myco-sequence .ms-record{min-height:350px}}
+
+.integration-triggers{margin:28px 0 36px;max-width:690px;scroll-margin-top:110px}.integration-triggers .explanation{margin-top:10px}
