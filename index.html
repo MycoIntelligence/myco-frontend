@@ -43,13 +43,13 @@
             <p class="lede">Myco traces a change through code, intent, and dependencies. Then validates what needs your attention.</p>
             <div class="actions"><a class="button primary" href="#evidence">Inspect the evidence</a><a class="text-link" href="#integrate">See integration model</a></div>
           </div>
-          <figure class="hero-evidence" aria-label="Illustrative amendment retry trace">
-            <figcaption class="hero-trace-caption"><span class="eyebrow">Amendment retry · illustrative trace</span><button class="text-link hero-replay" type="button" aria-label="Replay hero trace" aria-controls="hero-trace" hidden>Replay trace</button></figcaption>
+          <figure class="hero-evidence" aria-label="Illustrative payment retry trace">
+            <figcaption class="hero-trace-caption"><span class="eyebrow">Payment retry · illustrative trace</span><button class="text-link hero-replay" type="button" aria-label="Replay hero trace" aria-controls="hero-trace" hidden>Replay trace</button></figcaption>
             <ol class="trace hero-trace" id="hero-trace">
-              <li class="trace-node"><span class="hero-connector" aria-hidden="true"></span><p class="label">01 Change · replaces state</p><p class="excerpt"><code class="context-mark">amendment = restore(snapshot)</code></p><p class="source">checkout.amendment.ts</p></li>
-              <li class="trace-node"><span class="hero-connector" aria-hidden="true"></span><p class="label">02 Intent · constrains the change</p><p class="excerpt">An amendment must <span class="context-mark">preserve tax exemption.</span></p><p class="source">Requirement TAX-19</p></li>
-              <li class="trace-node"><span class="hero-connector" aria-hidden="true"></span><p class="label">03 Dependency · breaks that intent</p><p class="excerpt">Restored state <span class="context-mark">omits taxExempt.</span></p><p class="source">retry-state.ts</p></li>
-              <li class="trace-node signal"><p class="label">04 Validated signal</p><p class="excerpt">Retry loses the<br><span class="signal-mark">tax exemption.</span></p><p class="source">Expected true · observed false in example</p></li>
+              <li class="trace-node"><span class="hero-connector" aria-hidden="true"></span><p class="label">01 Change · replaces state</p><p class="excerpt"><code class="context-mark">payment = restore(snapshot)</code></p><p class="source">payment-retry.ts</p></li>
+              <li class="trace-node"><span class="hero-connector" aria-hidden="true"></span><p class="label">02 Intent · constrains the change</p><p class="excerpt">A payment retry must <span class="context-mark">preserve its idempotency key.</span></p><p class="source">Requirement PAY-42</p></li>
+              <li class="trace-node"><span class="hero-connector" aria-hidden="true"></span><p class="label">03 Dependency · breaks that intent</p><p class="excerpt">Restored state <span class="context-mark">omits idempotencyKey.</span></p><p class="source">retry-state.ts</p></li>
+              <li class="trace-node signal"><p class="label">04 Validated signal</p><p class="excerpt">Retry can cause<br><span class="signal-mark">duplicate charges.</span></p><p class="source">Expected pay_9182 · observed null in example</p></li>
             </ol>
           </figure>
         </div>
@@ -60,31 +60,31 @@
         </div>
         <section class="section-pad evidence-section" id="evidence" aria-labelledby="evidence-title">
           <div class="section-intro"><p class="eyebrow">01 · Evidence in context</p><h2 id="evidence-title">A diff is not<br>the whole system.</h2><p class="lede">A change can be locally correct and still violate the system’s intent. Follow the relationship that makes the difference.</p></div>
-          <div class="record-head"><p class="label">Illustrative evidence record · amendment retry</p><button class="button quiet" type="button" id="replay-trace" hidden>Replay trace</button></div>
+          <div class="record-head"><p class="label">Illustrative evidence record · payment retry</p><button class="button quiet" type="button" id="replay-trace" hidden>Replay trace</button></div>
           <div class="evidence-record" id="evidence-record">
             <div class="evidence-grid">
               <article class="artifact trace-reveal" style="--delay:0s">
-                <h3 class="artifact-label"><span>01 Change</span><span>checkout.amendment.ts</span></h3>
+                <h3 class="artifact-label"><span>01 Change</span><span>payment-retry.ts</span></h3>
                 <div class="code-diff" aria-label="Before and after code change">
-                  <p class="code-state">Before</p><div class="code-row before"><span class="line-number" aria-hidden="true">42</span><code>amendment.amount = snapshot.amount</code></div>
-                  <p class="code-state">After</p><div class="code-row changed"><span class="line-number" aria-hidden="true">42</span><code>amendment = restore(snapshot)</code></div>
-                  <div class="code-row"><span class="line-number" aria-hidden="true">43</span><code>return calculateTax(amendment)</code></div>
+                  <p class="code-state">Before</p><div class="code-row before"><span class="line-number" aria-hidden="true">42</span><code>payment.amount = snapshot.amount</code></div>
+                  <p class="code-state">After</p><div class="code-row changed"><span class="line-number" aria-hidden="true">42</span><code>payment = restore(snapshot)</code></div>
+                  <div class="code-row"><span class="line-number" aria-hidden="true">43</span><code>return createPaymentIntent(payment)</code></div>
                 </div>
-                <p class="explanation">The retry now replaces the object. Whether that is safe depends on what the restored object preserves.</p>
+                <p class="explanation">In retryPayment(), the retry now replaces the payment object. Whether that is safe depends on what the restored object preserves.</p>
               </article>
               <div class="context-branches trace-reveal" style="--delay:.4s">
-                <article class="context-branch"><h3 class="artifact-label"><span>02 Required by</span><span>TAX-19</span></h3><p class="excerpt">Amendments must <span class="context-mark">preserve the existing tax exemption.</span></p></article>
-                <article class="context-branch"><h3 class="artifact-label"><span>03 Depends on</span><span>retry-state.ts</span></h3><p class="excerpt"><code class="context-mark">return { amount: snapshot.amount }</code></p><p class="explanation">The returned object has no <code>taxExempt</code> field. In this example, tax calculation treats a missing exemption as false.</p></article>
+                <article class="context-branch"><h3 class="artifact-label"><span>02 Required by</span><span>PAY-42</span></h3><p class="excerpt">Payment retries must <span class="context-mark">preserve the original idempotency key.</span></p></article>
+                <article class="context-branch"><h3 class="artifact-label"><span>03 Depends on</span><span>retry-state.ts</span></h3><p class="excerpt"><code class="context-mark">return { amount: snapshot.amount }</code></p><p class="explanation">The restored object has no <code>idempotencyKey</code> field. In this example, <code>createPaymentIntent()</code> generates a new key when none is passed, allowing a separate payment.</p></article>
               </div>
             </div>
-            <div class="hypothesis trace-reveal" style="--delay:.8s"><span class="label">Hypothesis</span><p>Replacing the object may discard the exemption.</p></div>
+            <div class="hypothesis trace-reveal" style="--delay:.8s"><span class="label">Hypothesis</span><p>Replacing the object may drop the original key and allow a duplicate charge.</p></div>
             <div class="validation trace-reveal" style="--delay:1.15s">
-              <div><h3 class="label">04 Validation · illustrative assertion</h3><pre><code>before.taxExempt = true
-after = retry(before)
-after.taxExempt ?? false</code></pre></div>
-              <div><p class="label">Required by TAX-19</p><div class="test-result"><p>Expected: <code>true</code></p><p>Observed: <code class="signal-mark">false</code></p></div></div>
+              <div><h3 class="label">04 Validation · illustrative assertion</h3><pre><code>original.idempotencyKey = "pay_9182"
+retryRequest = restore(snapshot)
+retryRequest.idempotencyKey ?? null</code></pre></div>
+              <div><p class="label">Required by PAY-42</p><div class="test-result"><p>Expected: <code>"pay_9182"</code></p><p>Observed: <code class="signal-mark">null</code></p></div></div>
             </div>
-            <article class="finding trace-reveal" style="--delay:1.6s"><p class="label">Validated signal</p><h3>Retry discards the exemption before tax calculation.</h3><p>The changed assignment replaces the object with a state that omits the required exemption. Preserve that field when restoring the amendment.</p></article>
+            <article class="finding trace-reveal" style="--delay:1.6s"><p class="label">Validated signal</p><h3>Retry can result in duplicate customer charges.</h3><p>The changed assignment drops the original idempotency key before createPaymentIntent(). A new key allows a separate payment instead of deduplicating the original request. Preserve the original key when restoring the payment for retry.</p></article>
           </div>
           <div class="record-foot"><p class="label">Synthetic code and assertion · not a live analysis</p><div class="trace-legend"><span><i aria-hidden="true"></i>Context</span><span><i class="solid" aria-hidden="true"></i>Validated signal</span></div></div>
         </section>
@@ -103,11 +103,11 @@ after.taxExempt ?? false</code></pre></div>
  </div>
  <div class="ms-record" data-terminal="true">
   <div class="ms-record-head"><span class="ms-mono" data-record-label>PR · REVIEWER OUTPUT</span><span class="ms-mono">Synthetic example · not live</span></div>
-  <div class="ms-record-body"><div><span class="ms-mono" data-card-id>C01 · Merge blocked</span><div class="ms-record-title" data-record-title>Retry loses the tax exemption.</div><p class="ms-record-summary" data-record-summary>The reviewer sees the root cause and impact in the PR. A Jira ticket is linked when that integration is configured.</p></div><pre data-json aria-label="Illustrative card fields, not an API schema">{
+  <div class="ms-record-body"><div><span class="ms-mono" data-card-id>C01 · Merge blocked</span><div class="ms-record-title" data-record-title>Retry can cause duplicate charges.</div><p class="ms-record-summary" data-record-summary>The reviewer sees the root cause and impact in the PR. A Jira ticket is linked when that integration is configured.</p></div><pre data-json aria-label="Illustrative card fields, not an API schema">{
   "priority": "P1",
   "confidence": "High",
   "severity": "High",
-  "impact": "Incorrect tax calculation"
+  "impact": "Duplicate customer charges"
 }</pre></div>
  </div>
  <div class="ms-foot"><span class="ms-mono ms-status" data-phase>Complete · findings returned to the PR</span><span class="ms-mono">Illustrative fields &amp; timing</span><div class="ms-actions" hidden><button type="button" data-control="pause" aria-label="Pause workflow animation">Pause</button></div></div>
