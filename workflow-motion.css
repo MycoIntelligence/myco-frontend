@@ -1,6 +1,5 @@
 #myco-sequence{--ms-ink:#12151a;--ms-dim:#4a515b;--ms-line:#c0c6cc;--ms-paper:#f0f2f4;--ms-teal:#0e8e7e;background:var(--ms-paper);color:var(--ms-ink);font:400 14px/1.5 'IBM Plex Sans',sans-serif;padding:24px;position:relative;color-scheme:light}
 #myco-sequence *{box-sizing:border-box}
-#myco-sequence .ms-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
 #myco-sequence .ms-mono{font:400 11px/1.5 'JetBrains Mono',monospace;color:var(--ms-dim)}
 #myco-sequence .ms-kicker{letter-spacing:.06em;text-transform:uppercase}
 #myco-sequence .ms-actions{display:flex;gap:18px}
@@ -34,7 +33,7 @@
 #myco-sequence pre{font:400 11px/1.8 'JetBrains Mono',monospace;color:var(--ms-dim);margin:0;white-space:pre-wrap;overflow-wrap:anywhere;background:transparent;padding:0}
 #myco-sequence .ms-record[data-terminal=true]{border-color:var(--ms-teal);background:#e9f2f0}
 #myco-sequence .ms-record[data-terminal=true] .ms-record-head{border-color:#aacfc7}
-#myco-sequence .ms-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:16px}
+#myco-sequence .ms-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}
 #myco-sequence .ms-status{color:var(--ms-ink)}
 #myco-sequence .ms-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(max-width:800px){

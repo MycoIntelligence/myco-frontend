@@ -14,7 +14,7 @@ function setup({ width = 1200, reduced = false, height = 844, supported = true }
   });
   const root = {
     querySelector: selector => elements[selector] || (elements[selector] = {
-      dataset: {}, hidden: selector === '.ms-actions',
+      dataset: {}, hidden: selector === '.ms-actions', setAttribute() {},
       addEventListener: (event, callback) => { handlers[selector] = callback; }
     }),
     querySelectorAll: () => stages
@@ -44,7 +44,7 @@ function setup({ width = 1200, reduced = false, height = 844, supported = true }
 }
 
 for (const width of [1200, 801, 390, 320]) {
-  test(`sequential autoplay, terminal state and no scroll replay at ${width}px`, () => {
+  test(`sequential autoplay, terminal hold and repeat at ${width}px`, () => {
     const run = setup({ width });
     assert.equal(run.elements['.ms-record'].dataset.terminal, 'true');
     run.visible(.8);
@@ -56,14 +56,18 @@ for (const width of [1200, 801, 390, 320]) {
     assert.equal(run.stages[2].dataset.active, 'true');
     run.advance(250);
     assert.equal(run.stages[3].dataset.active, 'true');
-    run.advance(500);
+    run.advance(300);
     assert.equal(run.elements['.ms-record'].dataset.terminal, 'true');
     run.visible(0); run.visible(.9); run.advance(30);
     assert.equal(run.elements['.ms-record'].dataset.terminal, 'true');
-    run.click('replay'); run.advance(5);
+    run.advance(300);
     assert.equal(run.stages[0].dataset.active, 'true');
     run.click('pause'); run.advance(500);
     assert.equal(run.stages[0].dataset.active, 'true');
+    run.visible(0); run.visible(1); run.advance(500);
+    assert.equal(run.stages[0].dataset.active, 'true');
+    run.click('pause'); run.advance(260);
+    assert.equal(run.stages[1].dataset.active, 'true');
   });
 }
 test('reduced motion and mid-run preference changes show completed evidence', () => {
@@ -74,11 +78,11 @@ test('reduced motion and mid-run preference changes show completed evidence', ()
   assert.equal(run.elements['.ms-record'].dataset.terminal, 'true');
   assert.equal(run.elements['[data-control="pause"]'].disabled, true);
 });
-test('offscreen pauses; short viewports do not autoplay; unsupported observers preserve markup', () => {
+test('offscreen pauses; short viewports autoplay; unsupported observers preserve markup', () => {
   const run = setup(); run.visible(1); run.advance(20); run.visible(0); run.advance(500);
   assert.equal(run.stages[0].dataset.active, 'true');
   const short = setup({ width: 390, height: 450 }); short.visible(1); short.advance(500);
-  assert.equal(short.elements['.ms-record'].dataset.terminal, 'true');
+  assert.equal(short.stages[1].dataset.active, 'true');
   const fallback = setup({ supported: false });
   assert.equal(fallback.elements['.ms-record'].dataset.terminal, undefined);
 });

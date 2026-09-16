@@ -2,7 +2,7 @@
  const root=document.getElementById('myco-sequence');
  if(!root) return;
  const get=s=>root.querySelector(s),canvas=get('canvas'),ctx=canvas.getContext('2d'),map=get('.ms-map'),stages=[...root.querySelectorAll('.ms-stage')];
- const pause=get('[data-control="pause"]'),replay=get('[data-control="replay"]'),record=get('.ms-record'),phase=get('[data-phase]');
+ const pause=get('[data-control="pause"]'),record=get('.ms-record'),phase=get('[data-phase]');
  if(!ctx || !('IntersectionObserver' in window) || !('ResizeObserver' in window)) return;
  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -64,17 +64,15 @@
    }
   }else if(!mobile){ctx.font="11px 'JetBrains Mono',monospace";ctx.fillStyle=dim;ctx.textAlign='center';ctx.fillText('Structured cards carry the evidence forward',w/2,245)}
  }
- function controls(){pause.textContent=playing?'Pause':elapsed>=18?'Play again':'Play';pause.disabled=reduce.matches;replay.disabled=reduce.matches;}
+ function controls(){pause.textContent=playing?'Pause':'Resume';pause.setAttribute('aria-label',playing?'Pause workflow animation':'Resume workflow animation');pause.disabled=reduce.matches;get('.ms-actions').hidden=reduce.matches;}
  function resize(){w=map.clientWidth;h=map.clientHeight;mobile=matchMedia('(max-width:800px)').matches;const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
- function tick(now){raf=0;if(!playing||!visible||document.hidden||reduce.matches){last=0;return}if(last)elapsed=Math.min(18,elapsed+Math.min((now-last)/1000,.06));last=now;draw();if(elapsed>=18){playing=false;controls();get('[data-announcement]').textContent='Illustrative run complete. Findings returned to the PR.';last=0}else start()}
+ // Hold the finished evidence for five seconds, then begin the next illustrative run.
+ function tick(now){raf=0;if(!playing||!visible||document.hidden||reduce.matches){last=0;return}if(last)elapsed=(elapsed+Math.min((now-last)/1000,.06))%21;last=now;draw();start()}
  function start(){if(!raf&&playing&&visible&&!document.hidden&&!reduce.matches)raf=requestAnimationFrame(tick)}
- function restart(){if(reduce.matches)return;hasPlayed=true;elapsed=0;playing=true;last=0;controls();draw();get('[data-announcement]').textContent='Illustrative PR opened. Workflow restarted.';start()}
- pause.addEventListener('click',()=>{if(elapsed>=18){restart();return}playing=!playing;last=0;controls();get('[data-announcement]').textContent=playing?'Animation playing.':'Animation paused.';start()});
- replay.addEventListener('click',restart);
- reduce.addEventListener('change',()=>{elapsed=18;playing=false;hasPlayed=true;last=0;controls();draw()});
+ pause.addEventListener('click',()=>{if(reduce.matches)return;hasPlayed=true;playing=!playing;last=0;controls();get('[data-announcement]').textContent=playing?'Animation playing.':'Animation paused.';start()});
+ reduce.addEventListener('change',()=>{elapsed=reduce.matches?18:0;playing=!reduce.matches;hasPlayed=true;last=0;controls();draw();start()});
  document.addEventListener('visibilitychange',()=>{last=0;start()});
  new ResizeObserver(resize).observe(map);
- new IntersectionObserver(entries=>{const entry=entries[0];visible=entry.intersectionRatio>=.65;last=0;if(visible&&!hasPlayed&&!reduce.matches){hasPlayed=true;if(map.clientHeight<window.innerHeight-100){elapsed=0;playing=true;controls();}}start()},{threshold:[0,.65]}).observe(map);
- get('.ms-actions').hidden=false;
+ new IntersectionObserver(entries=>{const entry=entries[0];visible=entry.intersectionRatio>=.25;last=0;if(visible&&!hasPlayed&&!reduce.matches){hasPlayed=true;elapsed=0;playing=true;controls();}start()},{threshold:[0,.25]}).observe(map);
  resize();controls();draw();start();
 })();
