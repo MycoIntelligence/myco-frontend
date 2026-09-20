@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+@font-face{font-family:Geon;src:local('Geon'),local('Geon Regular');font-weight:400;font-display:swap}
+@font-face{font-family:Geon;src:local('Geon Medium');font-weight:500;font-display:swap}
+:root{
+ --bg:#F7F9F8;--bg-soft:#EDF2F0;--panel:#FFFFFF;--panel-cool:#EDF2F0;
+ --ink:#122024;--ink-soft:#425650;--muted:#566963;
+ --accent:#39756D;--accent-dark:#39756D;--verify:#39756D;
+ --border:#D4DEDA;--border-strong:#778B84;--wire:#778B84;
+ --font-display:'Geon','Geist',sans-serif;
+ --font-body:'Geist',sans-serif;
+ --font-mono:'Geist',sans-serif;
+ --font-serif:'Geon','Geist',sans-serif;
+}
+[data-theme="dark"]{
+ --bg:#122024;--bg-soft:#182C2F;--panel:#20383B;--panel-cool:#243B3E;
+ --ink:#F7F9F8;--ink-soft:#D4DEDA;--muted:#B4C9C2;
+ --accent:#8DC5B8;--accent-dark:#8DC5B8;--verify:#8DC5B8;
+ --border:#425650;--border-strong:#778B84;--wire:#778B84;
+}
+.display{font-family:var(--font-display);font-weight:500!important}
+h1,h2,h3,h4{font-family:var(--font-display)}
+.logo{font-family:var(--font-display);font-style:normal;font-weight:500}
+code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.btn-primary{background:#122024;color:#fff;border-color:#122024}
+.btn-primary:hover{background:#243B3E;color:#fff;border-color:#243B3E}
+[data-theme="dark"] .btn-primary{background:#F7F9F8;color:#122024;border-color:#F7F9F8}
+[data-theme="dark"] .btn-primary:hover{background:#D4DEDA;color:#122024}
+.sev-P0{color:#A12D35}.sev-P1{color:#805400}
+[data-theme="dark"] .sev-P0{color:#F4A3AA}[data-theme="dark"] .sev-P1{color:#E7C98A}
+.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(57,117,109,.14)}
+@keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 rgba(57,117,109,0)}50%{box-shadow:0 0 0 3px rgba(57,117,109,.18)}}
+/* Approved artwork, arranged horizontally without redrawing its forms. */
+.logo{display:inline-flex;align-items:center;gap:10px;flex-shrink:0;line-height:1;text-decoration:none;min-width:140px}
+.brand-icon{display:block;width:40px;height:42px;object-fit:contain;mix-blend-mode:multiply}
+.brand-wordmark{display:block;width:90px;height:30px;object-fit:contain}
+[data-theme="dark"] .brand-icon{mix-blend-mode:normal;background:#fff;border-radius:5px;padding:3px}
+[data-theme="dark"] .brand-wordmark{filter:brightness(0) invert(1)}
+.logo:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+@media(max-width:600px){.logo{min-width:110px;gap:8px}.brand-icon{width:32px;height:34px}.brand-wordmark{width:70px;height:24px}}
+/* Text-led hero: context graph temporarily removed. */
+.hero-grid{grid-template-columns:1fr!important}
+.hero-grid>div:first-child{border-right:0!important;max-width:900px}
+.hero-grid>div:nth-child(2){display:none!important}
