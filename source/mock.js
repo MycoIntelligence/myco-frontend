@@ -199,7 +199,7 @@ export const lead = {
   title: "Request a pilot",
   body:
     "Tell us about your codebase and we\u2019ll show you what Myco can find. We usually reply within a day.",
-  success: "Thanks \u2014 we\u2019ve got your details. The team will reach out shortly.",
+  success: "Thanks for your interest. One of our founders will reach out to you shortly.",
   fields: [
     { name: "name", label: "Your name", type: "text", placeholder: "Ada Lovelace", required: true },
     { name: "email", label: "Work email", type: "email", placeholder: "ada@company.com", required: true },
