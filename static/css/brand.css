@@ -126,6 +126,13 @@ code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
 #overview .hero-grid>div:nth-child(2){display:none!important}
 @media(max-width:900px){.App>div:first-child{padding:10px 12px 0!important}.App>div:first-child nav{padding:10px 14px!important}#overview .hero-grid>div:first-child{padding:70px 24px 62px!important}#overview .hero-grid>div:first-child h1{font-size:clamp(44px,10vw,66px)!important}}
 
+/* One continuous first viewport: white canvas, with the navigation as its only surface. */
+html,body,.App,.wrap{background:#fff!important}
+#overview .wrap{border-bottom:1px solid var(--border)!important}
+#overview .hero-grid>div:first-child{padding-bottom:68px!important}
+.stats-grid{max-width:800px!important;margin:0 auto!important;padding:22px 34px 34px!important;background:#fff!important}
+.stats-grid>.reveal{background:#fff!important}
+
 /* Evidence field: an open, editorial system of signals around one review. */
 .evidence-field{display:flex;align-items:center;width:100%;min-height:430px}.evidence-field-svg{width:100%;height:auto;overflow:visible;font-family:var(--font-mono)}
 .field-ring{fill:none;stroke:#edf2f0;stroke-width:1}.field-ring.ring-one{stroke-dasharray:3 12;animation:fieldDrift 28s linear infinite}.field-ring.ring-two{stroke:#dce7e3;stroke-dasharray:2 8;animation:fieldDrift 22s linear infinite reverse}.field-ring.ring-three{stroke:rgba(57,117,109,.24);stroke-dasharray:2 7;animation:fieldPulse 4.8s ease-in-out infinite}.field-lines path{fill:none;stroke:var(--border-strong);stroke-width:1.2}.field-lines .field-output-line{stroke:var(--accent);stroke-width:1.5}.field-particles circle{fill:var(--accent)}.field-label circle{fill:var(--accent)}.field-label text{fill:var(--ink);font-size:11px;letter-spacing:.12em}.field-sub{fill:var(--muted)!important;font-size:8.5px!important;letter-spacing:.02em!important}.field-core>circle{fill:#fff;stroke:rgba(57,117,109,.28);stroke-width:1}.field-core path{fill:#fff;stroke:var(--accent);stroke-width:1.2}.field-core text{fill:var(--ink);font-size:12px;font-weight:600;letter-spacing:.13em;text-anchor:middle}.field-report circle{fill:var(--accent)}.field-report line{stroke:var(--accent);stroke-width:1.2}.field-report text{fill:var(--accent-dark);font-size:10px;letter-spacing:.1em}
