@@ -10,22 +10,18 @@
     panel.replaceChildren();
     panel.classList.add('myco-motion-panel');
     panel.insertAdjacentHTML('beforeend', `
-      <div class="review-trace" role="img" aria-label="A smooth animated review trace from a requirement and pull request to a validated bug report.">
-        <svg viewBox="0 0 540 430" class="review-trace-svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="traceGradient" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#39756D" stop-opacity=".12"/><stop offset=".48" stop-color="#39756D" stop-opacity=".78"/><stop offset="1" stop-color="#39756D" stop-opacity=".15"/></linearGradient>
-            <filter id="traceGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <path class="trace-line faint" d="M115 102 C176 116 188 183 257 207"/>
-          <path class="trace-line faint" d="M425 111 C390 133 351 159 304 202"/>
-          <path class="trace-line active" id="review-path" d="M286 237 C325 255 344 282 368 309 C391 335 420 333 451 325"/>
-          <circle class="trace-dot dot-one" cx="115" cy="102" r="4"/><circle class="trace-dot dot-two" cx="425" cy="111" r="4"/>
-          <circle class="trace-particle" cx="115" cy="102" r="4" filter="url(#traceGlow)"><animateMotion dur="4.8s" repeatCount="indefinite" path="M115 102 C176 116 188 183 257 207 C280 216 295 222 304 226 C325 255 344 282 368 309 C391 335 420 333 451 325"/></circle>
-          <circle class="trace-particle secondary" cx="425" cy="111" r="3"><animateMotion dur="4.8s" begin="2.4s" repeatCount="indefinite" path="M425 111 C390 133 351 159 304 202 C325 255 344 282 368 309 C391 335 420 333 451 325"/></circle>
-          <g class="trace-card source-card"><rect x="35" y="65" width="160" height="60" rx="3"/><circle cx="57" cy="87" r="5"/><text x="72" y="92">REQUIREMENT</text><text class="trace-sub" x="57" y="111">TAX-19 · preserve exemption</text></g>
-          <g class="trace-card source-card"><rect x="335" y="74" width="165" height="60" rx="3"/><circle cx="357" cy="96" r="5"/><text x="372" y="101">PULL REQUEST</text><text class="trace-sub" x="357" y="120">#482 · amendment retry</text></g>
-          <g class="trace-core"><circle class="core-ripple" cx="280" cy="221" r="49"/><circle class="core-disc" cx="280" cy="221" r="36"/><path d="M280 188 L309 205 L309 237 L280 254 L251 237 L251 205 Z"/><text x="280" y="218">MYCO</text><text class="trace-sub" x="280" y="233">REVIEW</text></g>
-          <g class="trace-report"><rect x="294" y="292" width="206" height="92" rx="3"/><rect class="report-mark" x="294" y="292" width="4" height="92" rx="2"/><text class="report-label" x="316" y="318">VALIDATED BUG REPORT</text><line x1="316" y1="330" x2="478" y2="330"/><circle cx="320" cy="349" r="4"/><text class="report-body" x="332" y="353">Retry restores tax on exempt order</text><text class="report-evidence" x="316" y="373">3 EVIDENCE PATHS ATTACHED</text></g>
+      <div class="evidence-field" role="img" aria-label="An animated evidence field where requirements, code context, review history and dependencies converge into a validated bug report.">
+        <svg viewBox="0 0 560 440" class="evidence-field-svg" aria-hidden="true">
+          <defs><filter id="fieldGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <circle class="field-ring ring-one" cx="282" cy="215" r="143"/><circle class="field-ring ring-two" cx="282" cy="215" r="109"/><circle class="field-ring ring-three" cx="282" cy="215" r="76"/>
+          <g class="field-lines"><path d="M104 108 C181 111 191 160 241 190"/><path d="M100 310 C176 302 192 260 238 235"/><path d="M459 104 C393 125 373 161 327 190"/><path d="M468 313 C388 295 371 257 327 235"/><path class="field-output-line" d="M282 273 C282 310 282 329 282 359"/></g>
+          <g class="field-particles"><circle r="3.5" filter="url(#fieldGlow)"><animateMotion dur="5.6s" repeatCount="indefinite" path="M104 108 C181 111 191 160 241 190"/></circle><circle r="3.5"><animateMotion dur="5.9s" begin="1.4s" repeatCount="indefinite" path="M100 310 C176 302 192 260 238 235"/></circle><circle r="3.5"><animateMotion dur="5.3s" begin="2.6s" repeatCount="indefinite" path="M459 104 C393 125 373 161 327 190"/></circle><circle r="3.5"><animateMotion dur="5.7s" begin=".7s" repeatCount="indefinite" path="M468 313 C388 295 371 257 327 235"/></circle></g>
+          <g class="field-label label-a"><circle cx="100" cy="104" r="5"/><text x="117" y="100">REQUIREMENT</text><text class="field-sub" x="117" y="118">product intent</text></g>
+          <g class="field-label label-b"><circle cx="96" cy="314" r="5"/><text x="113" y="310">DEPENDENCIES</text><text class="field-sub" x="113" y="328">impact path</text></g>
+          <g class="field-label label-c"><circle cx="463" cy="100" r="5"/><text x="447" y="96" text-anchor="end">PR HISTORY</text><text class="field-sub" x="447" y="114" text-anchor="end">review context</text></g>
+          <g class="field-label label-d"><circle cx="472" cy="317" r="5"/><text x="455" y="313" text-anchor="end">CODEBASE</text><text class="field-sub" x="455" y="331" text-anchor="end">system behavior</text></g>
+          <g class="field-core"><circle cx="282" cy="215" r="57"/><path d="M282 174 L317 194 L317 236 L282 256 L247 236 L247 194 Z"/><text x="282" y="212">MYCO</text><text class="field-sub" x="282" y="230">REASONING</text></g>
+          <g class="field-report"><circle cx="282" cy="374" r="5"/><line x1="302" y1="374" x2="458" y2="374"/><text x="302" y="367">VALIDATED BUG REPORT</text><text class="field-sub" x="302" y="389">evidence attached · ready to review</text></g>
         </svg>
       </div>`);
   };
