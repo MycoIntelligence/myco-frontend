@@ -1,24 +1,32 @@
 (() => {
-  const mountMotion = () => {
+  const mountMotion = (attempt = 0) => {
     const panel = document.querySelector('.hero-grid > div:nth-child(2)');
-    if (!panel || panel.dataset.mycoMotion) return;
+    if (!panel) {
+      if (attempt < 40) setTimeout(() => mountMotion(attempt + 1), 50);
+      return;
+    }
+    if (panel.dataset.mycoMotion) return;
     panel.dataset.mycoMotion = 'true';
     panel.replaceChildren();
     panel.classList.add('myco-motion-panel');
     panel.insertAdjacentHTML('beforeend', `
-      <div class="myco-motion" role="img" aria-label="A subtle animated map showing engineering context becoming a validated Myco signal.">
-        <div class="map-topline"><span>LIVE CONTEXT MAP</span><span>1,284 ARTIFACTS</span></div>
-        <svg class="context-map" viewBox="0 0 520 390" aria-hidden="true">
-          <g class="map-wires"><path d="M136 78 C180 78 192 147 222 177"/><path d="M124 196 C170 196 184 196 222 196"/><path d="M142 315 C179 315 195 245 222 216"/><path d="M298 185 C342 168 354 112 390 102"/><path d="M298 208 C345 224 355 273 397 276"/></g>
-          <g class="map-flow"><circle r="3"><animateMotion dur="5s" repeatCount="indefinite" path="M136 78 C180 78 192 147 222 177"/></circle><circle r="3"><animateMotion dur="5.4s" begin=".8s" repeatCount="indefinite" path="M124 196 C170 196 184 196 222 196"/></circle><circle r="3"><animateMotion dur="5.1s" begin="1.4s" repeatCount="indefinite" path="M142 315 C179 315 195 245 222 216"/></circle><circle r="3"><animateMotion dur="4.8s" begin=".4s" repeatCount="indefinite" path="M298 208 C345 224 355 273 397 276"/></circle></g>
-          <g class="map-node input"><rect x="42" y="57" width="94" height="42" rx="4"/><text x="58" y="76">INTENT</text><text class="map-sub" x="58" y="90">requirements</text></g>
-          <g class="map-node input"><rect x="32" y="175" width="92" height="42" rx="4"/><text x="48" y="194">CHANGE</text><text class="map-sub" x="48" y="208">pull request</text></g>
-          <g class="map-node input"><rect x="48" y="294" width="94" height="42" rx="4"/><text x="64" y="313">SCOPE</text><text class="map-sub" x="64" y="327">dependencies</text></g>
-          <g class="map-core"><circle class="core-halo" cx="260" cy="196" r="60"/><circle class="core-ring" cx="260" cy="196" r="48"/><path d="M260 151 L299 174 L299 219 L260 241 L221 219 L221 174 Z"/><text x="260" y="193">MYCO</text><text class="map-sub" x="260" y="209">REASONING</text></g>
-          <g class="map-node output"><rect x="390" y="81" width="94" height="42" rx="4"/><text x="406" y="100">IMPACT</text><text class="map-sub" x="406" y="114">traced paths</text></g>
-          <g class="map-node output signal"><rect x="397" y="255" width="96" height="42" rx="4"/><circle cx="413" cy="276" r="4"/><text x="425" y="279">SIGNAL</text></g>
+      <div class="review-trace" role="img" aria-label="A smooth animated review trace from a requirement and pull request to a validated bug report.">
+        <svg viewBox="0 0 540 430" class="review-trace-svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="traceGradient" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#39756D" stop-opacity=".12"/><stop offset=".48" stop-color="#39756D" stop-opacity=".78"/><stop offset="1" stop-color="#39756D" stop-opacity=".15"/></linearGradient>
+            <filter id="traceGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path class="trace-line faint" d="M115 102 C176 116 188 183 257 207"/>
+          <path class="trace-line faint" d="M425 111 C390 133 351 159 304 202"/>
+          <path class="trace-line active" id="review-path" d="M286 237 C325 255 344 282 368 309 C391 335 420 333 451 325"/>
+          <circle class="trace-dot dot-one" cx="115" cy="102" r="4"/><circle class="trace-dot dot-two" cx="425" cy="111" r="4"/>
+          <circle class="trace-particle" cx="115" cy="102" r="4" filter="url(#traceGlow)"><animateMotion dur="4.8s" repeatCount="indefinite" path="M115 102 C176 116 188 183 257 207 C280 216 295 222 304 226 C325 255 344 282 368 309 C391 335 420 333 451 325"/></circle>
+          <circle class="trace-particle secondary" cx="425" cy="111" r="3"><animateMotion dur="4.8s" begin="2.4s" repeatCount="indefinite" path="M425 111 C390 133 351 159 304 202 C325 255 344 282 368 309 C391 335 420 333 451 325"/></circle>
+          <g class="trace-card source-card"><rect x="35" y="65" width="160" height="60" rx="3"/><circle cx="57" cy="87" r="5"/><text x="72" y="92">REQUIREMENT</text><text class="trace-sub" x="57" y="111">TAX-19 · preserve exemption</text></g>
+          <g class="trace-card source-card"><rect x="335" y="74" width="165" height="60" rx="3"/><circle cx="357" cy="96" r="5"/><text x="372" y="101">PULL REQUEST</text><text class="trace-sub" x="357" y="120">#482 · amendment retry</text></g>
+          <g class="trace-core"><circle class="core-ripple" cx="280" cy="221" r="49"/><circle class="core-disc" cx="280" cy="221" r="36"/><path d="M280 188 L309 205 L309 237 L280 254 L251 237 L251 205 Z"/><text x="280" y="218">MYCO</text><text class="trace-sub" x="280" y="233">REVIEW</text></g>
+          <g class="trace-report"><rect x="294" y="292" width="206" height="92" rx="3"/><rect class="report-mark" x="294" y="292" width="4" height="92" rx="2"/><text class="report-label" x="316" y="318">VALIDATED BUG REPORT</text><line x1="316" y1="330" x2="478" y2="330"/><circle cx="320" cy="349" r="4"/><text class="report-body" x="332" y="353">Retry restores tax on exempt order</text><text class="report-evidence" x="316" y="373">3 EVIDENCE PATHS ATTACHED</text></g>
         </svg>
-        <div class="map-footer"><span>CONTEXT</span><span>REASONING</span><span>VALIDATED SIGNAL</span></div>
       </div>`);
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountMotion);
