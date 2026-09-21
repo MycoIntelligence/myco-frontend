@@ -22,8 +22,8 @@ function App() {
           <Navbar />
           <Hero />
           <Stats />
-          <DiffSection />
           <ContextEngine />
+          <DiffSection />
           <ProofSection />
           <FindingsFeed />
           <HowItWorks />
