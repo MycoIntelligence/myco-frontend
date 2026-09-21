@@ -16,9 +16,18 @@ Run `python3 serve.py`, then open `http://127.0.0.1:8766`.
 - `source/`: recovered React components and authored styles for future development. The original build configuration was not available, so this directory is not a complete rebuild environment. The static bundle is the served version.
 - `serve.py`: local preview server.
 
-## Current limitations
+## Pilot request emails
 
-The contact form is not connected to lead delivery. The local server returns a clear error without forwarding or storing submissions. Static hosting also needs a real form backend before accepting requests.
+Submitting the Request a pilot form sends a notification through the `/api/leads` endpoint.
+
+Set these production environment variables in Vercel before use:
+
+- `RESEND_API_KEY`: a Resend API key with permission to send email.
+- `PILOT_EMAIL_FROM`: a sender address on a verified domain, for example `Myco Pilots <pilots@your-domain.com>`.
+
+The endpoint sends each valid request to `rodriguesgrege@gmail.com` and `abhishikaagarwal2023@gmail.com`, with the visitor's work email set as Reply-To.
+
+## Current limitations
 
 Geist loads from Google Fonts. Geon uses locally installed font files if available, otherwise headings fall back to Geist. Licensed Geon web fonts are still needed.
 
