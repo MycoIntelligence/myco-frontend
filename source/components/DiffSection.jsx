@@ -5,19 +5,13 @@ import { diff } from "../mock";
 export default function DiffSection() {
   return (
     <div className="wrap">
-      {/* Header row */}
-      <div className="split-head" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: "1px solid var(--border)" }}>
-        <div style={{ padding: "60px 34px", borderRight: "1px solid var(--border)", display: "flex", alignItems: "center" }}>
-          <Reveal className="eyebrow">{diff.eyebrow}</Reveal>
-        </div>
-        <div style={{ padding: "60px 34px" }}>
-          <Reveal>
-            <h2 className="display" style={{ fontSize: "clamp(34px, 3.6vw, 52px)" }}>
-              {diff.title}
-            </h2>
-            <p style={{ color: "var(--ink-soft)", maxWidth: 400, marginTop: 20, fontSize: 16 }}>{diff.body}</p>
-          </Reveal>
-        </div>
+      <div className="diff-centered-head" style={{ borderTop: "1px solid var(--border)" }}>
+        <Reveal>
+          <h2 className="display" style={{ fontSize: "clamp(34px, 3.6vw, 52px)" }}>
+            {diff.title}
+          </h2>
+          <p style={{ color: "var(--ink-soft)", maxWidth: 640, marginTop: 20, fontSize: 16 }}>{diff.body}</p>
+        </Reveal>
       </div>
 
       {/* Cards */}

@@ -55,6 +55,11 @@ code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
 .four-grid{border-top:0!important;gap:14px;padding:0 34px 48px;grid-template-columns:repeat(4,minmax(0,1fr))!important}
 .diff-card{border:1px solid var(--border)!important;border-top:2px solid var(--accent)!important;padding:22px 20px 26px!important;background:var(--panel)}
 .diff-card .display{margin-top:26px!important;line-height:1.1}
+.diff-centered .split-head{display:block!important;text-align:center}
+.diff-centered .split-head>div:first-child{display:none!important}
+.diff-centered .split-head>div:nth-child(2){padding:54px 34px 36px!important}
+.diff-centered .split-head h2{max-width:760px;margin-left:auto;margin-right:auto}
+.diff-centered .split-head p{max-width:640px!important;margin-left:auto;margin-right:auto}
 .feed-grid{border-top:0!important;padding:4px 34px 56px;gap:34px;grid-template-columns:280px minmax(0,1fr)!important}
 .feed-grid>div:first-child{border-right:0!important;padding:28px 0!important}
 .feed-grid>div:nth-child(2){padding:14px 0!important}
@@ -67,6 +72,7 @@ code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
  .stats-grid{display:block!important;padding:8px 24px 30px}
  .stats-grid>.reveal,.stats-grid>.reveal+.reveal{border-left:0!important;border-bottom:1px solid var(--border)!important;padding:16px 0!important}
  .split-head>div:first-child,.split-head>div:nth-child(2){padding:28px 24px!important}
+ .diff-centered .split-head>div:nth-child(2){padding:38px 24px 28px!important}
  .four-grid{display:grid!important;grid-template-columns:1fr 1fr!important;padding:0 24px 34px;gap:12px}
  .feed-grid{display:block!important;padding:0 24px 38px}
  .feed-grid>div:first-child,.feed-grid>div:nth-child(2){padding:24px 0!important}
