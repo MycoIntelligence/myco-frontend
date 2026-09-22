@@ -43,12 +43,6 @@ export const graph = {
   ],
 };
 
-export const stats = [
-  { value: "300+", label: "BUGS CAUGHT BEFORE SHIP" },
-  { value: "50", label: "FINDINGS IN 20 TO 25 DAYS" },
-  { value: "01", label: "SYSTEM, ONE USEFUL SIGNAL" },
-];
-
 export const diff = {
   eyebrow: "CONTEXT, REASONING, SIGNAL",
   title: "A diff is not the whole system.",
