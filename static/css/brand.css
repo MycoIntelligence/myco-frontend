@@ -139,17 +139,16 @@ html,body,.App,.wrap{background:#fff!important}
 .stats-grid{max-width:800px!important;margin:0 auto!important;padding:22px 34px 34px!important;background:#fff!important}
 .stats-grid>.reveal{background:#fff!important}
 
-/* Proof metrics: a restrained evidence strip rather than three product cards. */
-.proof-metrics{max-width:1180px;margin:0 auto;padding:20px 34px 48px;background:#fff}
-.proof-metrics__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.proof-metric{position:relative;min-height:206px;padding:27px 34px 30px;opacity:0;transform:translateY(7px);transition:opacity .42s cubic-bezier(.16,1,.3,1) var(--metric-delay),transform .42s cubic-bezier(.16,1,.3,1) var(--metric-delay)}
+/* Proof metrics: a contained, technical proof surface aligned with the navigation. */
+.proof-metrics{max-width:1180px;margin:20px auto 48px;padding:0;background:var(--panel);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.proof-metrics__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.proof-metric{position:relative;min-height:176px;padding:31px 34px 32px;opacity:0;transform:translateY(7px);transition:opacity .42s cubic-bezier(.16,1,.3,1) var(--metric-delay),transform .42s cubic-bezier(.16,1,.3,1) var(--metric-delay)}
 .proof-metric+.proof-metric{border-left:1px solid var(--border)}
 .proof-metrics.is-visible .proof-metric{opacity:1;transform:translateY(0)}
-.proof-metric__marker{display:block;width:7px;height:7px;margin-bottom:20px;background:var(--accent)}
 .proof-metric__number{min-height:58px;font-family:var(--font-display);font-size:clamp(42px,4.35vw,62px);font-weight:500;letter-spacing:-.045em;line-height:.94;color:var(--ink);font-variant-numeric:tabular-nums}
-.proof-metric__label{margin:17px 0 0;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.14em;line-height:1.35;text-transform:uppercase;color:var(--muted)}
+.proof-metric__label{margin:18px 0 0;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.14em;line-height:1.35;text-transform:uppercase;color:var(--muted)}
 .proof-metric__detail{max-width:270px;margin:8px 0 0;font-size:14px;line-height:1.45;color:var(--ink-soft)}
-@media(max-width:900px){.proof-metrics{padding:12px 24px 36px}.proof-metrics__grid{grid-template-columns:1fr}.proof-metric{min-height:0;padding:26px 0 28px}.proof-metric+.proof-metric{border-left:0;border-top:1px solid var(--border)}.proof-metric__number{font-size:clamp(44px,11vw,60px)}.proof-metric__detail{max-width:360px}}
+@media(max-width:900px){.proof-metrics{margin:16px 24px 36px}.proof-metrics__grid{grid-template-columns:1fr}.proof-metric{min-height:0;padding:26px 24px 28px}.proof-metric+.proof-metric{border-left:0;border-top:1px solid var(--border)}.proof-metric__number{font-size:clamp(44px,11vw,60px)}.proof-metric__detail{max-width:360px}}
 @media(prefers-reduced-motion:reduce){.proof-metric{opacity:1;transform:none;transition:none}}
 
 /* Evidence field: an open, editorial system of signals around one review. */

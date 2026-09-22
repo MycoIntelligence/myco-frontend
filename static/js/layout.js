@@ -27,7 +27,6 @@
       <div class="proof-metrics__grid">
         ${proofMetrics.map((metric, index) => `
           <article class="proof-metric" style="--metric-delay: ${index * 95}ms">
-            <span class="proof-metric__marker" aria-hidden="true"></span>
             <div class="proof-metric__number" data-value="${metric.value}" aria-hidden="true">${formatMetric(metric, metric.value)}</div>
             <div class="sr-only">${formatMetric(metric, metric.value)} ${metric.label}. ${metric.detail}.</div>
             <p class="proof-metric__label">${metric.label}</p>
@@ -40,15 +39,16 @@
     legacyGrid.dataset.proofMetricsApplied = "true";
     legacyGrid.replaceWith(section);
 
-    const showMetrics = () => {
+    const showMetrics = (animate = true) => {
       section.classList.add("is-visible");
+      if (!animate) return;
       section.querySelectorAll(".proof-metric__number").forEach((number, index) => {
         countMetric(number, proofMetrics[index]);
       });
     };
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      showMetrics();
+      showMetrics(false);
       return true;
     }
 

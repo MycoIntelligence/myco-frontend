@@ -46,7 +46,6 @@ export default function Stats() {
         <div className="proof-metrics__grid">
           {metrics.map((metric, index) => (
             <article className="proof-metric" style={{ "--metric-delay": `${index * 95}ms` }} key={metric.label}>
-              <span className="proof-metric__marker" aria-hidden="true" />
               <Count metric={metric} active={visible} />
               <span className="sr-only">{`${metric.value.toLocaleString("en-US")}${metric.suffix} ${metric.label}. ${metric.detail}.`}</span>
               <p className="proof-metric__label">{metric.label}</p>
