@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 820" role="img" aria-labelledby="title desc">
+  <title id="title">Myco engineering review flow</title>
+  <desc id="desc">Codebase context, requirements, and intent are collected, reasoned over, validated, scored, acted upon, and turned into Jira tickets for tracking.</desc>
+  <style>
+    .ink { fill: #122024; }
+    .muted { fill: #566963; }
+    .soft { fill: #8ca39d; }
+    .teal { fill: #39756d; }
+    .line { fill: none; stroke: #77928b; stroke-width: 1.45; }
+    .border { fill: #ffffff; stroke: #9aada7; stroke-width: 1.35; }
+    .label { font: 500 15px Geist, Arial, sans-serif; letter-spacing: 2.1px; }
+    .body { font: 500 18px Geist, Arial, sans-serif; }
+    .detail { font: 400 14px Geist, Arial, sans-serif; }
+    .step { font: 500 13px Geist, Arial, sans-serif; letter-spacing: 1.7px; }
+  </style>
+
+  <rect width="1600" height="820" fill="#ffffff"/>
+
+  <!-- Evidence inputs -->
+  <g aria-label="Evidence inputs">
+    <rect class="border" x="74" y="138" width="330" height="108"/>
+    <rect x="74" y="138" width="6" height="108" fill="#8cb4ab"/>
+    <circle cx="109" cy="191" r="7" fill="#39756d"/>
+    <text class="label muted" x="136" y="181">FETCH CODEBASE</text>
+    <text class="detail soft" x="136" y="210">modules · symbols · call graph</text>
+
+    <rect class="border" x="74" y="356" width="330" height="108"/>
+    <rect x="74" y="356" width="6" height="108" fill="#8cb4ab"/>
+    <circle cx="109" cy="409" r="7" fill="#39756d"/>
+    <text class="label muted" x="136" y="399">FETCH REQUIREMENTS</text>
+    <text class="detail soft" x="136" y="428">acceptance criteria · specifications</text>
+
+    <rect class="border" x="74" y="574" width="330" height="108"/>
+    <rect x="74" y="574" width="6" height="108" fill="#8cb4ab"/>
+    <circle cx="109" cy="627" r="7" fill="#39756d"/>
+    <text class="label muted" x="136" y="617">FETCH INTENT</text>
+    <text class="detail soft" x="136" y="646">decisions · discussion · history</text>
+  </g>
+
+  <!-- Evidence paths -->
+  <path class="line" d="M404 192 C522 192 550 290 665 365"/>
+  <path class="line" d="M404 410 C515 410 558 410 665 410"/>
+  <path class="line" d="M404 628 C522 628 550 530 665 455"/>
+  <circle cx="553" cy="286" r="5" fill="#39756d"/>
+  <circle cx="557" cy="410" r="5" fill="#39756d"/>
+  <circle cx="553" cy="534" r="5" fill="#39756d"/>
+
+  <!-- Reasoning engine -->
+  <g aria-label="Myco reasoning engine">
+    <circle cx="747" cy="410" r="116" fill="#39756d" opacity=".10"/>
+    <circle cx="747" cy="410" r="108" fill="none" stroke="#a9c8c1" stroke-width="1.4"/>
+    <path d="M747 322 L825 367 L825 457 L747 502 L669 457 L669 367 Z" fill="#ffffff" stroke="#39756d" stroke-width="2"/>
+    <text class="body ink" x="747" y="399" text-anchor="middle">MYCO ENGINE</text>
+    <text class="label teal" x="747" y="431" text-anchor="middle" style="font-size:13px">REASONING</text>
+  </g>
+
+  <!-- Internal review sequence -->
+  <g aria-label="Review sequence">
+    <path class="line" d="M865 410 H925"/>
+    <circle cx="897" cy="410" r="5" fill="#39756d"/>
+
+    <g transform="translate(934 329)">
+      <rect class="border" width="150" height="52"/>
+      <text class="step muted" x="75" y="22" text-anchor="middle">04 · BRAINSTORM</text>
+      <text class="detail soft" x="75" y="39" text-anchor="middle">explore paths</text>
+    </g>
+    <g transform="translate(934 389)">
+      <rect class="border" width="150" height="52"/>
+      <text class="step muted" x="75" y="22" text-anchor="middle">05 · VALIDATE</text>
+      <text class="detail soft" x="75" y="39" text-anchor="middle">test evidence</text>
+    </g>
+    <g transform="translate(934 449)">
+      <rect class="border" width="150" height="52"/>
+      <text class="step muted" x="75" y="22" text-anchor="middle">06 · SCORE</text>
+      <text class="detail soft" x="75" y="39" text-anchor="middle">rank relevance</text>
+    </g>
+  </g>
+
+  <!-- Output panel -->
+  <g aria-label="Actions and tracking">
+    <rect class="border" x="1170" y="179" width="350" height="462"/>
+    <text class="label muted" x="1205" y="228">STRUCTURED OUTPUT</text>
+    <line x1="1205" y1="253" x2="1485" y2="253" stroke="#d4deda" stroke-width="1"/>
+
+    <rect x="1205" y="285" width="280" height="88" fill="#edf2f0"/>
+    <rect x="1205" y="285" width="5" height="88" fill="#39756d"/>
+    <circle cx="1236" cy="329" r="7" fill="#39756d"/>
+    <text class="label ink" x="1261" y="320" style="font-size:14px">07 · ACT</text>
+    <text class="detail muted" x="1261" y="347">Route validated findings</text>
+
+    <text class="label muted" x="1205" y="432" style="font-size:13px">TRACKING HANDOFF</text>
+    <rect x="1205" y="461" width="280" height="92" fill="#ffffff" stroke="#39756d" stroke-width="1.4"/>
+    <rect x="1224" y="484" width="40" height="40" rx="2" fill="#39756d"/>
+    <path d="M1235 493h18v4h-18zm0 8h18v4h-18zm0 8h11v4h-11z" fill="#ffffff"/>
+    <text class="label ink" x="1280" y="494" style="font-size:13px">08 · JIRA TICKET</text>
+    <text class="detail muted" x="1280" y="520">Created for tracking</text>
+  </g>
+
+  <!-- Output path -->
+  <path class="line" d="M1084 410 H1170"/>
+  <circle cx="1127" cy="410" r="5" fill="#39756d"/>
+</svg>
