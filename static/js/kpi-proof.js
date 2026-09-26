@@ -10,13 +10,13 @@ window.MYCO_PROOF_METRICS = [
     detail: "Across 6 engineering teams",
   },
   {
-    value: 87,
-    suffix: "",
+    value: 350,
+    suffix: "+",
     label: "Confirmed issues before merge",
     detail: "Validated by engineers",
   },
   {
-    value: 72,
+    value: 92,
     suffix: "%",
     label: "Findings acted on",
     detail: "Fixed, investigated, or acknowledged by engineers",
