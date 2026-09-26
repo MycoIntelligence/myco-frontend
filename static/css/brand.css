@@ -157,3 +157,7 @@ html,body,.App,.wrap{background:#fff!important}
 @keyframes fieldDrift{to{stroke-dashoffset:-160}}@keyframes fieldPulse{0%,100%{opacity:.4}50%{opacity:1}}
 @media(max-width:900px){.evidence-field{min-height:380px}.evidence-field-svg{max-height:380px}}@media(max-width:560px){.evidence-field{min-height:280px}.field-label text{font-size:9px}.field-sub{font-size:7px!important}.field-report text{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.field-ring{animation:none}}
+
+/* Keep the KPI panel self-contained: adjacent content does not add extra section rules. */
+#overview .wrap{border-bottom:0!important}
+.wrap:has(.proof-metrics) + .wrap > div:first-child{border-top:0!important}
