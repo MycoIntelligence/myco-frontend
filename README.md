@@ -18,12 +18,13 @@ Run `python3 serve.py`, then open `http://127.0.0.1:8766`.
 
 ## Pilot request notifications
 
-The Request a pilot form sends each completed submission to `rodriguesgrege@gmail.com` through Resend. The visitor continues to see the confirmation modal, and their submitted email is set as Reply-To for direct follow-up.
+The Request a pilot form sends each completed submission through Resend to the email address configured for the deployment. The visitor continues to see the confirmation modal, and their submitted email is set as Reply-To for direct follow-up.
 
 The deployed project requires these Vercel environment variables:
 
 - `RESEND_API_KEY`
 - `PILOT_EMAIL_FROM`
+- `PILOT_EMAIL_TO` — recipient address, or a comma-separated list of recipients
 
 ## Current limitations
 

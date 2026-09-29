@@ -2,6 +2,13 @@ function clean(value, limit) {
   return typeof value === "string" ? value.trim().slice(0, limit) : "";
 }
 
+function configuredRecipients(value) {
+  return (value || "")
+    .split(",")
+    .map((recipient) => recipient.trim().toLowerCase())
+    .filter((recipient) => /^\S+@\S+\.\S+$/.test(recipient));
+}
+
 function escapeHtml(value) {
   return value.replace(/[&<>'"]/g, (character) => ({
     "&": "&amp;",
@@ -32,7 +39,8 @@ export default async function handler(request, response) {
 
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.PILOT_EMAIL_FROM;
-  if (!apiKey || !from) {
+  const recipients = configuredRecipients(process.env.PILOT_EMAIL_TO);
+  if (!apiKey || !from || recipients.length === 0) {
     console.error("Pilot request email is not configured.");
     return response.status(503).json({ detail: "Pilot requests are temporarily unavailable. Please try again shortly." });
   }
@@ -50,7 +58,7 @@ export default async function handler(request, response) {
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         from,
-        to: ["rodriguesgrege@gmail.com"],
+        to: recipients,
         reply_to: email,
         subject,
         html,
