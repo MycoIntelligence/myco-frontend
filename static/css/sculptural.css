@@ -36,3 +36,67 @@ footer{background:linear-gradient(150deg,#fff,#f1f4ef)!important;border-radius:2
  #security .three-grid{padding:0 16px 28px}
 }
 @media(prefers-reduced-motion:reduce){.btn,.how-row{transition:none}}
+
+/* Page rhythm: one measured cadence across the editorial sections. */
+#overview .hero-grid>div:first-child{padding:104px 34px 76px!important}
+.proof-metrics{margin:18px auto 36px!important}
+.proof-metric{padding:28px 34px 29px!important}
+
+/* Context: keep the introduction close to its diagram without crowding it. */
+.wrap:has([data-flow-preview])>div:first-child{padding:56px 34px 22px!important}
+.wrap:has([data-flow-preview])>div:last-child{padding-top:0!important;padding-bottom:64px!important}
+
+/* Narrative sections use the same heading-to-content and content-to-next-section spacing. */
+.diff-centered-head{padding:56px 34px 30px!important}
+.four-grid{padding-bottom:56px!important}
+.proof-grid>div:first-child{padding:56px 34px!important}
+.proof-grid>div:nth-child(2){padding:36px 34px!important}
+.feed-grid{padding-top:12px!important;padding-bottom:64px!important}
+#how>div:first-child,#security>div:first-child{padding:56px 34px 32px!important}
+.how-row{padding:26px 34px!important}
+#integrate .split-head>div:first-child{padding:48px 34px 28px!important}
+#integrate .split-head>div:nth-child(2){padding:28px 34px 48px!important}
+#integrate .wf-grid{margin:0 34px 56px!important}
+#security .three-grid{padding:0 34px 56px!important}
+footer .footer-grid>div{padding-top:64px!important;padding-bottom:64px!important}
+footer .footer-grid+div{padding-top:22px!important;padding-bottom:22px!important}
+
+@media(max-width:900px){
+ #overview .hero-grid>div:first-child{padding:82px 24px 60px!important}
+ .proof-metrics{margin:16px 24px 32px!important}
+ .proof-metric{padding:25px 24px 27px!important}
+ .wrap:has([data-flow-preview])>div:first-child{padding:48px 24px 20px!important}
+ .wrap:has([data-flow-preview])>div:last-child{padding-top:0!important;padding-bottom:48px!important}
+ .diff-centered-head{padding:46px 24px 26px!important}
+ .four-grid{padding-bottom:48px!important}
+ .proof-grid>div:first-child{padding:46px 24px 32px!important}
+ .proof-grid>div:nth-child(2){padding:0 24px 46px!important}
+ .feed-grid{padding-top:0!important;padding-bottom:48px!important}
+ #how>div:first-child,#security>div:first-child{padding:48px 24px 28px!important}
+ .how-row{padding:24px!important}
+ #integrate .split-head>div:first-child{padding:44px 24px 22px!important}
+ #integrate .split-head>div:nth-child(2){padding:22px 24px 44px!important}
+ #integrate .wf-grid{margin:0 24px 48px!important}
+ #security .three-grid{padding:0 24px 48px!important}
+ footer .footer-grid>div{padding:48px 24px!important}
+ footer .footer-grid+div{padding:18px 24px!important}
+}
+@media(max-width:560px){
+ #overview .hero-grid>div:first-child{padding:68px 22px 52px!important}
+ .proof-metrics{margin:14px 16px 28px!important}
+ .wrap:has([data-flow-preview])>div:first-child{padding:42px 22px 18px!important}
+ .wrap:has([data-flow-preview])>div:last-child{padding-left:16px!important;padding-right:16px!important;padding-bottom:42px!important}
+ .diff-centered-head{padding:40px 22px 24px!important}
+ .four-grid{padding-left:16px!important;padding-right:16px!important;padding-bottom:42px!important}
+ .proof-grid>div:first-child{padding:42px 22px 28px!important}
+ .proof-grid>div:nth-child(2){padding:0 22px 42px!important}
+ .feed-grid{padding-left:22px!important;padding-right:22px!important;padding-bottom:42px!important}
+ #how>div:first-child,#security>div:first-child{padding:42px 22px 26px!important}
+ .how-row{padding:22px!important}
+ #integrate .split-head>div:first-child{padding:40px 22px 20px!important}
+ #integrate .split-head>div:nth-child(2){padding:20px 22px 40px!important}
+ #integrate .wf-grid{margin:0 16px 42px!important}
+ #security .three-grid{padding:0 16px 42px!important}
+ footer .footer-grid>div{padding:42px 22px!important}
+ footer .footer-grid+div{padding:16px 22px!important}
+}
