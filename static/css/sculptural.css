@@ -1,0 +1,36 @@
+/* Sculptural identity: ivory surfaces, sage details, and generous curved edges. */
+:root{--bg:#f7f9f8;--bg-soft:#f1f4ef;--panel-cool:#f1f4ef;--border:#dce3da;--border-strong:#87978b;--muted:#586a5e}
+#overview{background:#fff url('../../assets/sculptural-layers.jpg') center center/cover no-repeat;isolation:isolate}
+#overview .hero-grid>div:first-child{max-width:1000px!important;padding:110px 34px 130px!important}
+#overview .hero-grid>div:first-child h1{max-width:940px!important;font-size:clamp(48px,5.4vw,76px)!important;line-height:1.08!important;letter-spacing:-.045em}
+#overview .hero-grid>div:first-child p{max-width:590px!important;line-height:1.65}
+.App>div:first-child>.wrap{border-radius:26px!important;background:rgba(255,255,255,.96)!important}
+.btn{border-radius:4px;transition:background-color .2s,border-color .2s,box-shadow .2s}
+.btn-primary{box-shadow:0 3px 10px rgba(18,32,36,.06)}
+.proof-metrics{border-radius:24px;background:linear-gradient(140deg,#fff,#f6f8f4);margin-top:28px}
+.diff-card{border-radius:18px!important;border-top:1px solid var(--border)!important;background:linear-gradient(145deg,#fff,#f4f7f1)!important}
+.diff-card .eyebrow{color:var(--accent-dark)}
+.feed-row.active{background:#f0f4ed!important}
+#how,#integrate,#security{position:relative;isolation:isolate}
+#how::before,#security::before{content:'';position:absolute;right:0;top:0;width:240px;height:150px;background:url('../../assets/sculptural-layers.jpg') right bottom/520px auto no-repeat;opacity:.2;pointer-events:none;z-index:-1;border-radius:0 0 0 100%}
+.how-row{border-color:var(--border)!important;border-radius:12px;transition:background-color .3s}
+#integrate .wf-grid{border-radius:22px;background:linear-gradient(135deg,#fff,#f3f6ef);overflow:hidden;margin:0 24px 40px}
+#security .three-grid{gap:14px;padding:0 24px 40px}
+#security .three-grid>.reveal{border:1px solid var(--border)!important;border-radius:18px;background:linear-gradient(150deg,#fff,#f3f6ef)}
+.field-input{border-radius:6px!important;background:#fff!important}
+footer{background:linear-gradient(150deg,#fff,#f1f4ef)!important;border-radius:26px 26px 0 0}
+@media(max-width:900px){
+ #overview{background-size:auto 100%;background-position:center}
+ #overview .hero-grid>div:first-child{padding:85px 32px 100px!important}
+ #overview .hero-grid>div:first-child h1{font-size:clamp(42px,7vw,64px)!important}
+ #integrate .wf-grid{margin:0 16px 30px}
+}
+@media(max-width:560px){
+ #overview{background-image:linear-gradient(rgba(255,255,255,.65),rgba(255,255,255,.65)),url('../../assets/sculptural-layers.jpg');background-size:auto 100%}
+ #overview .hero-grid>div:first-child{padding:65px 22px 75px!important}
+ #overview .hero-grid>div:first-child h1{font-size:clamp(38px,9.5vw,50px)!important}
+ #overview .hero-grid>div:first-child p{font-size:16px!important}
+ #how::before,#security::before{width:110px;height:90px;opacity:.12}
+ #security .three-grid{padding:0 16px 28px}
+}
+@media(prefers-reduced-motion:reduce){.btn,.how-row{transition:none}}

@@ -16,9 +16,15 @@ Run `python3 serve.py`, then open `http://127.0.0.1:8766`.
 - `source/`: recovered React components and authored styles for future development. The original build configuration was not available, so this directory is not a complete rebuild environment. The static bundle is the served version.
 - `serve.py`: local preview server.
 
-## Pilot request acknowledgement
+## Pilot request notifications
 
-The Request a pilot form validates required fields and returns a confirmation modal. It does not store form submissions or send email notifications.
+The Request a pilot form sends each completed submission through Resend to the email address configured for the deployment. The visitor continues to see the confirmation modal, and their submitted email is set as Reply-To for direct follow-up.
+
+The deployed project requires these Vercel environment variables:
+
+- `RESEND_API_KEY`
+- `PILOT_EMAIL_FROM`
+- `PILOT_EMAIL_TO` — recipient address, or a comma-separated list of recipients
 
 ## Current limitations
 
