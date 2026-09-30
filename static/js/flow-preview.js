@@ -5,14 +5,17 @@
 
     const slot = originalDiagram.parentElement;
     slot.dataset.flowPreview = "true";
-    slot.style.aspectRatio = "1600 / 900";
+    // The SVG's 900px canvas includes unused space below the finished flow.
+    // Crop that empty tail at the container level so the next section follows
+    // the diagram naturally, while the SVG itself remains a sharp vector asset.
+    slot.style.aspectRatio = "1600 / 680";
     slot.style.display = "flex";
     slot.style.alignItems = "center";
 
     const diagram = document.createElement("img");
     diagram.src = "assets/myco-flow-handoff-motion.svg?v=10";
     diagram.alt = "Animated Myco context flow";
-    diagram.style.cssText = "display:block;width:100%;height:100%;object-fit:contain;";
+    diagram.style.cssText = "display:block;width:100%;height:100%;object-fit:cover;object-position:top;";
     slot.replaceChildren(diagram);
     return true;
   };

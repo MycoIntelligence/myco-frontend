@@ -44,7 +44,9 @@ footer{background:linear-gradient(150deg,#fff,#f1f4ef)!important;border-radius:2
 
 /* Context: keep the introduction close to its diagram without crowding it. */
 .wrap:has([data-flow-preview])>div:first-child{padding:56px 34px 22px!important}
-.wrap:has([data-flow-preview])>div:last-child{padding-top:0!important;padding-bottom:64px!important}
+.wrap:has([data-flow-preview])>div:last-child{padding-top:0!important;padding-bottom:32px!important}
+/* The following editorial section supplies its own opening space. Avoid paying for both gaps. */
+.wrap:has([data-flow-preview]) + .wrap{margin-top:-56px}
 
 /* Narrative sections use the same heading-to-content and content-to-next-section spacing. */
 .diff-centered-head{padding:56px 34px 30px!important}
@@ -66,7 +68,8 @@ footer .footer-grid+div{padding-top:22px!important;padding-bottom:22px!important
  .proof-metrics{margin:16px 24px 32px!important}
  .proof-metric{padding:25px 24px 27px!important}
  .wrap:has([data-flow-preview])>div:first-child{padding:48px 24px 20px!important}
- .wrap:has([data-flow-preview])>div:last-child{padding-top:0!important;padding-bottom:48px!important}
+ .wrap:has([data-flow-preview])>div:last-child{padding-top:0!important;padding-bottom:28px!important}
+ .wrap:has([data-flow-preview]) + .wrap{margin-top:-42px}
  .diff-centered-head{padding:46px 24px 26px!important}
  .four-grid{padding-bottom:48px!important}
  .proof-grid>div:first-child{padding:46px 24px 32px!important}
@@ -85,7 +88,8 @@ footer .footer-grid+div{padding-top:22px!important;padding-bottom:22px!important
  #overview .hero-grid>div:first-child{padding:68px 22px 52px!important}
  .proof-metrics{margin:14px 16px 28px!important}
  .wrap:has([data-flow-preview])>div:first-child{padding:42px 22px 18px!important}
- .wrap:has([data-flow-preview])>div:last-child{padding-left:16px!important;padding-right:16px!important;padding-bottom:42px!important}
+ .wrap:has([data-flow-preview])>div:last-child{padding-left:16px!important;padding-right:16px!important;padding-bottom:24px!important}
+ .wrap:has([data-flow-preview]) + .wrap{margin-top:-32px}
  .diff-centered-head{padding:40px 22px 24px!important}
  .four-grid{padding-left:16px!important;padding-right:16px!important;padding-bottom:42px!important}
  .proof-grid>div:first-child{padding:42px 22px 28px!important}
