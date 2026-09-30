@@ -179,13 +179,11 @@ export const contextEngine = {
 export const feed = {
   eyebrow: "LIVE FINDINGS",
   title: "Signals as they surface.",
-  sub: "A sample of validated findings, streaming from active analysis.",
+  sub: "New risks, misconfigurations and anomalies as they appear in your code and runtime.",
   items: [
-    { sev: "P0", file: "checkout/amendment.ts", msg: "Retry path reintroduces tax on exempt orders", req: "TAX-19" },
-    { sev: "P1", file: "billing/invoice.ts", msg: "Removed currency field breaks export", req: "BILL-07" },
-    { sev: "P2", file: "cache/warmup.ts", msg: "Warm-up races with first read", req: "PERF-22" },
-    { sev: "P1", file: "auth/session.ts", msg: "Token refresh skips revoked check", req: "SEC-11" },
-    { sev: "P2", file: "api/pagination.ts", msg: "Off-by-one on final page cursor", req: "API-33" },
+    { sev: "P1", file: "agent-runner.ts", msg: "Tool retry skips approval check", req: "AGENT-12" },
+    { sev: "P2", file: "prompt.ts", msg: "Prompt version mismatch", req: "PROMPT-04" },
+    { sev: "P1", file: "tool-scope.ts", msg: "Unsafe tool scope", req: "AGENT-08" },
   ],
 };
 

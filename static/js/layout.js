@@ -186,6 +186,44 @@
       </section>`;
     return true;
   };
+
+  const applySignalsRedesign = () => {
+    const signals = [...document.querySelectorAll('.App > .wrap')]
+      .find(section => section.querySelector('h3')?.textContent.includes('Signals as they surface.'));
+    if (!signals || signals.dataset.signalsRedesignApplied !== undefined) return Boolean(signals);
+
+    signals.dataset.signalsRedesignApplied = 'true';
+    signals.classList.add('signals-queue-wrap');
+    signals.innerHTML = `
+      <section class="signals-queue" aria-labelledby="signals-queue-title">
+        <header class="signals-queue__intro">
+          <span class="signals-queue__eyebrow">LIVE FINDINGS</span>
+          <h2 class="display" id="signals-queue-title">Signals as they surface.</h2>
+          <p>New risks, misconfigurations and anomalies as they appear in your code and runtime.</p>
+        </header>
+        <ol class="signals-queue__list" aria-label="Validated engineering signals">
+          <li class="is-current">
+            <span class="signals-queue__severity signals-queue__severity--p1">P1</span>
+            <strong>Tool retry skips approval check</strong>
+            <span class="signals-queue__file">agent-runner.ts</span>
+            <span class="signals-queue__state" aria-label="Current signal"></span>
+          </li>
+          <li>
+            <span class="signals-queue__severity signals-queue__severity--p2">P2</span>
+            <strong>Prompt version mismatch</strong>
+            <span class="signals-queue__file">prompt.ts</span>
+            <span class="signals-queue__state" aria-label="Validated signal"></span>
+          </li>
+          <li>
+            <span class="signals-queue__severity signals-queue__severity--p1">P1</span>
+            <strong>Unsafe tool scope</strong>
+            <span class="signals-queue__file">tool-scope.ts</span>
+            <span class="signals-queue__state" aria-label="Validated signal"></span>
+          </li>
+        </ol>
+      </section>`;
+    return true;
+  };
   let attempts = 0;
   const timer = setInterval(() => {
     attempts += 1;
@@ -193,6 +231,7 @@
     const layoutReady = applySectionLayout();
     const diffReady = applyDiffRedesign();
     const workflowProofReady = applyWorkflowProofRedesign();
-    if ((proofReady && layoutReady && diffReady && workflowProofReady) || attempts === 20) clearInterval(timer);
+    const signalsReady = applySignalsRedesign();
+    if ((proofReady && layoutReady && diffReady && workflowProofReady && signalsReady) || attempts === 20) clearInterval(timer);
   }, 50);
 })();
