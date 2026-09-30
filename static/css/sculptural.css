@@ -5,6 +5,7 @@
 #overview .hero-grid>div:first-child h1{max-width:940px!important;font-size:clamp(48px,5.4vw,76px)!important;line-height:1.08!important;letter-spacing:-.045em}
 #overview .hero-grid>div:first-child p{max-width:590px!important;line-height:1.65}
 .App>div:first-child>.wrap{border-radius:26px!important;background:rgba(255,255,255,.96)!important}
+.wrap:has([data-flow-preview])>div:last-child{padding-left:34px!important;padding-right:34px!important}
 .btn{border-radius:4px;transition:background-color .2s,border-color .2s,box-shadow .2s}
 .btn-primary{box-shadow:0 3px 10px rgba(18,32,36,.06)}
 .proof-metrics{border-radius:24px;background:linear-gradient(140deg,#fff,#f6f8f4);margin-top:28px}
@@ -23,6 +24,7 @@ footer{background:linear-gradient(150deg,#fff,#f1f4ef)!important;border-radius:2
  #overview{background-size:auto 100%;background-position:center 28px}
  #overview .hero-grid>div:first-child{padding:85px 32px 100px!important}
  #overview .hero-grid>div:first-child h1{font-size:clamp(42px,7vw,64px)!important}
+ .wrap:has([data-flow-preview])>div:last-child{padding-left:24px!important;padding-right:24px!important}
  #integrate .wf-grid{margin:0 16px 30px}
 }
 @media(max-width:560px){
