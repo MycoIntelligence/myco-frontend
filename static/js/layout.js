@@ -80,13 +80,7 @@
 
     const title = diff.querySelector('h2')?.textContent.trim() || 'A diff is not the whole system.';
     const body = diff.querySelector('p')?.textContent.trim() || '';
-    const stages = [...diff.querySelectorAll('.diff-card')].map((card, index) => ({
-      number: card.querySelector('.eyebrow')?.textContent.split('·')[0].trim() || String(index + 1).padStart(2, '0'),
-      label: card.querySelector('.eyebrow')?.textContent.split('·')[1]?.trim() || '',
-      title: card.querySelector('.display')?.textContent.trim() || '',
-      body: card.querySelector('p')?.textContent.trim() || '',
-    }));
-    if (stages.length !== 4) return false;
+    const stages = [{"num": "01", "tag": "CONTEXT", "body": "We map the relevant code, ownership, dependencies and historical changes around the pull request."}, {"num": "02", "tag": "REASONING", "body": "We analyze intent, design trade-offs, and potential impact across the broader system."}, {"num": "03", "tag": "VALIDATION", "body": "We check the change against tests, standards, security, and operational constraints."}, {"num": "04", "tag": "SIGNAL", "body": "We produce a single, validated signal that captures what the change means in the full system."}];
 
     diff.dataset.diffRedesignApplied = 'true';
     diff.classList.add('diff-system-wrap');
@@ -95,37 +89,17 @@
         <div class="diff-system__top">
           <header class="diff-system__intro">
             <span class="diff-system__rule" aria-hidden="true"></span>
-            <h2 class="display" id="diff-system-title">${title}</h2>
+            <h2 class="display" id="diff-system-title"><span>A diff is not </span><span>the whole system.</span></h2>
             <p>${body}</p>
           </header>
-          <div class="diff-system__diagram" aria-label="Context, reasoning, validation and signal inform a pull request review">
-            <svg viewBox="0 0 620 330" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
-              <path class="ds-wire" d="M102 77H174Q194 77 194 98V140H260"/>
-              <path class="ds-wire" d="M102 244H174Q194 244 194 222V190H260"/>
-              <path class="ds-wire" d="M518 77H446Q426 77 426 98V140H360"/>
-              <path class="ds-wire" d="M518 244H446Q426 244 426 222V190H360"/>
-              <path class="ds-output" d="M310 246V284"/>
-              <g class="ds-annotation"><text x="24" y="71">CONTEXT</text><line x1="24" y1="86" x2="92" y2="86"/><line x1="24" y1="100" x2="78" y2="100"/></g>
-              <g class="ds-annotation"><text x="24" y="238">REASONING</text><line x1="24" y1="253" x2="92" y2="253"/><line x1="24" y1="267" x2="68" y2="267"/></g>
-              <g class="ds-annotation ds-annotation--right"><text x="596" y="71" text-anchor="end">VALIDATION</text><line x1="528" y1="86" x2="596" y2="86"/><line x1="542" y1="100" x2="596" y2="100"/></g>
-              <g class="ds-annotation ds-annotation--right"><text x="596" y="238" text-anchor="end">SIGNAL</text><line x1="528" y1="253" x2="596" y2="253"/><line x1="552" y1="267" x2="596" y2="267"/></g>
-              <g class="ds-pr">
-                <rect x="260" y="70" width="100" height="176" rx="1"/>
-                <path d="M278 99h64M278 117h49M278 145h64M278 163h41M278 181h60M278 199h46"/>
-                <circle cx="280" cy="135" r="3"/><circle cx="280" cy="189" r="3"/>
-                <text x="310" y="91" text-anchor="middle">PULL REQUEST</text>
-              </g>
-              <g class="ds-signal"><circle cx="310" cy="293" r="7"/><circle cx="310" cy="293" r="11"/><text x="310" y="320" text-anchor="middle">VALIDATED SIGNAL</text></g>
-            </svg>
-          </div>
+
         </div>
         <ol class="diff-system__ledger">
           ${stages.map(stage => `
             <li>
-              <span class="diff-system__index">${stage.number}</span>
-              <span class="diff-system__label">${stage.label}</span>
+              <span class="diff-system__index">${stage.num}</span>
+              <span class="diff-system__label">${stage.tag}</span>
               <span class="diff-system__mark" aria-hidden="true"></span>
-              <strong>${stage.title}</strong>
               <p>${stage.body}</p>
             </li>`).join('')}
         </ol>
@@ -224,6 +198,67 @@
       </section>`;
     return true;
   };
+
+  const applyHowJourneyRedesign = () => {
+    const how = document.querySelector('#how');
+    if (!how || how.dataset.howJourneyApplied !== undefined) return Boolean(how);
+
+    how.dataset.howJourneyApplied = 'true';
+    how.classList.add('how-journey-wrap');
+    how.innerHTML = `
+      <section class="how-journey" aria-labelledby="how-journey-title">
+        <header class="how-journey__header">
+          <span class="how-journey__eyebrow">HOW MYCO WORKS</span>
+          <div class="how-journey__headline">
+            <h2 class="display" id="how-journey-title"><span>Context first.</span><span>Then reasoning.</span></h2>
+            <p>Myco builds a scoped engineering view of your codebase, systems and intent before evaluating a change. This gives the model the right context to reason, validate and surface what matters.</p>
+          </div>
+        </header>
+        <ol class="how-journey__steps">
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--layers"><i></i><i></i><i></i></span></div>
+            <span class="how-journey__number">01</span><h3 class="display">Ingest</h3><p>We take in your change, codebase and relevant signals.</p>
+          </li>
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--overlap"><i></i><i></i></span></div>
+            <span class="how-journey__number">02</span><h3 class="display">Build context</h3><p>We assemble a scoped view of the code, systems and intent.</p>
+          </li>
+          <li class="is-reason">
+            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--reason"><i></i></span></div>
+            <span class="how-journey__number">03</span><h3 class="display">Reason</h3><p>We analyze the change with full context to find real impact.</p>
+          </li>
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--validate"><i></i><i></i></span></div>
+            <span class="how-journey__number">04</span><h3 class="display">Validate</h3><p>We check findings across multiple signals and constraints.</p>
+          </li>
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--surface"><i></i><i></i><i></i></span></div>
+            <span class="how-journey__number">05</span><h3 class="display">Score and surface</h3><p>We rank what matters and present clear, actionable insights.</p>
+          </li>
+        </ol>
+      </section>`;
+    return true;
+  };
+  const applyIntegrationWorkflowRedesign = () => {
+    const grid = document.querySelector('#integrate .wf-grid');
+    if (!grid) return Boolean(document.querySelector('.integration-workflow'));
+    grid.outerHTML = `<section class="integration-workflow" aria-labelledby="integration-workflow-title">
+<header class="integration-workflow__header"><span class="eyebrow">CONNECT IN THE WORKFLOW</span><h3 class="display" id="integration-workflow-title">Infrastructure, not interruption.</h3><p>The implementation is intentionally simple: authorize the context, let Myco build its working view, then receive actionable findings in the systems engineers already use.</p></header>
+<div class="integration-workflow__diagram" role="group" aria-label="Read-only repository context flows through Myco to GitHub, Jira, Slack and custom integrations">
+<svg class="integration-workflow__wires" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#89aaa1" stroke-width="1"><path d="M120 140H410M500 140H550C584 140 578 35 600 35H625M550 140C584 140 578 105 600 105H625M550 140C584 140 578 175 600 175H625"/><path d="M550 140C584 140 578 245 600 245H625" stroke-dasharray="4 5" opacity=".6"/></g></svg>
+<div class="integration-workflow__repository"><img src="assets/integration-repository.svg" width="40" height="40" alt=""><strong>Repository</strong><span class="mono">READ ONLY</span></div>
+<div class="integration-workflow__logo"><img src="assets/myco-icon.svg" width="100" height="103" alt="Myco"></div>
+<ul class="integration-workflow__tools"><li class="integration-workflow__tool"><img src="assets/integration-github.svg" width="32" height="32" alt=""><strong>GitHub</strong><span>Inline review comments</span></li><li class="integration-workflow__tool"><img src="assets/integration-jira.svg" width="32" height="32" alt=""><strong>Jira</strong><span>Issues for tracking</span></li><li class="integration-workflow__tool"><img src="assets/integration-slack.svg" width="32" height="32" alt=""><strong>Slack</strong><span>Team notifications</span></li><li class="integration-workflow__tool is-custom"><img src="assets/integration-custom.svg" width="32" height="32" alt=""><strong>Custom integrations</strong><span>Adapted to your workflow</span></li></ul></div><div class="integration-workflow__permissions"><span class="eyebrow">SCOPED ACCESS</span><ul><li><span>Read repository contents</span><strong class="mono is-allow">ALLOW</strong></li><li><span>Read pull request metadata</span><strong class="mono is-allow">ALLOW</strong></li><li><span>Write to source code</span><strong class="mono is-deny">DENY</strong></li><li><span>Push commits</span><strong class="mono is-deny">DENY</strong></li></ul></div></section>`;
+    return true;
+  };
+  const applySecurityRedesign = () => {
+    const section = document.querySelector("#security");
+    if (!section) return false;
+    if (section.dataset.securityApplied) return true;
+    section.dataset.securityApplied = "true";
+    section.innerHTML = `<section class="security-editorial" aria-labelledby="security-editorial-title"><header class="security-editorial__intro"><span class="eyebrow">SECURITY BY ARCHITECTURE</span><h2 class="display" id="security-editorial-title">Your code stays in your environment.</h2><p>Source code never leaves the environment you authorize. It is used only for active analysis and is never retained afterwards.</p></header><div class="security-editorial__rows"><article class="security-editorial__row"><img src="assets/security-boundary.svg" width="96" height="96" alt=""><div><span class="eyebrow">01 · PROCESSING BOUNDARY</span><h3 class="display">Code does not leave.</h3><p>Myco performs analysis within your authorized environment. Source code is not sent outside that boundary.</p></div></article><article class="security-editorial__row"><img src="assets/security-lifecycle.svg" width="96" height="96" alt=""><div><span class="eyebrow">02 · DATA LIFECYCLE</span><h3 class="display">Nothing to retain.</h3><p>Source code is discarded after the analysis that needs it. Myco does not retain a copy of your code.</p></div></article><article class="security-editorial__row"><img src="assets/security-readonly.svg" width="96" height="96" alt=""><div><span class="eyebrow">03 · ACCESS MODEL</span><h3 class="display">Read only by design.</h3><p>Myco observes authorized repository context. It does not write to source code or push changes to your repository.</p></div></article></div></section>`;
+    return true;
+  };
   let attempts = 0;
   const timer = setInterval(() => {
     attempts += 1;
@@ -232,6 +267,9 @@
     const diffReady = applyDiffRedesign();
     const workflowProofReady = applyWorkflowProofRedesign();
     const signalsReady = applySignalsRedesign();
-    if ((proofReady && layoutReady && diffReady && workflowProofReady && signalsReady) || attempts === 20) clearInterval(timer);
+    const howJourneyReady = applyHowJourneyRedesign();
+    const integrationReady = applyIntegrationWorkflowRedesign();
+    const securityReady = applySecurityRedesign();
+    if ((proofReady && layoutReady && diffReady && workflowProofReady && signalsReady && howJourneyReady && integrationReady && securityReady) || attempts === 20) clearInterval(timer);
   }, 50);
 })();

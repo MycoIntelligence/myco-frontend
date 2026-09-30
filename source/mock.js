@@ -49,11 +49,27 @@ export const diff = {
   body:
     "A pull request captures what changed. Myco traces the surrounding code, intent, dependencies and history that give a change meaning.",
   cards: [
-    { num: "01", tag: "CONTEXT", title: "Build the relevant view.", body: "Connect the artifacts that matter to this change." },
-    { num: "02", tag: "REASONING", title: "Trace the relationship.", body: "Move through context, not just lines in a diff." },
-    { num: "03", tag: "VALIDATION", title: "Test against intent.", body: "Evaluate implementation in the system it belongs to." },
-    { num: "04", tag: "SIGNAL", title: "Surface what matters.", body: "Give engineers an evidence-backed place to act." },
-  ],
+  {
+    "num": "01",
+    "tag": "CONTEXT",
+    "body": "We map the relevant code, ownership, dependencies and historical changes around the pull request."
+  },
+  {
+    "num": "02",
+    "tag": "REASONING",
+    "body": "We analyze intent, design trade-offs, and potential impact across the broader system."
+  },
+  {
+    "num": "03",
+    "tag": "VALIDATION",
+    "body": "We check the change against tests, standards, security, and operational constraints."
+  },
+  {
+    "num": "04",
+    "tag": "SIGNAL",
+    "body": "We produce a single, validated signal that captures what the change means in the full system."
+  }
+],
 };
 
 export const proof = {
@@ -75,14 +91,13 @@ export const how = {
   eyebrow: "HOW MYCO WORKS",
   titleLines: ["Context first.", "Then reasoning."],
   body:
-    "Myco is designed to make engineering context available before a change is evaluated. A finding can be inspected, not merely accepted.",
-  path: ["01 INGEST", "02 BUILD CONTEXT", "03 REASON", "04 VALIDATE", "05 SCORE", "06 SURFACE"],
+    "Myco builds a scoped engineering view of your codebase, systems and intent before evaluating a change. This gives the model the right context to reason, validate and surface what matters.",
   steps: [
-    { num: "01", title: "Ingest", body: "Connect the engineering artifacts Myco is authorized to observe: repository, PRs, issues and workflow context." },
-    { num: "02", title: "Build context", body: "Identify the code, dependencies, requirements and historical signals relevant to the work." },
-    { num: "03", title: "Reason", body: "Specialized agents trace relationships through this scoped context to form testable hypotheses.", accent: true },
-    { num: "04", title: "Validate", body: "Check the implementation against system behavior and the evidence available around the change." },
-    { num: "05 to 06", title: "Score and surface", body: "Prioritize findings by relevance, attach evidence, and return the result inside the engineering workflow." },
+    { num: "01", title: "Ingest", body: "We take in your change, codebase and relevant signals." },
+    { num: "02", title: "Build context", body: "We assemble a scoped view of the code, systems and intent." },
+    { num: "03", title: "Reason", body: "We analyze the change with full context to find real impact.", accent: true },
+    { num: "04", title: "Validate", body: "We check findings across multiple signals and constraints." },
+    { num: "05", title: "Score and surface", body: "We rank what matters and present clear, actionable insights." },
   ],
 };
 

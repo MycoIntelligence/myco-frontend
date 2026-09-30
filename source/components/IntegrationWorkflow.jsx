@@ -1,0 +1,13 @@
+import React from "react";
+
+const markup = `<section class="integration-workflow" aria-labelledby="integration-workflow-title">
+<header class="integration-workflow__header"><span class="eyebrow">CONNECT IN THE WORKFLOW</span><h3 class="display" id="integration-workflow-title">Infrastructure, not interruption.</h3><p>The implementation is intentionally simple: authorize the context, let Myco build its working view, then receive actionable findings in the systems engineers already use.</p></header>
+<div class="integration-workflow__diagram" role="group" aria-label="Read-only repository context flows through Myco to GitHub, Jira, Slack and custom integrations">
+<svg class="integration-workflow__wires" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#89aaa1" stroke-width="1"><path d="M120 140H410M500 140H550C584 140 578 35 600 35H625M550 140C584 140 578 105 600 105H625M550 140C584 140 578 175 600 175H625"/><path d="M550 140C584 140 578 245 600 245H625" stroke-dasharray="4 5" opacity=".6"/></g></svg>
+<div class="integration-workflow__repository"><img src="assets/integration-repository.svg" width="40" height="40" alt=""><strong>Repository</strong><span class="mono">READ ONLY</span></div>
+<div class="integration-workflow__logo"><img src="assets/myco-icon.svg" width="100" height="103" alt="Myco"></div>
+<ul class="integration-workflow__tools"><li class="integration-workflow__tool"><img src="assets/integration-github.svg" width="32" height="32" alt=""><strong>GitHub</strong><span>Inline review comments</span></li><li class="integration-workflow__tool"><img src="assets/integration-jira.svg" width="32" height="32" alt=""><strong>Jira</strong><span>Issues for tracking</span></li><li class="integration-workflow__tool"><img src="assets/integration-slack.svg" width="32" height="32" alt=""><strong>Slack</strong><span>Team notifications</span></li><li class="integration-workflow__tool is-custom"><img src="assets/integration-custom.svg" width="32" height="32" alt=""><strong>Custom integrations</strong><span>Adapted to your workflow</span></li></ul></div><div class="integration-workflow__permissions"><span class="eyebrow">SCOPED ACCESS</span><ul><li><span>Read repository contents</span><strong class="mono is-allow">ALLOW</strong></li><li><span>Read pull request metadata</span><strong class="mono is-allow">ALLOW</strong></li><li><span>Write to source code</span><strong class="mono is-deny">DENY</strong></li><li><span>Push commits</span><strong class="mono is-deny">DENY</strong></li></ul></div></section>`;
+
+export default function IntegrationWorkflow() {
+  return <div dangerouslySetInnerHTML={{ __html: markup }} />;
+}
