@@ -132,12 +132,67 @@
       </section>`;
     return true;
   };
+
+  const applyWorkflowProofRedesign = () => {
+    const proof = [...document.querySelectorAll('.App > .wrap')]
+      .find(section => section.querySelector('h2')?.textContent.includes('The bug isn’t always in the changed line.'));
+    if (!proof || proof.dataset.workflowProofApplied !== undefined) return Boolean(proof);
+
+    const title = proof.querySelector('h2')?.textContent.trim() || 'The bug isn’t always in the changed line.';
+    proof.dataset.workflowProofApplied = 'true';
+    proof.classList.add('workflow-proof-wrap');
+    proof.innerHTML = `
+      <section class="workflow-proof" aria-labelledby="workflow-proof-title">
+        <header class="workflow-proof__intro">
+          <span class="workflow-proof__eyebrow">PROOF IN WORKFLOW</span>
+          <span class="workflow-proof__rule" aria-hidden="true"></span>
+          <h2 class="display" id="workflow-proof-title">${title}</h2>
+          <p>Myco follows the full execution path, across code, policies and past decisions, to catch issues that slip through review.</p>
+        </header>
+        <article class="workflow-proof__panel" aria-label="Validated pull request finding">
+          <header class="workflow-proof__panel-header">
+            <span class="workflow-proof__panel-label">PULL REQUEST #4827</span>
+            <span class="workflow-proof__panel-change">Add retry for tool execution failures</span>
+          </header>
+          <section class="workflow-proof__finding" aria-labelledby="workflow-finding-title">
+            <span class="workflow-proof__severity">P1</span>
+            <div>
+              <span class="workflow-proof__finding-label">VALIDATED FINDING</span>
+              <h3 id="workflow-finding-title">Retry path bypasses the tool approval policy.</h3>
+              <p>The agent retry path executes tool calls without going through the approval check after a failed attempt.</p>
+            </div>
+          </section>
+          <section class="workflow-proof__evidence" aria-labelledby="workflow-evidence-title">
+            <header><h3 id="workflow-evidence-title">Evidence trail</h3><span>3 connected artifacts</span></header>
+            <ol>
+              <li>
+                <span class="workflow-proof__step">01</span>
+                <div><strong>AgentRunner</strong><span>agent-runner.ts</span></div>
+                <p>The retry path calls executeTool again without an approval check.</p>
+              </li>
+              <li>
+                <span class="workflow-proof__step">02</span>
+                <div><strong>toolPolicy.requiresApproval</strong><span>tool-policy.ts</span></div>
+                <p>Approval is required for sensitive tool calls, but the retry path skips it.</p>
+              </li>
+              <li>
+                <span class="workflow-proof__step">03</span>
+                <div><strong>AGENT-12</strong><span>Product requirement</span></div>
+                <p>Tool calls require approval after retry.</p>
+              </li>
+            </ol>
+          </section>
+        </article>
+      </section>`;
+    return true;
+  };
   let attempts = 0;
   const timer = setInterval(() => {
     attempts += 1;
     const proofReady = applyProofMetrics();
     const layoutReady = applySectionLayout();
     const diffReady = applyDiffRedesign();
-    if ((proofReady && layoutReady && diffReady) || attempts === 20) clearInterval(timer);
+    const workflowProofReady = applyWorkflowProofRedesign();
+    if ((proofReady && layoutReady && diffReady && workflowProofReady) || attempts === 20) clearInterval(timer);
   }, 50);
 })();

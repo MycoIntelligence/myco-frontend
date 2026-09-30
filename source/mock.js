@@ -60,14 +60,14 @@ export const proof = {
   eyebrow: "PROOF IN WORKFLOW",
   title: "The bug isn\u2019t always in the changed line.",
   code: [
-    { t: "comment", text: "PR #482 \u00B7 checkout: preserve tax mode in amendment flow" },
+    { t: "comment", text: "PR #4827 \u00B7 agent: add retry for tool execution failures" },
     { t: "blank" },
-    { t: "line", pre: "traced ", code: "CheckoutMutation", post: " to existing tax calculation" },
-    { t: "line", pre: "found ", code: "amendment.isTaxExempt", post: " resets on retry" },
-    { t: "line", pre: "compared against ", req: "requirement: TAX-19" },
+    { t: "line", pre: "traced ", code: "AgentRunner", post: " through the retry path" },
+    { t: "line", pre: "found ", code: "toolPolicy.requiresApproval", post: " skipped after retry" },
+    { t: "line", pre: "compared against ", req: "requirement: AGENT-12" },
     { t: "blank" },
     { t: "finding", text: "VALIDATED FINDING" },
-    { t: "result", text: "Retry path reintroduces tax on tax-exempt amendments. ", link: "Evidence attached." },
+    { t: "result", text: "Retry path bypasses the tool approval policy. ", link: "Evidence attached." },
   ],
 };
 
@@ -150,7 +150,7 @@ export const contextEngine = {
   eyebrow: "ONE SYSTEM, EVERY SIGNAL",
   title: "Myco reads your whole system. Not just the diff.",
   body:
-    "Pull request context, codebase, meeting notes, product requirements and dependency graphs all flow into one reasoning engine \u2014 which returns a structured, evidence-backed report.",
+    "Pull request context, codebase, meeting notes, product requirements and dependency graphs all flow into one reasoning engine, which returns a structured, evidence-backed report.",
   inputs: [
     { id: "pr", label: "PR CONTEXT", sub: "diff \u00B7 comments \u00B7 history", icon: "GitPullRequest" },
     { id: "code", label: "CODEBASE", sub: "modules \u00B7 call graph", icon: "Code2" },
@@ -198,6 +198,6 @@ export const lead = {
     { name: "name", label: "Your name", type: "text", placeholder: "Ada Lovelace", required: true },
     { name: "email", label: "Work email", type: "email", placeholder: "ada@company.com", required: true },
     { name: "repo", label: "Repository or org", type: "text", placeholder: "github.com/acme/checkout", required: false },
-    { name: "message", label: "What are you hoping Myco catches?", type: "textarea", placeholder: "Optional \u2014 a few words about your stack", required: false },
+    { name: "message", label: "What are you hoping Myco catches?", type: "textarea", placeholder: "Optional - a few words about your stack", required: false },
   ],
 };
