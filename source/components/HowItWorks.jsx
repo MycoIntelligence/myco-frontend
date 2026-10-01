@@ -17,11 +17,7 @@ export default function HowItWorks() {
           {how.steps.map((step, index) => (
             <li key={step.num} className={step.accent ? "is-reason" : ""}>
               <div className="how-journey__symbol" aria-hidden="true">
-                {index === 0 && <span className="how-symbol how-symbol--layers"><i /><i /><i /></span>}
-                {index === 1 && <span className="how-symbol how-symbol--overlap"><i /><i /></span>}
-                {index === 2 && <span className="how-symbol how-symbol--reason"><i /></span>}
-                {index === 3 && <span className="how-symbol how-symbol--validate"><i /><i /></span>}
-                {index === 4 && <span className="how-symbol how-symbol--surface"><i /><i /><i /></span>}
+                <img className="how-journey__art" src={`assets/how-${["layers", "overlap", "reason", "validate", "surface"][index]}.svg`} alt="" width="124" height="120" />
               </div>
               <span className="how-journey__number">{step.num}</span>
               <h3 className="display">{step.title}</h3>

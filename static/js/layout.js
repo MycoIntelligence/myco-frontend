@@ -218,23 +218,23 @@
         </header>
         <ol class="how-journey__steps">
           <li>
-            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--layers"><i></i><i></i><i></i></span></div>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-layers.svg" alt="" width="124" height="120"></div>
             <span class="how-journey__number">01</span><h3 class="display">Ingest</h3><p>We take in your change, codebase and relevant signals.</p>
           </li>
           <li>
-            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--overlap"><i></i><i></i></span></div>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-overlap.svg" alt="" width="124" height="120"></div>
             <span class="how-journey__number">02</span><h3 class="display">Build context</h3><p>We assemble a scoped view of the code, systems and intent.</p>
           </li>
           <li class="is-reason">
-            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--reason"><i></i></span></div>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-reason.svg" alt="" width="124" height="120"></div>
             <span class="how-journey__number">03</span><h3 class="display">Reason</h3><p>We analyze the change with full context to find real impact.</p>
           </li>
           <li>
-            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--validate"><i></i><i></i></span></div>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-validate.svg" alt="" width="124" height="120"></div>
             <span class="how-journey__number">04</span><h3 class="display">Validate</h3><p>We check findings across multiple signals and constraints.</p>
           </li>
           <li>
-            <div class="how-journey__symbol" aria-hidden="true"><span class="how-symbol how-symbol--surface"><i></i><i></i><i></i></span></div>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-surface.svg" alt="" width="124" height="120"></div>
             <span class="how-journey__number">05</span><h3 class="display">Score and surface</h3><p>We rank what matters and present clear, actionable insights.</p>
           </li>
         </ol>
