@@ -45,7 +45,7 @@ export default async function handler(request, response) {
     return response.status(503).json({ detail: "Pilot requests are temporarily unavailable. Please try again shortly." });
   }
 
-  const subject = `New Myco pilot request — ${name}`;
+  const subject = `New Myco pilot request - ${name}`;
   const html = `
     <div style="font-family:Arial,sans-serif;line-height:1.5;max-width:640px">
       <h2 style="margin:0 0 12px;color:#122024">New Myco pilot request</h2>

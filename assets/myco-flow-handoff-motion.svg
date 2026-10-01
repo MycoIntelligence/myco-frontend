@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
-  <title>Myco context flow — Reference report</title>
+  <title>Myco context flow - Reference report</title>
 <desc>Pull request, codebase, meeting notes, requirements and dependencies flow through Myco into a static report with validated findings and clean code suggestions.</desc>
 <style>@media (prefers-reduced-motion: reduce) { .flow-packets { display: none; } }</style>
 <rect width="1600" height="900" fill="#ffffff"/>
