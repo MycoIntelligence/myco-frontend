@@ -39,6 +39,11 @@
     engine.setAttribute('role', 'region');
     const engineTitle = engine.querySelector('h2');
     engineTitle.id = 'context-section-title';
+    engineTitle.replaceChildren(...['Myco reads your ', 'whole system. ', 'Not just the diff.'].map(line => {
+      const span = document.createElement('span');
+      span.textContent = line;
+      return span;
+    }));
     engine.setAttribute('aria-labelledby', engineTitle.id);
     return true;
   };
