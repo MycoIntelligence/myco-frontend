@@ -8,15 +8,24 @@
     // The SVG's 900px canvas includes unused space below the finished flow.
     // Crop that empty tail at the container level so the next section follows
     // the diagram naturally, while the SVG itself remains a sharp vector asset.
-    slot.style.aspectRatio = "1600 / 680";
+    slot.style.aspectRatio = "1490 / 620";
     slot.style.display = "flex";
     slot.style.alignItems = "center";
 
     const diagram = document.createElement("img");
-    diagram.src = "assets/myco-flow-handoff-motion.svg?v=10";
+    diagram.src = "assets/myco-flow-framed.svg?v=4";
     diagram.alt = "Animated Myco context flow";
-    diagram.style.cssText = "display:block;width:100%;height:100%;object-fit:cover;object-position:top;";
-    slot.replaceChildren(diagram);
+    diagram.style.cssText = "display:block;width:100%;height:100%;object-fit:contain;object-position:top;";
+    const desktop = document.createElement("div");
+    desktop.className = "flow-desktop";
+    desktop.append(diagram);
+    slot.innerHTML = `<div class="flow-mobile"><ul class="flow-mobile__sources"><li><img src="assets/flow-pr.svg" width="24" height="24" alt=""><div><strong>Pull request</strong><span>Require admin access to delete users</span></div></li><li><img src="assets/flow-code.svg" width="24" height="24" alt=""><div><strong>Codebase</strong><span>User role middleware</span></div></li><li><img src="assets/flow-notes.svg" width="24" height="24" alt=""><div><strong>Meeting notes</strong><span>Admin actions require explicit roles</span></div></li><li><img src="assets/flow-requirements.svg" width="24" height="24" alt=""><div><strong>Requirements</strong><span>Restrict delete-user endpoint</span></div></li><li><img src="assets/flow-deps.svg" width="24" height="24" alt=""><div><strong>Dependencies</strong><span>Authorization service</span></div></li></ul><div class="flow-mobile__bridge"><img src="assets/myco-icon.svg" width="64" height="66" alt="Myco"></div><article class="flow-report"><header><h3>Structured output</h3><time datetime="2026-09-25">25 September 2026</time></header><h4>Validated findings</h4><div class="flow-report__row"><span class="flow-report__severity is-p0">P0</span><div><h5>Permission bypass</h5><p>Authorization check can be bypassed via alternate code path.</p><small>src/auth/middleware.ts · L114-L132</small></div></div><div class="flow-report__row"><span class="flow-report__severity is-p1">P1</span><div><h5>Missing null guard</h5><p>Potential null dereference in user profile handling.</p><small>src/services/user.ts · L87-L102</small></div></div><div class="flow-report__row"><span class="flow-report__severity is-p2">P2</span><div><h5>Cache race condition</h5><p>Concurrent updates may overwrite cached entries.</p><small>src/cache/store.ts · L44-L78</small></div></div><h4>Clean code suggestions</h4><div class="flow-report__row"><span aria-hidden="true">↗</span><div><h5>Extract shared retry logic</h5><p>Consolidate retry logic into a reusable utility with exponential backoff.</p><small>src/utils/retry.ts · (new file)</small></div></div></article></div>`;
+    slot.prepend(desktop);
+    slot.classList.add("flow-responsive");
+    const details = document.createElement("details");
+    details.className = "flow-report-detail";
+    details.innerHTML = `<summary>Read the example report <span aria-hidden="true">+</span></summary>${slot.querySelector(".flow-report").outerHTML}`;
+    slot.parentElement.append(details);
     return true;
   };
 

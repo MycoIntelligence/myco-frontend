@@ -1,7 +1,7 @@
 import React from "react";
 
 const markup = `<section class="integration-workflow" aria-labelledby="integration-workflow-title">
-<header class="integration-workflow__header"><span class="eyebrow">CONNECT IN THE WORKFLOW</span><h3 class="display" id="integration-workflow-title">Infrastructure, not interruption.</h3><p>The implementation is intentionally simple: authorize the context, let Myco build its working view, then receive actionable findings in the systems engineers already use.</p></header>
+<header class="integration-workflow__header"><span class="eyebrow">CONNECT IN THE WORKFLOW</span><h2 class="display" id="integration-workflow-title">Connect your repository. Keep your stack.</h2><p>Myco fits into the workflow already in place. It observes authorized engineering context, builds the model it needs, and surfaces evidence where the team works.</p></header>
 <div class="integration-workflow__diagram" role="group" aria-label="Read-only repository context flows through Myco to GitHub, Jira, Slack and custom integrations">
 <svg class="integration-workflow__wires" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="#89aaa1" stroke-width="1"><path d="M120 140H410M500 140H550C584 140 578 35 600 35H625M550 140C584 140 578 105 600 105H625M550 140C584 140 578 175 600 175H625"/><path d="M550 140C584 140 578 245 600 245H625" stroke-dasharray="4 5" opacity=".6"/></g></svg>
 <div class="integration-workflow__repository"><img src="assets/integration-repository.svg" width="40" height="40" alt=""><strong>Repository</strong><span class="mono">READ ONLY</span></div>

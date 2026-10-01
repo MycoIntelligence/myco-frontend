@@ -7,8 +7,9 @@ import { ArrowUpRight } from "lucide-react";
 export default function Footer() {
   const { open } = useLeadModal();
   return (
-    <div className="wrap" style={{ borderBottom: "1px solid var(--border)" }}>
-      <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", borderTop: "1px solid var(--border)" }}>
+    <div className="wrap page-footer" style={{ borderBottom: "1px solid var(--border)" }}>
+      <section className="page-closing" aria-labelledby="page-closing-title"><div><span className="eyebrow">REQUEST A PILOT</span><h2 id="page-closing-title">See Myco in your workflow.</h2><p>Request a pilot to explore Myco with your engineering team.</p></div><div className="page-closing__action"><button onClick={open} className="btn btn-primary">{footer.cta.label} <ArrowUpRight size={15}/></button></div></section>
+      <div className="footer-grid page-footer__grid" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", borderTop: "1px solid var(--border)" }}>
         <div style={{ padding: "56px 34px", borderRight: "1px solid var(--border)" }}>
           <a href="#overview" aria-label="Myco home" className="logo" style={{ fontSize: 34 }}>
             <img className="brand-icon" src="assets/myco-icon.svg" alt="" width="40" height="42" />
@@ -24,14 +25,11 @@ export default function Footer() {
               </a>
             ))}
           </div>
-          <button onClick={open} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
-            {footer.cta.label} <ArrowUpRight size={15} />
-          </button>
+
         </div>
       </div>
-      <div style={{ padding: "20px 34px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+      <div className="page-footer__legal" style={{ padding: "20px 34px", borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
         <span className="mono" style={{ fontSize: 11.5, color: "var(--muted)" }}>{footer.copyright}</span>
-        <span className="mono" style={{ fontSize: 11.5, color: "var(--muted)" }}>DEMO CLONE · MOCK DATA</span>
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ import { LeadModalProvider } from "./context/LeadModalContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Stats from "./components/Stats";
-import DiffSection from "./components/DiffSection";
 import ContextEngine from "./components/ContextEngine";
 import ProofSection from "./components/ProofSection";
 import FindingsFeed from "./components/FindingsFeed";
@@ -23,7 +22,6 @@ function App() {
           <Hero />
           <Stats />
           <ContextEngine />
-          <DiffSection />
           <ProofSection />
           <FindingsFeed />
           <HowItWorks />

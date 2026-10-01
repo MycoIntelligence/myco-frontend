@@ -8,7 +8,7 @@
     const duration = 720;
     const start = performance.now();
     const tick = (now) => {
-      const progress = Math.min((now - start) / duration, 1);
+      const progress = Math.max(0, Math.min((now - start) / duration, 1));
       const eased = 1 - Math.pow(1 - progress, 3);
       element.textContent = formatMetric(metric, Math.round(metric.value * eased));
       if (progress < 1) requestAnimationFrame(tick);
@@ -67,6 +67,8 @@
     const diff = sections.find(section => section.querySelector('h2')?.textContent.includes('A diff is not the whole system.'));
     const engine = sections.find(section => section.querySelector('h2')?.textContent.includes('Myco reads your whole system.'));
     if (!diff || !engine) return false;
+    engine.classList.add('context-section');
+    engine.querySelector(':scope > div:first-child')?.classList.add('context-section__header');
     engine.parentElement.insertBefore(engine, diff);
     diff.classList.add('diff-centered');
     diff.querySelector('.eyebrow')?.remove();
