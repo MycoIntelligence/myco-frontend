@@ -30,15 +30,11 @@
 .context-section>.context-section__visual{padding:30px 34px 0!important}
 .context-section>.context-section__header{align-items:start}
 .context-section>.diff-system__ledger{margin-top:30px}
-.flow-report-detail{max-width:680px;margin:14px auto 0;border-top:1px solid var(--border)}
-.flow-report-detail summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:16px 0;color:var(--accent-dark);font-size:13px;list-style:none}
-.flow-report-detail summary::-webkit-details-marker{display:none}.flow-report-detail summary span{font-size:20px}.flow-report-detail[open] summary span{transform:rotate(45deg)}
-.flow-report-detail .flow-report{padding:26px;border:1px solid var(--border);border-radius:8px;background:#fafbf9}.flow-report-detail h3,.flow-report-detail h4,.flow-report-detail h5{font-family:Georgia,serif;margin:0;line-height:1.25}.flow-report-detail header{display:flex;justify-content:space-between;gap:20px;align-items:center;padding-bottom:20px;border-bottom:1px solid var(--border)}.flow-report-detail h3{font-size:26px}.flow-report-detail h4{font-size:20px;margin:22px 0 0}.flow-report-detail h5{font-size:20px}.flow-report-detail time,.flow-report-detail small{font-size:12px;color:var(--muted)}.flow-report-detail .flow-report__row{display:grid;grid-template-columns:42px 1fr;gap:16px;padding:22px 0;border-bottom:1px solid var(--border)}.flow-report-detail .flow-report__row:last-child{border:0}.flow-report-detail p{font-size:15px;color:var(--ink-soft);line-height:1.6;margin:10px 0}.flow-report-detail .flow-report__severity{padding:8px;text-align:center;align-self:start;border-radius:4px;font-size:12px;font-weight:600}
 .workflow-proof,.signals-queue,.how-journey,.integration-workflow{padding-top:var(--section-space);padding-bottom:var(--section-space)}
 #security>.security-editorial{padding-top:var(--section-space)!important;padding-bottom:var(--section-space)!important}
 #integrate{margin-top:0!important}.how-journey__steps{margin-top:48px}.how-journey__headline{gap:48px}
 .App>.wrap{scroll-margin-top:108px}
-@media(max-width:900px){.context-section>.context-section__visual{padding:28px 24px 0!important}.flow-report-detail{display:none}.workflow-proof,.signals-queue,.how-journey,.integration-workflow{padding-left:24px;padding-right:24px}}
+@media(max-width:900px){.context-section>.context-section__visual{padding:28px 24px 0!important}.workflow-proof,.signals-queue,.how-journey,.integration-workflow{padding-left:24px;padding-right:24px}}
 @media(max-width:600px){.context-section>.context-section__visual{padding:26px 22px 0!important}.workflow-proof,.signals-queue,.how-journey,.integration-workflow{padding-left:22px;padding-right:22px}.how-journey__headline{gap:22px}.how-journey__steps{margin-top:32px}}
 
 /* 5. A clear invitation, followed by a compact production footer. */

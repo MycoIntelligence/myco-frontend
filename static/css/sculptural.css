@@ -1,6 +1,6 @@
 /* Sculptural identity: ivory surfaces, sage details, and generous curved edges. */
 :root{--bg:#f7f9f8;--bg-soft:#f1f4ef;--panel-cool:#f1f4ef;--border:#e0e7df;--border-strong:#b4c0b6;--wire:#b8c2bb;--muted:#586a5e}
-#overview{background:#fff url('../../assets/sculptural-layers.jpg') center 34px/cover no-repeat;isolation:isolate}
+#overview{background:#fff url('../../assets/sculptural-layers.jpg') center center/cover no-repeat;isolation:isolate}
 #overview .hero-grid>div:first-child{max-width:1000px!important;padding:110px 34px 130px!important}
 #overview .hero-grid>div:first-child h1{max-width:940px!important;font-size:clamp(48px,5.4vw,76px)!important;line-height:1.08!important;letter-spacing:-.045em}
 #overview .hero-grid>div:first-child p{max-width:590px!important;line-height:1.65}
@@ -21,7 +21,7 @@
 .field-input{border-radius:6px!important;background:#fff!important}
 footer{background:linear-gradient(150deg,#fff,#f1f4ef)!important;border-radius:26px 26px 0 0}
 @media(max-width:900px){
- #overview{background-size:auto 100%;background-position:center 28px}
+ #overview{background-size:auto 100%;background-position:center center}
  #overview .hero-grid>div:first-child{padding:85px 32px 100px!important}
  #overview .hero-grid>div:first-child h1{font-size:clamp(42px,7vw,64px)!important}
  .wrap:has([data-flow-preview])>div:last-child{padding-left:24px!important;padding-right:24px!important}
