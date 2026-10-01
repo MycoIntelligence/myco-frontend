@@ -1,28 +1,56 @@
-/* Editorial introductions: supporting copy sits beside each statement. */
-.context-section>.context-section__header{grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr);column-gap:64px;align-items:start}
-.context-section>.context-section__header h2{max-width:none;font-size:clamp(48px,4.8vw,84px)!important;line-height:.98!important;letter-spacing:-.055em!important;white-space:normal;font-weight:400!important;color:#151615}
-.context-section>.context-section__header h2 span{display:block!important}
-.context-section>.context-section__header p{padding-top:15px;font-size:clamp(16px,1.25vw,23px)!important;line-height:1.55!important;color:#454b4e;max-width:none}
+/* One editorial system. Main introductions share a grid; evidence sections stay compact. */
+:root{--intro-title:clamp(44px,3.7vw,60px);--intro-compact-title:clamp(38px,3.2vw,48px);--intro-body:17px;--intro-gap:64px;--intro-label-gap:24px;--intro-visual-gap:32px}
+.context-section>.context-section__header,.diff-system__intro,.how-journey__headline,.integration-workflow__header{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr);column-gap:var(--intro-gap);align-items:start;max-width:none}
+.context-section__header>.reveal:not(.eyebrow){display:contents}
+.context-section>.context-section__header>.eyebrow{grid-column:1/-1;margin:0 0 var(--intro-label-gap)}
+.context-section>.context-section__header h2,.diff-system__intro h2,.how-journey__headline h2,.integration-workflow__header h2{font-size:var(--intro-title)!important;font-weight:400!important;line-height:1.08!important;letter-spacing:-.045em!important;margin:0!important;max-width:none!important;white-space:normal;grid-column:1;color:#151615}
+.context-section>.context-section__header h2 span,.diff-system__intro h2 span,.how-journey__headline h2 span,.integration-workflow__header h2 span{display:block!important}
+.context-section>.context-section__header p,.diff-system__intro>p,.how-journey__headline p,.integration-workflow__header p{grid-column:2;font-size:var(--intro-body)!important;line-height:1.65!important;padding:6px 0 0!important;margin:0!important;max-width:none!important;color:#454b4e}
 .context-section>.context-section__visual{padding-top:16px!important}
 .diff-system__top{min-height:0}
-.diff-system__intro{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 64px;align-items:center}
-.diff-system__intro>.diff-system__rule{grid-column:1/-1}
-.diff-system__intro h2{grid-column:1;margin:0}
-.diff-system__intro>p{grid-column:2;margin:0;max-width:490px;font-size:16px;line-height:1.65}
-.diff-system__ledger{margin-top:38px}
-@media(max-width:1000px){
- .context-section>.context-section__header{grid-template-columns:1fr;gap:22px;align-items:start}
- .context-section>.context-section__header h2{font-size:clamp(39px,7vw,72px)!important;white-space:normal;grid-column:1;grid-row:2}
- .context-section>.context-section__header p{grid-column:1;grid-row:3;max-width:650px}
- .context-section>.context-section__visual{padding-top:16px!important}
- .diff-system__intro{grid-template-columns:1fr;gap:22px}
- .diff-system__intro>.diff-system__rule{margin:0}
- .diff-system__intro h2,.diff-system__intro>p{grid-column:1}
- .diff-system__intro>p{max-width:650px}
+.diff-system__intro>.diff-system__rule{grid-column:1/-1;margin:0 0 var(--intro-label-gap)}
+.diff-system__ledger{margin-top:var(--intro-visual-gap)}
+.how-journey__headline{margin-top:var(--intro-label-gap)}
+.how-journey__steps{margin-top:var(--intro-visual-gap)}
+.integration-workflow__header{row-gap:0}
+.integration-workflow__header>.eyebrow{grid-column:1/-1;margin:0 0 var(--intro-label-gap)}
+.integration-workflow__diagram{margin-top:var(--intro-visual-gap)}
+/* Proof and Security pair a compact introduction with evidence rather than a second paragraph column. */
+.workflow-proof{align-items:start}
+.workflow-proof__intro h2,.security-editorial__intro h2,.page-closing h2{font-size:var(--intro-compact-title)!important;line-height:1.12!important;font-weight:400!important;letter-spacing:-.04em!important}
+.workflow-proof__intro h2 span,.security-editorial__intro h2 span{display:block}
+.workflow-proof__rule{margin:var(--intro-label-gap) 0}
+.workflow-proof__intro p,.security-editorial__intro>p,.page-closing p{font-size:var(--intro-body)!important;line-height:1.65!important;margin:24px 0 0!important;max-width:none!important}
+.security-editorial__intro h2{margin:var(--intro-label-gap) 0 0!important}
+.context-section__header>.eyebrow,.how-journey__eyebrow,.integration-workflow__header>.eyebrow,.workflow-proof__eyebrow,.security-editorial__intro>.eyebrow{font-size:10px;line-height:1.4;letter-spacing:.18em;font-weight:500}
+@media(max-width:1100px){
+ :root{--intro-title:clamp(40px,5.4vw,56px);--intro-compact-title:clamp(38px,4.8vw,48px)}
+ .context-section>.context-section__header,.diff-system__intro,.how-journey__headline,.integration-workflow__header{grid-template-columns:1fr;row-gap:22px}
+ .context-section>.context-section__header>.eyebrow,.diff-system__intro>.diff-system__rule,.integration-workflow__header>.eyebrow{margin:0;grid-row:1}
+ .context-section>.context-section__header h2,.integration-workflow__header h2{grid-column:1;grid-row:2}
+ .context-section>.context-section__header p,.diff-system__intro>p,.how-journey__headline p,.integration-workflow__header p{grid-column:1;grid-row:auto;padding:0!important;max-width:650px!important}
+ .context-section>.context-section__header p,.integration-workflow__header p{grid-row:3}
+ .workflow-proof{grid-template-columns:1fr;gap:32px}
+ .workflow-proof__intro{max-width:650px}
+ #security>.security-editorial{grid-template-columns:1fr;gap:32px}
+ .security-editorial__intro{max-width:650px}
 }
-/* The shipped static build wraps heading and paragraph in one reveal element. */
-.context-section__header>.reveal:not(.eyebrow){display:contents}
-.context-section>.context-section__header p{max-width:none!important;margin:0!important}
+@media(max-width:600px){
+ :root{--intro-title:clamp(34px,9.2vw,44px);--intro-compact-title:clamp(32px,8.6vw,40px);--intro-body:15px;--intro-label-gap:20px;--intro-visual-gap:28px}
+}
+/* Match section insets and label positions as the shared grid changes width. */
+.how-journey,.workflow-proof,.integration-workflow{padding-top:64px;padding-bottom:64px}
+@media(max-width:1100px){
+ .App>.wrap.context-section>.context-section__header{padding:48px 24px 0!important}
+ .diff-system,.how-journey,.workflow-proof,.integration-workflow{padding:48px 24px}
+ .diff-system{padding-bottom:0}
+ #security>.security-editorial{padding:48px 24px!important}
+}
+@media(max-width:600px){
+ .App>.wrap.context-section>.context-section__header{padding:44px 22px 0!important}
+ .diff-system,.how-journey,.workflow-proof,.integration-workflow{padding:44px 22px}
+ .diff-system{padding-bottom:0}
+ #security>.security-editorial{padding:44px 22px!important}
+}
 
-@media(max-width:1000px){.context-section>.context-section__header p{padding-top:0;font-size:17px!important}}
-@media(max-width:600px){.context-section>.context-section__header h2{font-size:clamp(37px,9.8vw,58px)!important}}
+@media(min-width:1101px){.App>.wrap.context-section>.context-section__header{padding:64px 34px 0!important}}

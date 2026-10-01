@@ -16,7 +16,7 @@
     const h2 = document.createElement('h2');
     h2.id = heading.id;
     h2.className = heading.className;
-    h2.textContent = 'Connect your repository. Keep your stack.';
+    h2.innerHTML = '<span>Connect your repository. </span><span>Keep your stack.</span>';
     heading.replaceWith(h2);
     workflow.querySelector('.integration-workflow__header p').textContent = 'Myco fits into the workflow already in place. It observes authorized engineering context, builds the model it needs, and surfaces evidence where the team works.';
     const footerGrid = document.querySelector('.footer-grid');
