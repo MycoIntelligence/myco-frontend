@@ -1,0 +1,25 @@
+/* Editorial introductions: supporting copy sits beside each statement. */
+.context-section>.context-section__header{grid-template-columns:minmax(0,2.15fr) minmax(0,1fr);column-gap:34px;align-items:center}
+.context-section>.context-section__header h2{max-width:none;font-size:clamp(24px,2.1vw,34px)!important;line-height:1.2!important;letter-spacing:-.035em!important;white-space:nowrap}
+.context-section>.context-section__header h2 span{display:inline!important}
+.context-section>.context-section__header p{padding:0;margin:0;max-width:none}
+.context-section>.context-section__visual{padding-top:16px!important}
+.diff-system__top{min-height:0}
+.diff-system__intro{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 64px;align-items:center}
+.diff-system__intro>.diff-system__rule{grid-column:1/-1}
+.diff-system__intro h2{grid-column:1;margin:0}
+.diff-system__intro>p{grid-column:2;margin:0;max-width:490px;font-size:16px;line-height:1.65}
+.diff-system__ledger{margin-top:38px}
+@media(max-width:1000px){
+ .context-section>.context-section__header{grid-template-columns:1fr;gap:22px;align-items:start}
+ .context-section>.context-section__header h2{font-size:clamp(32px,4.5vw,44px)!important;white-space:normal;grid-column:1;grid-row:2}
+ .context-section>.context-section__header p{grid-column:1;grid-row:3;max-width:650px}
+ .context-section>.context-section__visual{padding-top:16px!important}
+ .diff-system__intro{grid-template-columns:1fr;gap:22px}
+ .diff-system__intro>.diff-system__rule{margin:0}
+ .diff-system__intro h2,.diff-system__intro>p{grid-column:1}
+ .diff-system__intro>p{max-width:650px}
+}
+/* The shipped static build wraps heading and paragraph in one reveal element. */
+.context-section__header>.reveal:not(.eyebrow){display:contents}
+.context-section>.context-section__header p{max-width:none!important;margin:0!important}
