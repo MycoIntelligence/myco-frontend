@@ -1,0 +1,41 @@
+/* 1. Keep the label attached to its headline and the introduction on one grid. */
+.context-section>.context-section__header>.eyebrow{grid-column:1/-1;margin:0 0 22px}
+.context-section>.context-section__header h2{grid-column:1;grid-row:2;margin:0}
+.context-section>.context-section__header p{grid-column:2;grid-row:2;margin:0;padding-top:6px}
+@media(max-width:900px){.context-section>.context-section__header>.eyebrow{margin:0}.context-section>.context-section__header h2{grid-column:1;grid-row:2}.context-section>.context-section__header p{grid-column:1;grid-row:3;padding:0}}
+
+/* 3. Shared optical weight for the geometric illustrations. */
+.how-journey__steps::before{background:#a6b9b1}
+.how-symbol--layers i,.how-symbol--overlap i,.how-symbol--validate i,.how-symbol--surface{border-color:#78968a;border-width:1.5px}
+.how-symbol--reason{border-width:1.5px;border-color:#39756d}
+.how-symbol--reason::before{border-color:#98afa5}
+.how-symbol--surface i{background:#78968a}
+.how-symbol--surface i:first-child{background:var(--accent-dark)}
+.integration-workflow__wires path{stroke:#8ca79b;stroke-width:1.5}
+
+/* 4. Corners follow purpose: navigation capsule, data panel, compact control. */
+:root{--surface-radius:14px;--control-radius:6px;--surface-border:#cad7d0;--surface-shadow:0 8px 24px rgba(18,32,36,.035)}
+.proof-metrics{border-radius:var(--surface-radius);border-color:var(--surface-border)}
+.workflow-proof__panel{border-radius:var(--surface-radius);border-color:var(--surface-border);box-shadow:var(--surface-shadow);background:#fff}
+.workflow-proof__finding{border-radius:8px}
+.flow-mobile__sources li,.flow-report{border-radius:10px;border-color:var(--surface-border)}
+.btn,.field-input,.theme-toggle{border-radius:var(--control-radius)!important}
+.modal-panel{border:1px solid var(--surface-border);border-radius:var(--surface-radius);background:#f7f9f8;box-shadow:0 20px 70px rgba(18,32,36,.14);max-height:calc(100dvh - 32px);overflow-y:auto}
+.modal-overlay{padding:16px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+
+/* 5. The mobile menu uses the same panel and control system. */
+.site-nav{position:relative}
+.mobile-menu-toggle{display:none;width:44px;height:44px;flex-shrink:0;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:1px solid var(--surface-border);border-radius:var(--control-radius);background:#fff;color:var(--ink);cursor:pointer}
+.mobile-menu-toggle span{width:18px;height:1.5px;background:currentColor;transition:transform .18s ease}
+.mobile-menu-toggle[aria-expanded="true"] span:first-child{transform:translateY(3.75px) rotate(45deg)}
+.mobile-menu-toggle[aria-expanded="true"] span:last-child{transform:translateY(-3.75px) rotate(-45deg)}
+.mobile-navigation{position:absolute;top:calc(100% + 10px);left:0;right:0;display:grid;padding:8px;border:1px solid var(--surface-border);border-radius:var(--surface-radius);background:#fff;box-shadow:0 12px 30px rgba(18,32,36,.08);max-height:calc(100dvh - 100px);overflow-y:auto}
+.mobile-navigation[hidden]{display:none!important}
+.mobile-navigation a{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:12px 16px;border-radius:8px;color:var(--ink-soft);font-size:15px;text-decoration:none}
+.mobile-navigation a:hover,.mobile-navigation a[aria-current="location"]{background:#f1f5f2;color:var(--accent-dark)}
+.mobile-navigation a[aria-current="location"]::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+@media(max-width:900px){.site-nav .nav-links{display:none!important}.mobile-menu-toggle{display:flex}.site-nav__actions{gap:8px!important}.site-nav__actions .btn{min-height:44px;white-space:nowrap}}
+@media(max-width:400px){.site-nav .logo{gap:6px!important}.site-nav .brand-icon{width:28px!important;height:30px!important}.site-nav .brand-wordmark{width:60px!important;height:auto!important}.site-nav__actions .btn{font-size:11.5px;padding:10px!important}}
+@media(min-width:901px){.mobile-navigation{display:none!important}}
+@media(prefers-reduced-motion:reduce){.mobile-menu-toggle span{transition:none}}

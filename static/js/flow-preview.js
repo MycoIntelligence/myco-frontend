@@ -8,12 +8,12 @@
     // The SVG's 900px canvas includes unused space below the finished flow.
     // Crop that empty tail at the container level so the next section follows
     // the diagram naturally, while the SVG itself remains a sharp vector asset.
-    slot.style.aspectRatio = "1490 / 620";
+    slot.style.aspectRatio = "1520 / 760";
     slot.style.display = "flex";
     slot.style.alignItems = "center";
 
     const diagram = document.createElement("img");
-    diagram.src = "assets/myco-flow-framed.svg?v=4";
+    diagram.src = "assets/myco-flow-readable.svg?v=4";
     diagram.alt = "Animated Myco context flow";
     diagram.style.cssText = "display:block;width:100%;height:100%;object-fit:contain;object-position:top;";
     const desktop = document.createElement("div");
