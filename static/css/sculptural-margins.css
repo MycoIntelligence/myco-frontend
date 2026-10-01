@@ -1,0 +1,31 @@
+/* Approved sculptural margins: three static accents, positioned between chapters. */
+.App{overflow-x:clip}
+.context-section,#how,#integrate{position:relative;isolation:isolate}
+.context-section::before,#how::before,#integrate::after{
+ content:"";position:absolute;z-index:-1;pointer-events:none;
+ width:340px;aspect-ratio:3/2;
+ background:url('../../assets/sculptural-fold.png') center/contain no-repeat;
+ opacity:.95;
+}
+/* A small opening cue near the first diagram, well outside the reading column. */
+.context-section::before{left:calc((1180px - 100vw)/2 - 150px);top:12px;transform:scaleX(-1) rotate(-18deg);width:280px}
+/* A larger right fold at the transition into the findings queue. */
+#how::before{right:calc((1180px - 100vw)/2 - 105px);top:-72px;transform:rotate(12deg)}
+/* The final body accent marks the transition from reasoning to integration. */
+#integrate::after{left:calc((1180px - 100vw)/2 - 135px);top:-48px;width:300px;transform:scaleX(-1) rotate(-28deg)}
+@media(min-width:1600px){
+ .context-section::before{width:340px;left:calc((1180px - 100vw)/2 - 135px)}
+ #how::before{width:400px;right:calc((1180px - 100vw)/2 - 105px)}
+ #integrate::after{width:360px;left:calc((1180px - 100vw)/2 - 120px)}
+}
+/* Narrow layouts use cropped edge details only in the chapter's top whitespace. */
+@media(max-width:1279px){
+ .context-section::before{width:180px;left:-120px;top:-28px}
+ #how::before{width:200px;right:-110px;top:-65px}
+ #integrate::after{width:180px;left:-125px;top:-40px}
+}
+@media(max-width:700px){
+ .context-section::before{content:none}
+ #how::before{width:155px;right:-45px;top:-65px;opacity:.85}
+ #integrate::after{width:140px;left:-42px;top:-75px;opacity:.85}
+}

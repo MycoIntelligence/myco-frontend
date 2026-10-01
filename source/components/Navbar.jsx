@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { nav } from "../mock";
 
 import { useLeadModal } from "../context/LeadModalContext";
@@ -7,13 +7,28 @@ import { useLeadModal } from "../context/LeadModalContext";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("#overview");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef(null);
+  const toggleRef = useRef(null);
   const { open } = useLeadModal();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    useEffect(() => {
+    const closeOutside = event => { if (!navRef.current?.contains(event.target)) setMenuOpen(false); };
+    const closeEscape = event => { if (event.key === "Escape" && menuOpen) { setMenuOpen(false); toggleRef.current?.focus(); } };
+    const media = window.matchMedia("(max-width:900px)");
+    const closeResize = () => setMenuOpen(false);
+    document.addEventListener("click", closeOutside);
+    document.addEventListener("keydown", closeEscape);
+    media.addEventListener("change", closeResize);
+    return () => { document.removeEventListener("click", closeOutside); document.removeEventListener("keydown", closeEscape); media.removeEventListener("change", closeResize); };
+  }, [menuOpen]);
+  useEffect(() => { if (menuOpen) navRef.current?.querySelector(".mobile-navigation a")?.focus(); }, [menuOpen]);
+
+  return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
@@ -29,7 +44,7 @@ export default function Navbar() {
       }}
     >
       <div className="wrap" style={{ borderTop: "none", background: "transparent" }}>
-        <nav
+        <nav className="site-nav" ref={navRef}
           style={{
             display: "flex",
             alignItems: "center",
@@ -67,10 +82,14 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <button onClick={open} className="btn btn-primary">
+          <div className="site-nav__actions" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button ref={toggleRef} className="mobile-menu-toggle" type="button" aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}><span aria-hidden="true"/><span aria-hidden="true"/></button>
+            <button onClick={() => { setMenuOpen(false); open(); }} className="btn btn-primary">
               {nav.cta.label}
             </button>
+          </div>
+          <div id="mobile-navigation" className="mobile-navigation" hidden={!menuOpen}>
+            {nav.links.map(link => <a key={link.href} href={link.href} aria-current={active === link.href ? "location" : undefined} onClick={() => { setActive(link.href); setMenuOpen(false); }}>{link.label}</a>)}
           </div>
         </nav>
       </div>

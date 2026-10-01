@@ -8,7 +8,6 @@ import Stats from "./components/Stats";
 import DiffSection from "./components/DiffSection";
 import ContextEngine from "./components/ContextEngine";
 import ProofSection from "./components/ProofSection";
-import FindingsFeed from "./components/FindingsFeed";
 import HowItWorks from "./components/HowItWorks";
 import Integration from "./components/Integration";
 import Security from "./components/Security";
@@ -25,7 +24,6 @@ function App() {
           <ContextEngine />
           <DiffSection />
           <ProofSection />
-          <FindingsFeed />
           <HowItWorks />
           <Integration />
           <Security />

@@ -1,0 +1,34 @@
+/* Approved reference: one quiet, static composition with vector geometry. */
+.how-journey{background:#faf9f6;padding:54px 34px 58px;border-top:0}
+.how-journey__eyebrow{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;letter-spacing:.25em;font-weight:400;color:#214a44}
+.how-journey__headline{grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr);gap:64px;align-items:start;margin-top:20px}
+.how-journey__headline h2{font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(52px,5.7vw,110px)!important;line-height:.98!important;letter-spacing:-.055em!important;font-weight:400!important;color:#151615}
+.how-journey__headline p{font-size:clamp(16px,1.25vw,23px)!important;line-height:1.55!important;margin:15px 0 0;color:#454b4e;max-width:560px}
+.how-journey__steps{grid-template-columns:repeat(5,minmax(0,1fr));margin-top:56px;gap:0}
+.how-journey__steps::before{left:6%;right:6%;top:60px;height:1px;width:auto;bottom:auto;background:linear-gradient(to right,#9aaba7 0 19%,transparent 19% 23%,#9aaba7 23% 78%,transparent 78% 82%,#9aaba7 82%),repeating-linear-gradient(to right,#9aaba7 0 2px,transparent 2px 5px);border:0}
+.how-journey__steps::after{content:"";position:absolute;top:57px;left:0;right:0;height:6px;background:radial-gradient(circle at 20% 50%,#788984 0 2px,#faf9f6 2px 5px,transparent 5px),radial-gradient(circle at 40% 50%,#075752 0 2.5px,#faf9f6 2.5px 6px,transparent 6px),radial-gradient(circle at 60% 50%,#075752 0 2.5px,#faf9f6 2.5px 6px,transparent 6px),radial-gradient(circle at 80% 50%,#788984 0 2px,#faf9f6 2px 5px,transparent 5px)}
+.how-journey__steps li{padding:0 24px 0 0;border:0;background:none;display:block}
+.how-journey__steps li::before,.how-journey__steps li::after{content:none}
+.how-journey__symbol{height:120px;display:flex;align-items:center;justify-content:center;position:relative}
+.how-journey__steps li:first-child .how-journey__symbol{justify-content:flex-start;margin-left:12px}
+.how-journey__steps li:last-child .how-journey__symbol{justify-content:flex-end;margin-right:10px}
+.how-journey__art{display:block;width:124px;height:120px;max-width:100%;position:relative;flex-shrink:0}
+.how-journey__number{margin:24px 0 0;font-size:11px;font-weight:400;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em;color:#355951}
+.how-journey__steps h3{font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(23px,1.85vw,36px);font-weight:400!important;line-height:1.1;letter-spacing:-.04em;margin:13px 0 0;color:#151615}
+.how-journey__steps p{font-size:clamp(14px,1.08vw,20px);line-height:1.5;max-width:235px;margin:17px 0 0;color:#454b4e}
+@media(max-width:1000px){
+ .how-journey{padding:44px 24px}
+ .how-journey__headline{grid-template-columns:1fr;gap:24px}
+ .how-journey__headline h2{font-size:clamp(48px,8vw,78px)!important}
+ .how-journey__headline p{margin:0;max-width:620px;font-size:17px!important}
+ .how-journey__steps{grid-template-columns:1fr;margin-top:38px}
+ .how-journey__steps::before,.how-journey__steps::after{content:none}
+ .how-journey__steps li{display:grid;grid-template-columns:92px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:22px;padding:0 0 30px}
+ .how-journey__symbol,.how-journey__steps li:first-child .how-journey__symbol,.how-journey__steps li:last-child .how-journey__symbol{grid-column:1;grid-row:1/4;height:92px;margin:0;justify-content:center;align-items:center}
+ .how-journey__art{width:92px;height:89px}
+ .how-journey__number{grid-column:2;grid-row:1;margin:0}
+ .how-journey__steps h3{grid-column:2;grid-row:2;font-size:29px;margin:10px 0 0}
+ .how-journey__steps p{grid-column:2;grid-row:3;font-size:15px;margin:12px 0 0;max-width:500px}
+ .how-journey__steps li:last-child{padding-bottom:0}
+}
+@media(max-width:600px){.how-journey{padding:44px 22px}.how-journey__headline h2{font-size:clamp(39px,10.4vw,61px)!important}.how-journey__steps li{grid-template-columns:72px minmax(0,1fr);column-gap:18px}.how-journey__art{width:72px;height:70px}.how-journey__symbol{height:80px}.how-journey__eyebrow{font-size:10px}.how-journey__steps h3{font-size:27px}}
