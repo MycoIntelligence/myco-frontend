@@ -1,0 +1,22 @@
+/* Shared page background: one continuous canvas; product evidence keeps its own surface. */
+html,body{background:#f7f9f8!important}
+.App{position:relative;isolation:isolate;background:
+ radial-gradient(ellipse 65% 13% at 0% 29%,rgba(220,232,221,.32),transparent 100%),
+ radial-gradient(ellipse 75% 18% at 100% 60%,rgba(239,229,210,.23),transparent 100%),
+ radial-gradient(ellipse 60% 15% at 0% 84%,rgba(217,231,221,.3),transparent 100%),#f7f9f8!important}
+.App>.wrap,.App>div:first-child{background:transparent!important}
+.context-section,.context-section__header,.context-section__visual,.diff-system,.workflow-proof,.signals-queue,.how-journey,.integration-workflow,#security>.security-editorial,.page-closing{background:transparent!important;border-top:0!important}
+.context-section>div:first-child,.context-section>div:last-child{border-top:0!important;border-bottom:0!important}
+.diff-system-wrap{border-top:0!important;border-bottom:0!important}
+.page-footer__grid,.page-footer__legal{border-top:0!important;background:transparent!important}
+.App>.wrap:last-child{border-bottom:0!important}
+/* Fade the existing hero artwork into the shared canvas without changing its crop. */
+#overview{background-image:linear-gradient(to bottom,transparent 65%,#f7f9f8 100%),url('../../assets/sculptural-layers.jpg')}
+#how::before,#security::before,.page-closing::after{content:none}
+/* Raster-white backgrounds inside vector evidence must not become large white panels. */
+.flow-desktop{mix-blend-mode:multiply}
+/* Keep the approved connector geometry while matching its tiny node cutouts to the canvas. */
+.how-journey__steps::after{background:radial-gradient(circle at 20% 50%,#788984 0 2px,#f7f9f8 2px 5px,transparent 5px),radial-gradient(circle at 40% 50%,#075752 0 2.5px,#f7f9f8 2.5px 6px,transparent 6px),radial-gradient(circle at 60% 50%,#075752 0 2.5px,#f7f9f8 2.5px 6px,transparent 6px),radial-gradient(circle at 80% 50%,#788984 0 2px,#f7f9f8 2px 5px,transparent 5px)}
+/* These backgrounds mask wires behind labels; they are not section containers. */
+.integration-workflow__repository,.integration-workflow__logo,.integration-workflow__tool{background:#f7f9f8}
+@media(max-width:560px){#overview{background-image:linear-gradient(to bottom,rgba(255,255,255,.65) 55%,#f7f9f8 100%),url('../../assets/sculptural-layers.jpg')}}
