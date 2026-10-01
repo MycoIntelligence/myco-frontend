@@ -8,14 +8,8 @@
     if (!engine || !diff || !flow || !workflow) return false;
     if (engine.dataset.pageComposed) return true;
     engine.dataset.pageComposed = 'true';
-    engine.dataset.diffRedesignApplied = 'true';
-    const intro = diff.querySelector('.diff-system__intro');
-    intro.classList.add('context-section__header');
-    engine.querySelector('.context-section__header').replaceWith(intro);
     const visual = flow.parentElement;
     visual.classList.add('context-section__visual');
-    engine.append(diff.querySelector('.diff-system__ledger'));
-    diff.remove();
     const integration = document.querySelector('#integrate');
     integration.querySelector('.split-head')?.remove();
     const heading = workflow.querySelector('h3');
@@ -43,7 +37,9 @@
       });
     }
     engine.setAttribute('role', 'region');
-    engine.setAttribute('aria-labelledby', 'diff-system-title');
+    const engineTitle = engine.querySelector('h2');
+    engineTitle.id = 'context-section-title';
+    engine.setAttribute('aria-labelledby', engineTitle.id);
     return true;
   };
   if (compose()) return;

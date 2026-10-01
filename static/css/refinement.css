@@ -7,8 +7,8 @@
 
 /* 2. A shared editorial hierarchy; product evidence remains sans-serif. */
 :root{--editorial-font:Georgia,"Times New Roman",serif;--section-title:clamp(38px,4.4vw,64px);--section-body:16px;--section-space:64px}
-.context-section h2,.diff-system__intro h2,.workflow-proof__intro h2,.signals-queue__intro h2,.how-journey__headline h2,.integration-workflow__header h3,.security-editorial__intro h2{font-family:var(--editorial-font)!important;font-size:var(--section-title)!important;font-weight:400!important;line-height:1.08!important;letter-spacing:-.04em!important}
-.context-section__header p,.diff-system__intro p,.workflow-proof__intro p,.signals-queue__intro p,.how-journey__headline p,.integration-workflow__header p,.security-editorial__intro>p{font-size:var(--section-body)!important;line-height:1.65!important}
+.context-section h2,.workflow-proof__intro h2,.signals-queue__intro h2,.how-journey__headline h2,.integration-workflow__header h3,.security-editorial__intro h2{font-family:var(--editorial-font)!important;font-size:var(--section-title)!important;font-weight:400!important;line-height:1.08!important;letter-spacing:-.04em!important}
+.context-section__header p,.workflow-proof__intro p,.signals-queue__intro p,.how-journey__headline p,.integration-workflow__header p,.security-editorial__intro>p{font-size:var(--section-body)!important;line-height:1.65!important}
 .how-journey__headline h2{letter-spacing:-.045em!important}.how-journey__steps h3{font-size:28px;line-height:1.15;letter-spacing:-.025em}
 @media(max-width:600px){:root{--section-title:38px;--section-body:15px;--section-space:44px}.how-journey__steps h3{font-size:28px}}
 
