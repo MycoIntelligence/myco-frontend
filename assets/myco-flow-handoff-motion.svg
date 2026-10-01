@@ -67,7 +67,6 @@
     <rect width="503" height="573" rx="8" fill="#fafbf9" stroke="#d7dfdb" stroke-width="1.5" />
     <path transform="translate(10 5)" d="M22 25h17l7 7v25H22zM39 25v8h7M28 42h13M28 48h13" fill="none" stroke="#122024" stroke-width="1.7" stroke-linecap="round" />
     <text x="76" y="51" font-family="Georgia, serif" font-size="21" font-weight="700" fill="#122024">STRUCTURED OUTPUT</text>
-    <text x="478" y="49" text-anchor="end" font-size="10.5" fill="#7b8985">25 September 2026</text>
     <line x1="26" y1="76" x2="478" y2="76" stroke="#dfe6e2" />
     <text x="29" y="111" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#122024">Validated findings</text>
     <line x1="26" y1="129" x2="478" y2="129" stroke="#e8ecea" />
