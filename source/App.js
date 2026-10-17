@@ -7,6 +7,7 @@ import Hero from "./components/Hero";
 import Stats from "./components/Stats";
 import DiffSection from "./components/DiffSection";
 import ContextEngine from "./components/ContextEngine";
+import Playground from "./components/Playground";
 import ProofSection from "./components/ProofSection";
 import HowItWorks from "./components/HowItWorks";
 import Integration from "./components/Integration";
@@ -22,6 +23,7 @@ function App() {
           <Hero />
           <Stats />
           <ContextEngine />
+          <Playground />
           <DiffSection />
           <ProofSection />
           <HowItWorks />

@@ -26,9 +26,25 @@
       item.textContent = link.textContent.trim();
       menu.append(item);
     });
+    if (!menu.querySelector('a[href="#playground"]')) {
+      const pItem = document.createElement('a');
+      pItem.href = '#playground';
+      pItem.textContent = 'Playground';
+      const ov = menu.querySelector('a[href="#overview"]');
+      if (ov && ov.nextSibling) menu.insertBefore(pItem, ov.nextSibling);
+      else menu.appendChild(pItem);
+    }
     actions.prepend(button);
     nav.append(menu);
     const setOpen = (open, focusToggle = false) => {
+      if (!menu.querySelector('a[href="#playground"]')) {
+        const pItem = document.createElement('a');
+        pItem.href = '#playground';
+        pItem.textContent = 'Playground';
+        const ov = menu.querySelector('a[href="#overview"]');
+        if (ov && ov.nextSibling) menu.insertBefore(pItem, ov.nextSibling);
+        else menu.appendChild(pItem);
+      }
       menu.hidden = !open;
       button.setAttribute('aria-expanded', String(open));
       button.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
