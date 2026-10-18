@@ -14,7 +14,10 @@ from typing import Any, Dict, List, Optional
 from pipeline.types import (
     AnalysisFinding,
     CodeInputFile,
+    EscalationReason,
     FindingSeverity,
+    ReviewResult,
+    ReviewStatus,
     SourceRange,
 )
 
@@ -24,8 +27,25 @@ INTELLIGENCE_CORE_JS = os.path.join(os.path.dirname(__file__), "..", "static", "
 
 class InternalProcessingEngine:
     """
-    Executes internal static code analysis and policy verification.
+    Executes internal static code analysis and policy verification (Little My).
     """
+
+    SUPPORTED_EXTENSIONS = {
+        ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
+        ".py", ".sql", ".json", ".yaml", ".yml", ".env", ".md", ".markdown", ".diff", ".patch"
+    }
+
+    @classmethod
+    def is_file_supported(cls, path: str) -> bool:
+        """Determines if the given file path is supported by Little My native parsers and rules."""
+        if not path:
+            return True
+        p_lower = path.lower()
+        base = os.path.basename(p_lower)
+        if base in ("dockerfile", "makefile", ".env") or base.startswith(".env."):
+            return True
+        _, ext = os.path.splitext(p_lower)
+        return ext in cls.SUPPORTED_EXTENSIONS
 
     def process(
         self,
@@ -38,11 +58,31 @@ class InternalProcessingEngine:
         """
         start_time = time.time()
         findings: List[AnalysisFinding] = []
+        unsupported_files: List[str] = []
+        unresolved_cases: List[str] = []
 
         code = primary_file.content or ""
         file_path = primary_file.path or "code.ts"
         lines = code.splitlines()
         trimmed_code = code.strip()
+
+        # Capability check: Verify primary file extension
+        if not self.is_file_supported(file_path):
+            unsupported_files.append(file_path)
+
+        # Capability check: Verify context files
+        for cf in context_files:
+            if cf.path and not self.is_file_supported(cf.path):
+                if cf.path not in unsupported_files:
+                    unsupported_files.append(cf.path)
+
+        # Boundary check: Cross-repository internal package dependencies
+        if re.search(r'import\s+.*?from\s+["\']@(?:company|enterprise|internal|myco-core)/', code):
+            unresolved_cases.append(f"Cross-repository dependency detected in {file_path}")
+
+        # Inconclusive analysis check
+        if "@little-my: inconclusive" in code or "@review: inconclusive" in code:
+            unresolved_cases.append(f"Explicit inconclusive static analysis marker in {file_path}")
 
         # 0. Rule: Grammar & Syntax Integrity (Bare Identifier & Delimiter Stack)
         clean_tokens = re.sub(r"/\*[\s\S]*?\*/|//.*|#.*", "", trimmed_code).strip()
@@ -509,21 +549,213 @@ class InternalProcessingEngine:
             "isMergeBlocking": False,
         }
 
+        # Determine escalation state for single-file analysis
+        escalation_required = False
+        escalation_reason = EscalationReason.NONE
+
+        if unsupported_files:
+            escalation_required = True
+            escalation_reason = EscalationReason.UNSUPPORTED_LANGUAGE
+        elif unresolved_cases:
+            escalation_required = True
+            if any("cross-repository" in c.lower() for c in unresolved_cases):
+                escalation_reason = EscalationReason.CAPABILITY_EXCEEDED
+            else:
+                escalation_reason = EscalationReason.INCONCLUSIVE_ANALYSIS
+
+        if escalation_required:
+            review_status = ReviewStatus.PARTIAL if findings or (self.is_file_supported(file_path) and not unsupported_files) else ReviewStatus.INCOMPLETE
+            confidence = 0.5
+        else:
+            review_status = ReviewStatus.COMPLETE
+            confidence = 1.0
+
         return {
-            "status": "completed",
+            "status": "completed" if review_status == ReviewStatus.COMPLETE else review_status.value,
+            "reviewStatus": review_status.value,
             "executionTimeMs": round(duration_ms, 2),
             "findings": [f.to_dict() for f in findings],
             "primaryFinding": primary_finding,
             "isClean": is_clean,
             "isMergeBlocking": is_merge_blocking,
+            "unsupportedFiles": unsupported_files,
+            "unresolvedCases": unresolved_cases,
+            "escalationRequired": escalation_required,
+            "escalationReason": escalation_reason.value if escalation_reason else None,
+            "unsupported_files": unsupported_files,
+            "unresolved_cases": unresolved_cases,
+            "escalation_required": escalation_required,
+            "escalation_reason": escalation_reason.value if escalation_reason else None,
+            "confidence": confidence,
             "summary": {
                 "totalFindings": len(findings),
                 "criticalCount": critical_count,
                 "highCount": high_count,
                 "mediumCount": medium_count,
                 "cleanVerified": is_clean,
+                "escalationRequired": escalation_required,
+                "escalationReason": escalation_reason.value if escalation_reason else None,
             },
         }
+
+    def review_file(
+        self,
+        file_input: CodeInputFile,
+        prd_text: Optional[str] = None,
+    ) -> ReviewResult:
+        """Convenience method to review a single file and return a canonical ReviewResult."""
+        res = self.process(primary_file=file_input, context_files=[], prd_text=prd_text)
+        return ReviewResult(
+            status=ReviewStatus(res.get("reviewStatus", "complete")),
+            findings=res.get("findings", []),
+            unsupported_files=res.get("unsupported_files", []),
+            unresolved_cases=res.get("unresolved_cases", []),
+            escalation_required=res.get("escalation_required", False),
+            escalation_reason=EscalationReason(res["escalation_reason"]) if res.get("escalation_reason") else EscalationReason.NONE,
+            confidence=res.get("confidence", 1.0),
+            execution_time_ms=res.get("executionTimeMs", 0.0),
+            is_clean=res.get("isClean", True),
+            is_merge_blocking=res.get("isMergeBlocking", False),
+            metadata={"file": file_input.path or "code.ts", "engine": "Little My"},
+        )
+
+    def review_pr(
+        self,
+        files: List[CodeInputFile],
+        prd_text: Optional[str] = None,
+        timeout_sec: float = 30.0,
+    ) -> ReviewResult:
+        """
+        Reviews a pull request with multiple files under Little My.
+        Preserves all detected findings while explicitly identifying unsupported files,
+        parser failures, and unresolved constructs requiring Myco escalation.
+        """
+        start_time = time.time()
+        findings: List[Any] = []
+        unsupported_files: List[str] = []
+        unresolved_cases: List[str] = []
+        escalation_required = False
+        escalation_reason: Optional[EscalationReason] = None
+        analyzed_supported_files = 0
+
+        if not files:
+            return ReviewResult(
+                status=ReviewStatus.COMPLETE,
+                findings=[],
+                unsupported_files=[],
+                unresolved_cases=[],
+                escalation_required=False,
+                escalation_reason=EscalationReason.NONE,
+                confidence=1.0,
+                execution_time_ms=0.0,
+                is_clean=True,
+                is_merge_blocking=False,
+                metadata={"totalFiles": 0, "engine": "Little My"},
+            )
+
+        for file_input in files:
+            elapsed = time.time() - start_time
+            if elapsed >= timeout_sec or timeout_sec <= 0:
+                unresolved_cases.append(f"Little My review timeout exceeded after {elapsed:.2f}s (budget: {timeout_sec}s)")
+                escalation_required = True
+                escalation_reason = EscalationReason.STAGE_TIMEOUT
+                break
+
+            file_path = file_input.path or "code.ts"
+
+            if not self.is_file_supported(file_path):
+                if file_path not in unsupported_files:
+                    unsupported_files.append(file_path)
+                escalation_required = True
+                if escalation_reason is None or escalation_reason == EscalationReason.NONE:
+                    escalation_reason = EscalationReason.UNSUPPORTED_LANGUAGE
+                continue
+
+            try:
+                res = self.process(primary_file=file_input, context_files=[], prd_text=prd_text)
+                analyzed_supported_files += 1
+
+                for f_item in res.get("findings", []):
+                    f_id = f_item.get("id") if isinstance(f_item, dict) else getattr(f_item, "id", None)
+                    existing_ids = [
+                        (f.get("id") if isinstance(f, dict) else getattr(f, "id", None))
+                        for f in findings
+                    ]
+                    if f_id not in existing_ids:
+                        findings.append(f_item)
+
+                if res.get("unsupported_files"):
+                    for uf in res["unsupported_files"]:
+                        if uf not in unsupported_files:
+                            unsupported_files.append(uf)
+                    escalation_required = True
+                    if escalation_reason is None or escalation_reason == EscalationReason.NONE:
+                        escalation_reason = EscalationReason.UNSUPPORTED_LANGUAGE
+
+                if res.get("unresolved_cases"):
+                    for uc in res["unresolved_cases"]:
+                        if uc not in unresolved_cases:
+                            unresolved_cases.append(uc)
+                    escalation_required = True
+                    if escalation_reason is None or escalation_reason == EscalationReason.NONE:
+                        if res.get("escalation_reason"):
+                            escalation_reason = EscalationReason(res["escalation_reason"])
+                        else:
+                            escalation_reason = EscalationReason.INCONCLUSIVE_ANALYSIS
+
+            except SyntaxError as syn_err:
+                unresolved_cases.append(f"Parser failure in '{file_path}': {str(syn_err)}")
+                escalation_required = True
+                if escalation_reason is None or escalation_reason == EscalationReason.NONE:
+                    escalation_reason = EscalationReason.PARSER_FAILURE
+            except Exception as err:
+                unresolved_cases.append(f"Analysis error in '{file_path}': {str(err)}")
+                escalation_required = True
+                if escalation_reason is None or escalation_reason == EscalationReason.NONE:
+                    escalation_reason = EscalationReason.ANALYSIS_ERROR
+
+        total_time_ms = (time.time() - start_time) * 1000.0
+
+        if escalation_required:
+            if escalation_reason == EscalationReason.STAGE_TIMEOUT:
+                status = ReviewStatus.PARTIAL if findings or analyzed_supported_files > 0 else ReviewStatus.FAILED
+            elif escalation_reason == EscalationReason.ANALYSIS_ERROR and analyzed_supported_files == 0:
+                status = ReviewStatus.FAILED
+            elif analyzed_supported_files > 0:
+                status = ReviewStatus.PARTIAL
+            else:
+                status = ReviewStatus.INCOMPLETE
+            confidence = 0.5
+        else:
+            status = ReviewStatus.COMPLETE
+            escalation_reason = EscalationReason.NONE
+            confidence = 1.0
+
+        is_clean = len(findings) == 0
+        is_merge_blocking = any(
+            (f.get("isMergeBlocking") if isinstance(f, dict) else getattr(f, "is_merge_blocking", False))
+            for f in findings
+        )
+
+        return ReviewResult(
+            status=status,
+            findings=findings,
+            unsupported_files=unsupported_files,
+            unresolved_cases=unresolved_cases,
+            escalation_required=escalation_required,
+            escalation_reason=escalation_reason,
+            confidence=confidence,
+            execution_time_ms=total_time_ms,
+            is_clean=is_clean,
+            is_merge_blocking=is_merge_blocking,
+            metadata={
+                "totalFiles": len(files),
+                "analyzedFiles": analyzed_supported_files,
+                "unsupportedCount": len(unsupported_files),
+                "unresolvedCount": len(unresolved_cases),
+                "engine": "Little My",
+            },
+        )
 
     def _find_line_number(self, lines: List[str], target: str) -> int:
         for idx, line in enumerate(lines, start=1):

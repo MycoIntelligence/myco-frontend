@@ -33,6 +33,65 @@ class FindingSeverity(str, Enum):
     CRITICAL = "CRITICAL"
 
 
+class ReviewStatus(str, Enum):
+    """Execution completion state of Little My review."""
+    COMPLETE = "complete"
+    PARTIAL = "partial"
+    INCOMPLETE = "incomplete"
+    FAILED = "failed"
+
+
+class EscalationReason(str, Enum):
+    """Explicit escalation reasons for triggering Myco fallback."""
+    NONE = "NONE"
+    UNSUPPORTED_LANGUAGE = "UNSUPPORTED_LANGUAGE"
+    PARSER_FAILURE = "PARSER_FAILURE"
+    CAPABILITY_EXCEEDED = "CAPABILITY_EXCEEDED"
+    INCONCLUSIVE_ANALYSIS = "INCONCLUSIVE_ANALYSIS"
+    STAGE_TIMEOUT = "STAGE_TIMEOUT"
+    ANALYSIS_ERROR = "ANALYSIS_ERROR"
+    REQUIRED_DEPENDENCY_UNAVAILABLE = "REQUIRED_DEPENDENCY_UNAVAILABLE"
+
+
+@dataclass
+class ReviewResult:
+    """Structured review result from Little My with completion status & escalation indicators."""
+    status: ReviewStatus
+    findings: List[Any]
+    unsupported_files: List[str] = field(default_factory=list)
+    unresolved_cases: List[str] = field(default_factory=list)
+    escalation_required: bool = False
+    escalation_reason: Optional[EscalationReason] = None
+    confidence: float = 1.0
+    execution_time_ms: float = 0.0
+    is_clean: bool = True
+    is_merge_blocking: bool = False
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        reason_val = self.escalation_reason.value if self.escalation_reason else None
+        return {
+            "status": self.status.value,
+            "findings": [f.to_dict() if hasattr(f, "to_dict") else f for f in self.findings],
+            "unsupported_files": self.unsupported_files,
+            "unresolved_cases": self.unresolved_cases,
+            "escalation_required": self.escalation_required,
+            "escalation_reason": reason_val,
+            "unsupportedFiles": self.unsupported_files,
+            "unresolvedCases": self.unresolved_cases,
+            "escalationRequired": self.escalation_required,
+            "escalationReason": reason_val,
+            "confidence": self.confidence,
+            "execution_time_ms": round(self.execution_time_ms, 2),
+            "executionTimeMs": round(self.execution_time_ms, 2),
+            "is_clean": self.is_clean,
+            "isClean": self.is_clean,
+            "is_merge_blocking": self.is_merge_blocking,
+            "isMergeBlocking": self.is_merge_blocking,
+            "metadata": self.metadata,
+        }
+
+
 @dataclass
 class SourceRange:
     start_line: int

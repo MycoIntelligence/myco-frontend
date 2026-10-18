@@ -7,3 +7,4 @@ node_modules/
 !.env.example
 .demo_allowance.json
 .demo_allowance.json.tmp
+.pr_review_cache.json
