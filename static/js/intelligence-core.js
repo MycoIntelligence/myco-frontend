@@ -13,6 +13,7 @@
     TYPESCRIPT: "typescript",
     JAVASCRIPT: "javascript",
     PYTHON: "python",
+    SQL: "sql",
     JSON: "json",
     YAML: "yaml",
     ENV: "env",
@@ -39,6 +40,18 @@
         confidence: 1.0,
         parser: "binary_guard",
         limitations: "Binary and compiled formats cannot be parsed into AST nodes."
+      };
+    }
+
+    // SQL query check (explicit or content sniffing)
+    if (fn.endsWith(".sql") || /^\s*(?:SELECT\b|INSERT\s+INTO\b|UPDATE\b|DELETE\s+FROM\b|CREATE\s+TABLE\b|DROP\s+TABLE\b|ALTER\s+TABLE\b|WITH\s+[a-zA-Z_]\w*\s+AS\b)/i.test(text.trim())) {
+      return {
+        format: FORMATS.SQL,
+        language: "SQL Query",
+        isSupported: true,
+        confidence: 0.98,
+        parser: "sql_ast_analyzer",
+        limitations: null
       };
     }
 
@@ -328,6 +341,13 @@
     // Always run format validation and secret check
     checks.push("format_integrity");
     checks.push("secret_credential_detector");
+    checks.push("syntax_and_grammar_detector");
+    checks.push("logic_defect_detector");
+
+    if (primaryFormat.format === FORMATS.SQL) {
+      checks.push("sql_query_detector");
+      checks.push("tenant_boundary_detector");
+    }
 
     // Code specific checks
     if ([FORMATS.TYPESCRIPT, FORMATS.JAVASCRIPT].includes(primaryFormat.format)) {
@@ -349,6 +369,10 @@
     const allPossible = [
       "format_integrity",
       "secret_credential_detector",
+      "syntax_and_grammar_detector",
+      "sql_query_detector",
+      "logic_defect_detector",
+      "external_myco_routing_detector",
       "dom_xss_detector",
       "tenant_boundary_detector",
       "missing_error_path_detector",
@@ -366,6 +390,461 @@
   /* -------------------------------------------------------------------------- */
   /* Deterministic Static Analysis Runners                                      */
   /* -------------------------------------------------------------------------- */
+
+  /**
+   * 0. Grammar & Syntax Integrity Detector
+   * Lexically scans tokens, verifies delimiter balance (parentheses, braces, brackets),
+   * and identifies bare unresolved identifiers outside statements.
+   */
+  function checkSyntaxAndGrammar(context) {
+    const findings = [];
+    const content = context.primary.content || "";
+    const lines = content.split("\n");
+    const format = context.primary.formatMeta.format;
+
+    if (format === FORMATS.MARKDOWN || format === FORMATS.DIFF || format === FORMATS.UNSUPPORTED_BINARY) {
+      return findings;
+    }
+
+    const trimmed = content.trim();
+    if (!trimmed) return findings;
+
+    // A. Bare unresolved identifier (e.g., "haaaa" on its own without declaration or invocation)
+    const cleanTokens = trimmed.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, "").trim();
+    if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(cleanTokens)) {
+      const bareToken = cleanTokens;
+      const validSingleKeywords = ["return", "break", "continue", "debugger", "pass", "yield"];
+      if (!validSingleKeywords.includes(bareToken)) {
+        findings.push({
+          id: "SYNTAX-BARE-IDENTIFIER-L1",
+          category: "syntax",
+          severity: "CRITICAL",
+          confidence: "CONFIRMED",
+          validationStatus: "VALIDATED",
+          title: `Syntax Error: Unresolved Bare Identifier '${bareToken}'`,
+          explanation: `The bare identifier '${bareToken}' exists outside any statement, declaration, or function invocation. In TypeScript/JavaScript, this throws a ReferenceError at runtime (TS2304); in SQL or Python, this is invalid syntax.`,
+          impact: "Code cannot execute or compile. Evaluation raises an immediate ReferenceError or SyntaxError.",
+          filePath: context.primary.path,
+          sourceRange: { startLine: 1, endLine: 1 },
+          evidenceSnippet: bareToken,
+          evidenceRule: "SYNTAX-01 · GRAMMAR & REFERENCE INTEGRITY",
+          suggestedAction: `Declare '${bareToken}' with a declaration keyword (e.g., 'const ${bareToken} = ...;') or provide a valid statement or query.`,
+          suggestedPatch: `const ${bareToken} = "sample_value";`,
+          fixedCode: `const ${bareToken} = "sample_value";\n`,
+          isMergeBlocking: true
+        });
+        return findings;
+      }
+    }
+
+    // B. Delimiter and Bracket Balance Check
+    const bracketStack = [];
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    let inBacktick = false;
+    let inLineComment = false;
+    let inBlockComment = false;
+    let line = 1;
+    let col = 1;
+
+    for (let i = 0; i < content.length; i++) {
+      const char = content[i];
+      const nextChar = content[i + 1] || "";
+
+      if (char === "\n") {
+        line++;
+        col = 1;
+        inLineComment = false;
+        continue;
+      } else {
+        col++;
+      }
+
+      if (inLineComment) continue;
+
+      if (inBlockComment) {
+        if (char === "*" && nextChar === "/") {
+          inBlockComment = false;
+          i++;
+        }
+        continue;
+      }
+
+      // Check comments
+      if (!inSingleQuote && !inDoubleQuote && !inBacktick) {
+        if (char === "/" && nextChar === "/") {
+          inLineComment = true;
+          i++;
+          continue;
+        }
+        if (char === "/" && nextChar === "*") {
+          inBlockComment = true;
+          i++;
+          continue;
+        }
+        if (char === "#" && (format === FORMATS.PYTHON || format === FORMATS.ENV || format === FORMATS.YAML)) {
+          inLineComment = true;
+          continue;
+        }
+      }
+
+      // Check string quotes
+      if (char === "'" && !inDoubleQuote && !inBacktick) {
+        if (inSingleQuote && content[i - 1] !== "\\") {
+          inSingleQuote = false;
+        } else if (!inSingleQuote) {
+          inSingleQuote = true;
+        }
+        continue;
+      }
+      if (char === '"' && !inSingleQuote && !inBacktick) {
+        if (inDoubleQuote && content[i - 1] !== "\\") {
+          inDoubleQuote = false;
+        } else if (!inDoubleQuote) {
+          inDoubleQuote = true;
+        }
+        continue;
+      }
+      if (char === "`" && !inSingleQuote && !inDoubleQuote) {
+        if (inBacktick && content[i - 1] !== "\\") {
+          inBacktick = false;
+        } else if (!inBacktick) {
+          inBacktick = true;
+        }
+        continue;
+      }
+
+      if (inSingleQuote || inDoubleQuote || inBacktick) continue;
+
+      // Push opening brackets
+      if (char === "{" || char === "(" || char === "[") {
+        bracketStack.push({ char, line, col });
+      } else if (char === "}" || char === ")" || char === "]") {
+        if (bracketStack.length === 0) {
+          findings.push({
+            id: `SYNTAX-UNMATCHED-BRACKET-L${line}`,
+            category: "syntax",
+            severity: "CRITICAL",
+            confidence: "CONFIRMED",
+            validationStatus: "VALIDATED",
+            title: `Syntax Error: Unexpected Closing Delimiter '${char}'`,
+            explanation: `Found unmatched closing delimiter '${char}' without an opening counterpart.`,
+            impact: "Unbalanced delimiters cause immediate parser failure.",
+            filePath: context.primary.path,
+            sourceRange: { startLine: line, endLine: line },
+            evidenceSnippet: lines[line - 1] ? lines[line - 1].trim() : char,
+            evidenceRule: "SYNTAX-02 · DELIMITER INTEGRITY",
+            suggestedAction: `Remove the stray closing delimiter '${char}' or add the matching opening delimiter.`,
+            isMergeBlocking: true
+          });
+          break;
+        }
+        const last = bracketStack.pop();
+        const matches = (last.char === "{" && char === "}") ||
+                        (last.char === "(" && char === ")") ||
+                        (last.char === "[" && char === "]");
+        if (!matches) {
+          findings.push({
+            id: `SYNTAX-MISMATCHED-DELIMITER-L${line}`,
+            category: "syntax",
+            severity: "CRITICAL",
+            confidence: "CONFIRMED",
+            validationStatus: "VALIDATED",
+            title: `Syntax Error: Mismatched Delimiter: Opened '${last.char}' but closed with '${char}'`,
+            explanation: `Delimiter opened as '${last.char}' at line ${last.line} was closed with non-matching '${char}' at line ${line}.`,
+            impact: "Mismatched delimiters break block structure and parser state.",
+            filePath: context.primary.path,
+            sourceRange: { startLine: line, endLine: line },
+            evidenceSnippet: lines[line - 1] ? lines[line - 1].trim() : char,
+            evidenceRule: "SYNTAX-02 · DELIMITER INTEGRITY",
+            suggestedAction: `Replace '${char}' with matching '${last.char === "{" ? "}" : last.char === "(" ? ")" : "]"}'`,
+            isMergeBlocking: true
+          });
+          break;
+        }
+      }
+    }
+
+    if (bracketStack.length > 0 && findings.length === 0) {
+      const unclosed = bracketStack[bracketStack.length - 1];
+      findings.push({
+        id: `SYNTAX-UNCLOSED-DELIMITER-L${unclosed.line}`,
+        category: "syntax",
+        severity: "CRITICAL",
+        confidence: "CONFIRMED",
+        validationStatus: "VALIDATED",
+        title: `Syntax Error: Unclosed Delimiter '${unclosed.char}'`,
+        explanation: `Delimiter '${unclosed.char}' opened at line ${unclosed.line} was never closed before end of file.`,
+        impact: "Premature EOF in block structure causing unparseable code.",
+        filePath: context.primary.path,
+        sourceRange: { startLine: unclosed.line, endLine: lines.length },
+        evidenceSnippet: lines[unclosed.line - 1] ? lines[unclosed.line - 1].trim() : unclosed.char,
+        evidenceRule: "SYNTAX-02 · DELIMITER INTEGRITY",
+        suggestedAction: `Close delimiter with '${unclosed.char === "{" ? "}" : unclosed.char === "(" ? ")" : "]"}' before end of file.`,
+        isMergeBlocking: true
+      });
+    }
+
+    return findings;
+  }
+
+  /**
+   * 0.1 SQL Query Intelligence Detector
+   * Evaluates standalone SQL queries and embedded queries for data-loss risks,
+   * unbounded projections, and tenant isolation leakage.
+   */
+  function checkSqlQuery(context) {
+    const findings = [];
+    const content = context.primary.content || "";
+    const lines = content.split("\n");
+    const format = context.primary.formatMeta.format;
+
+    const isSql = format === FORMATS.SQL ||
+      context.primary.path.endsWith(".sql") ||
+      /^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b/i.test(content.trim());
+
+    if (!isSql) return findings;
+
+    // 1. Unbounded Table Modification (UPDATE or DELETE without WHERE clause)
+    const updateOrDeleteMatch = content.match(/\b(UPDATE\s+([a-zA-Z0-9_.]+)\s+SET\b|DELETE\s+FROM\s+([a-zA-Z0-9_.]+)\b)/i);
+    if (updateOrDeleteMatch) {
+      const hasWhere = /\bWHERE\b/i.test(content);
+      if (!hasWhere) {
+        const lineIdx = lines.findIndex((l) => /\b(?:UPDATE|DELETE\s+FROM)\b/i.test(l));
+        const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+        const targetTable = updateOrDeleteMatch[2] || updateOrDeleteMatch[3] || "table";
+
+        findings.push({
+          id: `SQL-UNBOUNDED-MOD-L${lineNum}`,
+          category: "security",
+          severity: "CRITICAL",
+          confidence: "CONFIRMED",
+          validationStatus: "VALIDATED",
+          title: "Critical: Unbounded Table Modification (Missing WHERE Clause)",
+          explanation: `The ${updateOrDeleteMatch[1].toUpperCase()} operation does not specify a WHERE clause filter. In production, executing this query will permanently modify or delete all records across the entire '${targetTable}' table.`,
+          impact: "Catastrophic permanent data loss or database corruption across all tenants.",
+          filePath: context.primary.path,
+          sourceRange: { startLine: lineNum, endLine: lineNum },
+          evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : updateOrDeleteMatch[0],
+          evidenceRule: "SQL-01 · UNBOUNDED_TABLE_MODIFICATION",
+          suggestedAction: `Specify a bounded WHERE clause with unique identifier constraint (e.g. 'WHERE id = :id' or 'WHERE tenant_id = :tenant_id').`,
+          suggestedPatch: `  // FIX: Add strict WHERE boundary\n  WHERE id = :id AND tenant_id = :tenant_id`,
+          isMergeBlocking: true
+        });
+      }
+    }
+
+    // 2. Unbounded Projection (SELECT * without LIMIT)
+    const selectAllMatch = content.match(/\bSELECT\s+\*\s+FROM\s+([a-zA-Z0-9_.]+)/i);
+    if (selectAllMatch) {
+      const hasLimit = /\bLIMIT\s+\d+|\bFETCH\s+FIRST|\bTOP\s+\d+/i.test(content);
+      if (!hasLimit) {
+        const lineIdx = lines.findIndex((l) => /\bSELECT\s+\*\s+FROM\b/i.test(l));
+        const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+        const tableName = selectAllMatch[1];
+
+        findings.push({
+          id: `SQL-UNBOUNDED-SELECT-L${lineNum}`,
+          category: "performance",
+          severity: "MEDIUM",
+          confidence: "CONFIRMED",
+          validationStatus: "VALIDATED",
+          title: "Advisory: Unbounded Column Projection (SELECT * Without LIMIT)",
+          explanation: `The query executes 'SELECT * FROM ${tableName}' without a LIMIT or pagination clause. Retrieving unbounded columns and rows exhausts memory buffers, degrades query latency, and creates cache evictions.`,
+          impact: "Database connection pool exhaustion and memory pressure under high concurrent query volume.",
+          filePath: context.primary.path,
+          sourceRange: { startLine: lineNum, endLine: lineNum },
+          evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : selectAllMatch[0],
+          evidenceRule: "SQL-02 · UNBOUNDED_PROJECTION",
+          suggestedAction: `Explicitly project only required columns (e.g. SELECT id, name) and append a LIMIT clause (e.g. LIMIT 100).`,
+          suggestedPatch: `SELECT id, name FROM ${tableName} LIMIT 100;`,
+          isMergeBlocking: false
+        });
+      }
+    }
+
+    // 3. Multi-Tenant Isolation Leak on Sensitive Tables
+    const sensitiveTableMatch = content.match(/\bFROM\s+([a-zA-Z0-9_.]*(?:users|accounts|invoices|tenants|organizations|projects|records|billing|orders|profiles)[a-zA-Z0-9_.]*)/i);
+    if (sensitiveTableMatch) {
+      const hasTenantFilter = /\b(?:tenant_id|org_id|tenantId|orgId|account_id|accountId)\b/i.test(content);
+      if (!hasTenantFilter) {
+        const lineIdx = lines.findIndex((l) => /\bFROM\b/i.test(l));
+        const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+        const tableName = sensitiveTableMatch[1];
+
+        findings.push({
+          id: `SQL-TENANT-LEAK-L${lineNum}`,
+          category: "security",
+          severity: "HIGH",
+          confidence: "CONFIRMED",
+          validationStatus: "VALIDATED",
+          title: `Tenant Boundary Violation: Missing Tenant Isolation Filter on '${tableName}'`,
+          explanation: `The query accesses the multi-tenant resource collection '${tableName}' without filtering by 'tenant_id' or 'org_id'. In multi-tenant environments, this permits cross-tenant data exposure.`,
+          impact: "Violates enterprise TENANT-02 zero-trust isolation policy. Potential authorization bypass and privacy leak.",
+          filePath: context.primary.path,
+          sourceRange: { startLine: lineNum, endLine: lineNum },
+          evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : sensitiveTableMatch[0],
+          evidenceRule: "TENANT-02 · STRICT_MULTI_TENANT_ISOLATION",
+          suggestedAction: `Append tenant isolation filter to WHERE clause: 'WHERE tenant_id = :tenant_id' or 'AND org_id = :org_id'.`,
+          suggestedPatch: `WHERE tenant_id = :tenant_id`,
+          isMergeBlocking: true
+        });
+      }
+    }
+
+    return findings;
+  }
+
+  /**
+   * 0.2 Logic Defect & Quality Detector
+   * Evaluates assignment in conditions, comparison against NaN, empty catch blocks,
+   * and unencrypted endpoint transport.
+   */
+  function checkLogicDefects(context) {
+    const findings = [];
+    const content = context.primary.content || "";
+    const lines = content.split("\n");
+
+    // 1. Accidental Assignment in Conditional
+    const assignInIf = content.match(/\bif\s*\(\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*([^=][^)]*)\)/);
+    if (assignInIf) {
+      const lineIdx = lines.findIndex((l) => /\bif\s*\([^=)]*=\s*[^=]/.test(l));
+      const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+      const varName = assignInIf[1];
+
+      findings.push({
+        id: `LOGIC-ACCIDENTAL-ASSIGN-L${lineNum}`,
+        category: "logic",
+        severity: "HIGH",
+        confidence: "CONFIRMED",
+        validationStatus: "VALIDATED",
+        title: `Logic Defect: Accidental Variable Assignment in 'if' Condition`,
+        explanation: `Condition assigns a value to '${varName}' ('${varName} = ...') instead of testing equality ('==='). The condition evaluates truthiness of the assigned value and mutates '${varName}'.`,
+        impact: "Severe logical bug: branch condition behaves unpredictably and mutates variable state.",
+        filePath: context.primary.path,
+        sourceRange: { startLine: lineNum, endLine: lineNum },
+        evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : assignInIf[0],
+        evidenceRule: "LOGIC-01 · ACCIDENTAL_ASSIGNMENT",
+        suggestedAction: `Replace assignment '=' with strict equality comparison '===': if (${varName} === ${assignInIf[2].trim()})`,
+        suggestedPatch: `if (${varName} === ${assignInIf[2].trim()})`,
+        isMergeBlocking: true
+      });
+    }
+
+    // 2. NaN Equality Bug
+    const nanMatch = content.match(/(?:===|==|!==|!=)\s*NaN\b|\bNaN\s*(?:===|==|!==|!=)/);
+    if (nanMatch) {
+      const lineIdx = lines.findIndex((l) => /(?:===|==|!==|!=)\s*NaN\b|\bNaN\s*(?:===|==|!==|!=)/.test(l));
+      const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+
+      findings.push({
+        id: `LOGIC-NAN-EQUALITY-L${lineNum}`,
+        category: "logic",
+        severity: "HIGH",
+        confidence: "CONFIRMED",
+        validationStatus: "VALIDATED",
+        title: "Logic Defect: Invalid Direct Equality Comparison Against NaN",
+        explanation: "Comparing a value directly to NaN ('=== NaN' or '== NaN') is an anti-pattern. In the IEEE 754 floating-point standard, NaN !== NaN is always true, so 'x === NaN' evaluates to false for all values.",
+        impact: "Conditional check will never match, causing logic branches to be permanently unreachable.",
+        filePath: context.primary.path,
+        sourceRange: { startLine: lineNum, endLine: lineNum },
+        evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : nanMatch[0],
+        evidenceRule: "LOGIC-02 · IEEE754_NAN_EQUALITY",
+        suggestedAction: "Use 'Number.isNaN(value)' instead of direct equality comparison.",
+        suggestedPatch: "if (Number.isNaN(val))",
+        isMergeBlocking: false
+      });
+    }
+
+    // 3. Silent Exception Swallowing (Empty Catch Block)
+    const emptyCatchMatch = content.match(/\bcatch\s*(?:\([^)]*\))?\s*\{\s*(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/|\s*)*\}/);
+    if (emptyCatchMatch) {
+      const lineIdx = lines.findIndex((l) => /\bcatch\s*(?:\([^)]*\))?\s*\{/.test(l));
+      const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+
+      findings.push({
+        id: `REL-EMPTY-CATCH-L${lineNum}`,
+        category: "reliability",
+        severity: "HIGH",
+        confidence: "CONFIRMED",
+        validationStatus: "VALIDATED",
+        title: "Reliability Risk: Silent Exception Swallowing in Catch Block",
+        explanation: "Catch block completely swallows exceptions without logging, telemetry, or rethrowing. Silencing exceptions masks runtime failures and leaves systems in an inconsistent state.",
+        impact: "Violates enterprise REL-01 reliability standard. Prevents incident alerts and complicates root cause analysis.",
+        filePath: context.primary.path,
+        sourceRange: { startLine: lineNum, endLine: lineNum },
+        evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : "catch (err) {}",
+        evidenceRule: "REL-01 · EXPLICIT_ERROR_HANDLING",
+        suggestedAction: "Log the error with logger.error(err) or implement a structured fallback recovery path.",
+        suggestedPatch: "catch (err) {\n    logger.error(\"Operation failed\", err);\n    throw err;\n  }",
+        isMergeBlocking: true
+      });
+    }
+
+    // 4. Insecure HTTP Protocol
+    const insecureHttpMatch = content.match(/["']http:\/\/(?!(?:localhost|127\.0\.0\.1|0\.0\.0\.0|example\.com)[/:"'])([a-zA-Z0-9_.-]+[^"']*)/i);
+    if (insecureHttpMatch) {
+      const lineIdx = lines.findIndex((l) => /["']http:\/\/(?!(?:localhost|127\.0\.0\.1|0\.0\.0\.0|example\.com))/i.test(l));
+      const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+
+      findings.push({
+        id: `SEC-INSECURE-HTTP-L${lineNum}`,
+        category: "security",
+        severity: "HIGH",
+        confidence: "CONFIRMED",
+        validationStatus: "VALIDATED",
+        title: "Security Risk: Insecure Plaintext HTTP Protocol in Remote Endpoint",
+        explanation: `Endpoint '${insecureHttpMatch[0]}' uses unencrypted 'http://' protocol. Data transmitted over unencrypted HTTP is vulnerable to network sniffing, eavesdropping, and Man-in-the-Middle (MitM) tampering.`,
+        impact: "Violates enterprise transport security guidelines. Exposes tokens and data in transit.",
+        filePath: context.primary.path,
+        sourceRange: { startLine: lineNum, endLine: lineNum },
+        evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : insecureHttpMatch[0],
+        evidenceRule: "SEC-01 · ENCRYPTED_TRANSPORT_ENFORCEMENT",
+        suggestedAction: "Upgrade endpoint protocol to secure TLS/HTTPS ('https://').",
+        suggestedPatch: insecureHttpMatch[0].replace("http://", "https://"),
+        isMergeBlocking: false
+      });
+    }
+
+    return findings;
+  }
+
+  /**
+   * 0.3 External Myco Enterprise Routing Detector
+   * Detects cross-repository monorepo packages, multi-service boundaries, and deep
+   * symbolic execution requirements that route to the Enterprise Myco engine.
+   */
+  function checkExternalMycoRouting(context) {
+    const findings = [];
+    const content = context.primary.content || "";
+    const lines = content.split("\n");
+
+    const enterpriseImport = content.match(/import\s+.*?from\s+["'](@(?:company|enterprise|internal|myco-core)\/[^"']+)["']/);
+    if (enterpriseImport) {
+      const lineIdx = lines.findIndex((l) => /from\s+["']@(?:company|enterprise|internal|myco-core)\//.test(l));
+      const lineNum = lineIdx !== -1 ? lineIdx + 1 : 1;
+
+      findings.push({
+        id: `ROUTER-EXTERNAL-MYCO-L${lineNum}`,
+        category: "architecture",
+        severity: "INFO",
+        confidence: "CONFIRMED",
+        validationStatus: "VALIDATED",
+        title: "Workload Routed to Myco Enterprise Pipeline",
+        explanation: `Detected cross-repository dependency '${enterpriseImport[1]}'. Multi-repository indexing, cross-repo dependency resolution, and deep symbolic taint tracking exceed single-file in-browser capabilities and are processed by the Myco Enterprise backend.`,
+        impact: "Pipeline routes request to future Myco Enterprise backend queue with complete cross-repo dependency graph.",
+        filePath: context.primary.path,
+        sourceRange: { startLine: lineNum, endLine: lineNum },
+        evidenceSnippet: lines[lineIdx] ? lines[lineIdx].trim() : enterpriseImport[0],
+        evidenceRule: "GATEWAY-01 · CROSS_REPO_DISPATCH",
+        suggestedAction: "Submit request to Myco Enterprise Pilot endpoint for multi-repo workspace indexing.",
+        isMergeBlocking: false,
+        requiresBackendRoute: true
+      });
+    }
+
+    return findings;
+  }
 
   /**
    * 1. Secret & Credential Detector
@@ -1172,6 +1651,30 @@
     const allFindings = [];
 
     // 4. Run Selected Detectors
+    const synF = checkSyntaxAndGrammar(context);
+    if (synF.length > 0) {
+      allFindings.push(...synF);
+      executedChecks.push("syntax_and_grammar_detector");
+    }
+
+    const sqlF = checkSqlQuery(context);
+    if (sqlF.length > 0) {
+      allFindings.push(...sqlF);
+      executedChecks.push("sql_query_detector");
+    }
+
+    const logicF = checkLogicDefects(context);
+    if (logicF.length > 0) {
+      allFindings.push(...logicF);
+      executedChecks.push("logic_defect_detector");
+    }
+
+    const extF = checkExternalMycoRouting(context);
+    if (extF.length > 0) {
+      allFindings.push(...extF);
+      executedChecks.push("external_myco_routing_detector");
+    }
+
     if (plan.selected.includes("secret_credential_detector")) {
       const sf = checkSecrets(context);
       allFindings.push(...sf);
@@ -1252,8 +1755,8 @@
         severity: "CLEAN",
         confidence: "CONFIRMED",
         validationStatus: "VALIDATED",
-        title: "All Security & Multi-Tenant Boundaries Verified",
-        explanation: "Myco AST reasoning traced execution paths and verified that no hardcoded credentials, unsanitized DOM sinks, or tenant boundary leaks exist. Surrounding policy rules were evaluated and verified compliant.",
+        title: "All Architectural & Security Invariants Satisfied",
+        explanation: "Myco AST reasoning parsed execution paths, checked syntax integrity, and verified that no hardcoded credentials, unsanitized DOM sinks, or tenant boundary leaks exist. Surrounding policy rules were evaluated and verified compliant.",
         impact: "Complies with enterprise zero-trust security and repository policies. No blocking regressions or vulnerabilities detected.",
         filePath: context.primary.path,
         sourceRange: { startLine: 1, endLine: Math.min(context.primary.content.split("\n").length, 12) },
@@ -1295,7 +1798,7 @@
           }
         }
       };
-      validatedFindings.push(primaryFinding);
+      // Note: Do not push primaryFinding into validatedFindings so findings array remains empty [] for clean code
     } else {
       primaryFinding = criticalFindings[0] || highFindings[0] || mediumFindings[0] || validatedFindings[0];
     }
@@ -1334,6 +1837,10 @@
     planAnalysis,
     analyze,
     checks: {
+      checkSyntaxAndGrammar,
+      checkSqlQuery,
+      checkLogicDefects,
+      checkExternalMycoRouting,
       checkSecrets,
       checkDomXss,
       checkTenantBoundary,

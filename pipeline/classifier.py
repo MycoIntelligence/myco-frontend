@@ -21,7 +21,7 @@ class RequestClassifier:
 
     SUPPORTED_INTERNAL_EXTENSIONS = {
         ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
-        ".py", ".json", ".yaml", ".yml", ".env", ".md", ".diff", ".patch"
+        ".py", ".sql", ".json", ".yaml", ".yml", ".env", ".md", ".diff", ".patch"
     }
 
     DIFF_HEADER_REGEX = re.compile(r"^diff --git|^@@\s+-\d+,\d+\s+\+\d+,\d+\s+@@|^---\s+[ab]/", re.MULTILINE)
@@ -45,22 +45,7 @@ class RequestClassifier:
         requested_features = requested_features or []
         features: Dict[str, Any] = {}
 
-        # 1. Check for whole-repository or external service requirements
-        requires_cross_repo = (
-            "cross_repo_graph" in requested_features
-            or "multi_repo_index" in requested_features
-            or (repo_url and not primary_file and not raw_code and not raw_diff)
-        )
-        requires_deep_symbolic = (
-            "deep_symbolic_execution" in requested_features
-            or "whole_project_taint" in requested_features
-            or "dynamic_fuzzing" in requested_features
-        )
-
-        features["requires_cross_repo"] = requires_cross_repo
-        features["requires_deep_symbolic"] = requires_deep_symbolic
-
-        # 2. Extract content and determine file properties
+        # 1. Extract content and determine file properties
         primary_content = ""
         primary_path = "code.ts"
         if primary_file:
@@ -77,6 +62,23 @@ class RequestClassifier:
         total_files = (1 if primary_content else 0) + len(context_files)
         features["total_files"] = total_files
         features["total_chars"] = total_chars
+
+        # 2. Check for whole-repository or external service requirements
+        has_enterprise_pkg = bool(re.search(r'import\s+.*?from\s+["\']@(?:company|enterprise|internal|myco-core)/', primary_content))
+        requires_cross_repo = (
+            "cross_repo_graph" in requested_features
+            or "multi_repo_index" in requested_features
+            or has_enterprise_pkg
+            or (repo_url and not primary_file and not raw_code and not raw_diff)
+        )
+        requires_deep_symbolic = (
+            "deep_symbolic_execution" in requested_features
+            or "whole_project_taint" in requested_features
+            or "dynamic_fuzzing" in requested_features
+        )
+
+        features["requires_cross_repo"] = requires_cross_repo
+        features["requires_deep_symbolic"] = requires_deep_symbolic
 
         # Check for binary characters (null bytes or binary sequences)
         if any("\x00" in (f.content or "") for f in context_files) or "\x00" in primary_content:
@@ -106,8 +108,9 @@ class RequestClassifier:
         # 5. Check if input contains recognisable code structures
         is_code = (
             is_diff
-            or detected_format in ("typescript", "javascript", "python", "json", "yaml")
+            or detected_format in ("typescript", "javascript", "python", "sql", "json", "yaml")
             or bool(self.CODE_KEYWORDS_REGEX.search(primary_content))
+            or bool(re.match(r"^[a-zA-Z_$][a-zA-Z0-9_$]*$", primary_content.strip()))
         )
         features["is_code"] = is_code
 
@@ -203,6 +206,12 @@ class RequestClassifier:
 
     def _detect_format(self, path: str, content: str) -> str:
         fn = (path or "").strip().lower()
+        trimmed = (content or "").strip()
+
+        # SQL detection (extension or content starting with SQL verbs)
+        if fn.endswith(".sql") or re.search(r"^\s*(?:SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM|CREATE\s+TABLE|DROP\s+TABLE|ALTER\s+TABLE|WITH\s+[a-zA-Z_]\w*\s+AS)\b", trimmed, re.IGNORECASE):
+            return "sql"
+
         if fn.endswith((".ts", ".tsx")):
             return "typescript"
         if fn.endswith((".js", ".jsx", ".mjs")):
@@ -227,6 +236,8 @@ class RequestClassifier:
             return "json"
         if "def " in content or "import " in content and ":" in content:
             return "python"
+        if re.search(r"\b(const|let|var|function|export|import)\b", content):
+            return "typescript"
 
         return "unknown"
 

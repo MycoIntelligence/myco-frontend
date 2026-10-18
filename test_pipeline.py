@@ -20,6 +20,7 @@ Validates:
 
 import json
 import sys
+import time
 import unittest
 from pathlib import Path
 
@@ -41,7 +42,11 @@ from pipeline.router import PipelineRouter
 class TestPublicDemoPipeline(unittest.TestCase):
 
     def setUp(self):
+        quota_service.reset_all()
         self.router = PipelineRouter(backend_provider=future_myco_adapter)
+
+    def tearDown(self):
+        quota_service.reset_all()
 
     # -------------------------------------------------------------------------
     # 1. Custom Code Internal Processing
@@ -298,6 +303,86 @@ class TestPublicDemoPipeline(unittest.TestCase):
         allowance = quota_service.get_allowance_info(fingerprint)
         self.assertEqual(allowance["usedRuns"], 0)
         self.assertEqual(allowance["remainingRuns"], 5)
+
+    # -------------------------------------------------------------------------
+    # 15. Anti-Bypass Guard (Incognito / Cache Clear Blocked by IP Composite)
+    # -------------------------------------------------------------------------
+    def test_15_anti_bypass_incognito_blocked_by_ip_composite(self):
+        client_ip = "192.168.1.50"
+        user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0"
+        headers_sess_a = {
+            "X-Demo-Session-ID": "sess_primary_user_session",
+            "User-Agent": user_agent,
+            "Content-Type": "application/json",
+        }
+
+        # User runs 5 analyses in their normal browser session
+        for i in range(5):
+            p = json.dumps({"code": f"export const normalSnippet{i} = () => {i};"}).encode("utf-8")
+            res = self.router.execute(p, headers_sess_a, client_ip=client_ip)
+            self.assertEqual(res.status_code, 200)
+
+        # User tries to bypass quota by opening Incognito window (new random session ID, no cookie)
+        headers_incognito = {
+            "X-Demo-Session-ID": "sess_brand_new_incognito_session_99",
+            "User-Agent": user_agent,
+            "Content-Type": "application/json",
+        }
+        bypass_payload = json.dumps({"code": "export const incognitoSnippet = () => 'bypass';"}).encode("utf-8")
+        res_incognito = self.router.execute(bypass_payload, headers_incognito, client_ip=client_ip)
+
+        # Must be rejected because composite IP fingerprint has exhausted 5 runs!
+        self.assertEqual(res_incognito.status_code, 429)
+        self.assertIn("Demo allowance used", res_incognito.message)
+        self.assertEqual(res_incognito.summary.get("errorCode"), "DEMO_ALLOWANCE_EXHAUSTED")
+
+    # -------------------------------------------------------------------------
+    # 16. Rolling 24-Hour Sliding Window (Old runs drop off automatically)
+    # -------------------------------------------------------------------------
+    def test_16_rolling_24h_window_restores_allowance(self):
+        session = "sess_rolling_window_test"
+        session_key = quota_service.get_session_key(session)
+        now = time.time()
+
+        # Seed 4 runs from 25 hours ago (>86400s) and 1 run from 2 hours ago (<86400s)
+        expired_ts = now - 90000.0  # 25 hours ago
+        recent_ts = now - 7200.0    # 2 hours ago
+        quota_service._session_runs[session_key] = [expired_ts, expired_ts, expired_ts, expired_ts, recent_ts]
+
+        # Check allowance: the 4 expired runs should drop off, leaving only 1 used run
+        allowance = quota_service.get_allowance_info(session_key)
+        self.assertEqual(allowance["usedRuns"], 1)
+        self.assertEqual(allowance["remainingRuns"], 4)
+        self.assertFalse(allowance["isExhausted"])
+
+    # -------------------------------------------------------------------------
+    # 17. Flat-File Persistence Survives Restart Without Database
+    # -------------------------------------------------------------------------
+    def test_17_flat_file_persistence_survives_restart(self):
+        import tempfile
+        from pipeline.quota import DemoQuotaService
+
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+
+        try:
+            # Service 1 writes run records to the flat file
+            service1 = DemoQuotaService(persistence_file=tmp_path)
+            sess_key = "sess_test_persistence"
+            service1.record_success_and_cache(
+                session_key=sess_key,
+                content_hash="hash123",
+                response_data={"status": "ok"},
+            )
+
+            # Service 2 simulates server restart by initializing from the same file
+            service2 = DemoQuotaService(persistence_file=tmp_path)
+            allowance = service2.get_allowance_info(sess_key)
+            self.assertEqual(allowance["usedRuns"], 1)
+            self.assertEqual(allowance["remainingRuns"], 4)
+        finally:
+            if tmp_path.exists():
+                tmp_path.unlink()
 
 
 if __name__ == "__main__":

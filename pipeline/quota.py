@@ -12,6 +12,9 @@ Enforces:
 """
 
 import hashlib
+import json
+import os
+from pathlib import Path
 import threading
 import time
 from dataclasses import dataclass, field
@@ -56,13 +59,29 @@ class TokenEstimator:
 
 class DemoQuotaService:
     """
-    Thread-safe Central Demo Quota and Fair Usage Service.
-    Enforces server-side limits before starting computationally heavy analysis.
+    Thread-safe Central Demo Quota and Fair Usage Service with Anti-Bypass Enforcement.
+
+    Enforces:
+    - Finite demo allowance (5 free analyses per rolling 24-hour window).
+    - Persistent state via lightweight JSON flat file (survives restarts without a database).
+    - Anti-bypass protection combining client session ID and IP/User-Agent fingerprint.
+    - True sliding-window 24-hour rolling reset based on run epoch timestamps.
+    - Input ceilings (25k characters, 400 diff lines, 5 files, 256 KB body size).
+    - Idempotency & request deduplication (submitting identical code does not deduct demo allowance).
+    - Fair-usage guarantee (failed, invalid, or interrupted requests are never charged).
+    - Sliding-window anti-spam rate limiting (5 RPM).
+    - Concurrency limit (1 active operation per demo session).
+    - Graceful exhaustion state with reset timestamps and pilot request guidance.
     """
 
-    def __init__(self):
+    def __init__(self, persistence_file: Optional[Path] = None):
         self._lock = threading.Lock()
-        # Session run records: key -> list of execution timestamps
+        self._persistence_file = (
+            persistence_file
+            if persistence_file is not None
+            else Path(__file__).resolve().parent / ".demo_allowance.json"
+        )
+        # Session & IP run records: key -> list of execution epoch timestamps
         self._session_runs: Dict[str, List[float]] = {}
         # RPM rate limit windows: key -> list of timestamps
         self._rpm_windows: Dict[str, List[float]] = {}
@@ -71,17 +90,108 @@ class DemoQuotaService:
         # Idempotency deduplication cache: (key + content_hash) -> cached NormalizedResponse dict
         self._idempotency_cache: Dict[str, Dict[str, Any]] = {}
 
-    def get_session_fingerprint(self, session_id: Optional[str], client_ip: str) -> str:
+        self._load_from_disk()
+
+    def _load_from_disk(self):
+        """Loads persisted demo run timestamps from flat file if present."""
+        if not self._persistence_file.exists():
+            return
+        try:
+            with open(self._persistence_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                now = time.time()
+                # Prune runs older than 48 hours on startup
+                cutoff = now - (config.demo_policy.window_duration_seconds * 2)
+                pruned: Dict[str, List[float]] = {}
+                for k, timestamps in data.items():
+                    if isinstance(timestamps, list):
+                        valid = [float(t) for t in timestamps if isinstance(t, (int, float)) and t > cutoff]
+                        if valid:
+                            pruned[k] = valid
+                self._session_runs = pruned
+        except Exception:
+            # Resilient fallback: start fresh if file is unreadable or malformed
+            pass
+
+    def _save_to_disk(self):
+        """Persists run timestamps to flat file atomically."""
+        try:
+            now = time.time()
+            cutoff = now - (config.demo_policy.window_duration_seconds * 2)
+            cleaned = {}
+            for k, timestamps in self._session_runs.items():
+                valid = [t for t in timestamps if t > cutoff]
+                if valid:
+                    cleaned[k] = valid
+            self._session_runs = cleaned
+
+            tmp_file = self._persistence_file.with_suffix(".tmp")
+            with open(tmp_file, "w", encoding="utf-8") as f:
+                json.dump(cleaned, f)
+            os.replace(tmp_file, self._persistence_file)
+        except Exception:
+            pass
+
+    def reset_all(self, clear_disk: bool = False):
+        """Helper for test suites and maintenance to reset all in-memory usage state."""
+        with self._lock:
+            self._session_runs.clear()
+            self._rpm_windows.clear()
+            self._active_concurrency.clear()
+            self._idempotency_cache.clear()
+            if clear_disk and self._persistence_file.exists():
+                try:
+                    self._persistence_file.unlink()
+                except Exception:
+                    pass
+
+    def reset_allowance(self, *keys: Optional[str]):
+        """Resets run records and rate limits for specified keys (or clears all if no keys)."""
+        with self._lock:
+            filter_keys = [k for k in keys if k]
+            if not filter_keys:
+                self._session_runs.clear()
+                self._rpm_windows.clear()
+                self._active_concurrency.clear()
+            else:
+                for k in filter_keys:
+                    self._session_runs.pop(k, None)
+                    self._rpm_windows.pop(k, None)
+                    self._active_concurrency.pop(k, None)
+            self._save_to_disk()
+
+    def get_session_key(self, session_id: Optional[str]) -> Optional[str]:
+        """Derives primary session token hash."""
+        clean = (session_id or "").strip()
+        if not clean or clean == "demo_sess_anon":
+            return None
+        return f"sess_{hashlib.sha256(clean.encode('utf-8')).hexdigest()[:16]}"
+
+    def get_ip_key(self, client_ip: str = "127.0.0.1", user_agent: str = "") -> str:
         """
-        Derives privacy-preserving session key combining session token and IP subnet.
-        Prevents shared-IP false positives while reducing easy refresh-clearing bypasses.
+        Derives secondary network & browser composite fingerprint.
+        Combines client IP and User-Agent to catch Incognito/cache-clearing bypasses
+        while avoiding false positives across different devices on a shared Wi-Fi.
+        """
+        clean_ip = (client_ip or "127.0.0.1").strip()
+        clean_ua = (user_agent or "").strip().lower()
+        composite = f"{clean_ip}:{clean_ua}" if clean_ua else clean_ip
+        return f"ip_{hashlib.sha256(composite.encode('utf-8')).hexdigest()[:16]}"
+
+    def get_session_fingerprint(
+        self,
+        session_id: Optional[str],
+        client_ip: str = "127.0.0.1",
+        user_agent: str = "",
+    ) -> str:
+        """
+        Maintains backward compatibility for callers expecting a single fingerprint string.
         """
         clean_session = (session_id or "").strip()
-        if clean_session:
+        if clean_session and clean_session != "demo_sess_anon":
             return f"sess_{hashlib.sha256(clean_session.encode('utf-8')).hexdigest()[:16]}"
-        # Fallback to IP address if no session token was provided
-        clean_ip = (client_ip or "127.0.0.1").strip()
-        return f"ip_{hashlib.sha256(clean_ip.encode('utf-8')).hexdigest()[:16]}"
+        return self.get_ip_key(client_ip, user_agent)
 
     def compute_content_hash(self, content_str: str) -> str:
         """Generates SHA-256 fingerprint of submitted code/diff for deduplication."""
@@ -97,9 +207,11 @@ class DemoQuotaService:
         diff_lines: int,
         is_admin_bypass: bool = False,
         is_sample_demo: bool = False,
+        ip_key: Optional[str] = None,
     ) -> DemoQuotaCheckResult:
         """
         Enforces input limits, rate limits, and demo run allowance before processing begins.
+        Checks both session key and IP composite key to prevent bypasses.
         """
         policy: DemoAllowancePolicy = config.demo_policy
         now = time.time()
@@ -174,28 +286,35 @@ class DemoQuotaService:
         # Thread-safe allowance check and reservation
         with self._lock:
             # 3. Concurrency Lock Check (HTTP 429)
-            active = self._active_concurrency.get(session_key, 0)
-            if active >= policy.max_concurrent_requests:
+            active_sess = self._active_concurrency.get(session_key, 0)
+            active_ip = self._active_concurrency.get(ip_key, 0) if (ip_key and ip_key != session_key) else 0
+            if active_sess >= policy.max_concurrent_requests or active_ip >= policy.max_concurrent_requests:
                 return DemoQuotaCheckResult(
                     allowed=False,
                     status_code=429,
                     error_code="CONCURRENCY_LIMIT_REACHED",
                     message="Another analysis is already in progress for this session. Please wait for it to complete.",
                     limit_type="concurrent_requests",
-                    current_value=active,
+                    current_value=max(active_sess, active_ip),
                     max_limit=policy.max_concurrent_requests,
                 )
 
-            # 4. Demo Allowance Check (Rolling 24-hour Window)
+            # 4. Demo Allowance Check (Rolling 24-hour Window across session and IP)
             window_start = now - policy.window_duration_seconds
-            all_runs = self._session_runs.setdefault(session_key, [])
-            # Prune runs older than rolling window
-            valid_runs = [t for t in all_runs if t > window_start]
-            self._session_runs[session_key] = valid_runs
+            sess_runs = [t for t in self._session_runs.get(session_key, []) if t > window_start]
+            self._session_runs[session_key] = sess_runs
 
-            if not is_sample_demo and len(valid_runs) >= policy.max_analyses_per_window:
+            ip_runs = []
+            if ip_key and ip_key != session_key:
+                ip_runs = [t for t in self._session_runs.get(ip_key, []) if t > window_start]
+                self._session_runs[ip_key] = ip_runs
+
+            used_count = max(len(sess_runs), len(ip_runs))
+            governing_runs = sess_runs if len(sess_runs) >= len(ip_runs) else ip_runs
+
+            if not is_sample_demo and used_count >= policy.max_analyses_per_window:
                 # Calculate when the earliest run in this window resets
-                earliest_run = min(valid_runs)
+                earliest_run = min(governing_runs) if governing_runs else (now - policy.window_duration_seconds)
                 reset_timestamp = earliest_run + policy.window_duration_seconds
                 reset_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(reset_timestamp))
                 hours_remaining = max(1, int((reset_timestamp - now) // 3600))
@@ -210,7 +329,7 @@ class DemoQuotaService:
                         f"To analyze full repositories without demo limits, please request a pilot."
                     ),
                     limit_type="demo_analyses",
-                    current_value=len(valid_runs),
+                    current_value=used_count,
                     max_limit=policy.max_analyses_per_window,
                     reset_at=reset_iso,
                     next_action="request_pilot",
@@ -236,11 +355,13 @@ class DemoQuotaService:
                 self._rpm_windows[session_key].append(now)
 
             # Reserve concurrency slot
-            self._active_concurrency[session_key] = active + 1
+            self._active_concurrency[session_key] = active_sess + 1
+            if ip_key and ip_key != session_key:
+                self._active_concurrency[ip_key] = active_ip + 1
 
             return DemoQuotaCheckResult(
                 allowed=True,
-                current_value=len(valid_runs),
+                current_value=used_count,
                 max_limit=policy.max_analyses_per_window,
             )
 
@@ -251,58 +372,73 @@ class DemoQuotaService:
         response_data: Dict[str, Any],
         is_admin_bypass: bool = False,
         is_sample_demo: bool = False,
+        ip_key: Optional[str] = None,
     ):
         """
-        Counts a completed successful analysis towards the demo allowance,
-        caches the response for idempotency deduplication, and releases concurrency.
+        Counts a completed successful analysis towards the demo allowance across session and IP,
+        persists run state to flat file, caches response for deduplication, and releases concurrency.
         """
         now = time.time()
         cache_key = f"{session_key}:{content_hash}"
 
         with self._lock:
             # Release concurrency
-            active = self._active_concurrency.get(session_key, 1)
-            self._active_concurrency[session_key] = max(0, active - 1)
+            active_sess = self._active_concurrency.get(session_key, 1)
+            self._active_concurrency[session_key] = max(0, active_sess - 1)
+            if ip_key and ip_key != session_key:
+                active_ip = self._active_concurrency.get(ip_key, 1)
+                self._active_concurrency[ip_key] = max(0, active_ip - 1)
 
-            # Record run towards allowance if custom code (not admin bypass, not guided sample demo)
+            # Record run towards allowance if custom code
             if not is_admin_bypass and not is_sample_demo:
                 self._session_runs.setdefault(session_key, []).append(now)
+                if ip_key and ip_key != session_key:
+                    self._session_runs.setdefault(ip_key, []).append(now)
+                self._save_to_disk()
 
             # Cache response for duplicate submissions
             if content_hash:
                 self._idempotency_cache[cache_key] = response_data
-                # Keep cache bounded to 1,000 recent items
                 if len(self._idempotency_cache) > 1000:
                     first_key = next(iter(self._idempotency_cache))
                     del self._idempotency_cache[first_key]
 
-    def release_on_failure(self, session_key: str):
+    def release_on_failure(self, session_key: str, ip_key: Optional[str] = None):
         """
         Releases the concurrency slot WITHOUT deducting from the user's demo allowance.
         Fair-usage guarantee: Failed or interrupted requests are never charged.
         """
         with self._lock:
-            active = self._active_concurrency.get(session_key, 1)
-            self._active_concurrency[session_key] = max(0, active - 1)
+            active_sess = self._active_concurrency.get(session_key, 1)
+            self._active_concurrency[session_key] = max(0, active_sess - 1)
+            if ip_key and ip_key != session_key:
+                active_ip = self._active_concurrency.get(ip_key, 1)
+                self._active_concurrency[ip_key] = max(0, active_ip - 1)
 
-    def get_allowance_info(self, session_key: str) -> Dict[str, Any]:
+    def get_allowance_info(self, session_key: str, ip_key: Optional[str] = None) -> Dict[str, Any]:
         """Provides current demo allowance state for client UI indicators."""
         policy: DemoAllowancePolicy = config.demo_policy
         now = time.time()
         window_start = now - policy.window_duration_seconds
 
         with self._lock:
-            all_runs = self._session_runs.get(session_key, [])
-            valid_runs = [t for t in all_runs if t > window_start]
-            used_count = len(valid_runs)
+            sess_runs = [t for t in self._session_runs.get(session_key, []) if t > window_start]
+            ip_runs = []
+            if ip_key and ip_key != session_key:
+                ip_runs = [t for t in self._session_runs.get(ip_key, []) if t > window_start]
+
+            used_count = max(len(sess_runs), len(ip_runs))
+            governing_runs = sess_runs if len(sess_runs) >= len(ip_runs) else ip_runs
             remaining = max(0, policy.max_analyses_per_window - used_count)
             is_exhausted = (remaining == 0)
 
             reset_iso = None
-            if valid_runs:
-                earliest_run = min(valid_runs)
+            reset_in_seconds = 0
+            if governing_runs:
+                earliest_run = min(governing_runs)
                 reset_timestamp = earliest_run + policy.window_duration_seconds
                 reset_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(reset_timestamp))
+                reset_in_seconds = max(0, int(reset_timestamp - now))
 
         return {
             "maxRuns": policy.max_analyses_per_window,
@@ -310,6 +446,7 @@ class DemoQuotaService:
             "remainingRuns": remaining,
             "isExhausted": is_exhausted,
             "resetAt": reset_iso,
+            "resetInSeconds": reset_in_seconds,
             "nextAction": "request_pilot" if is_exhausted else "analyze",
             "limits": {
                 "maxCharacters": policy.max_characters_per_request,

@@ -29,6 +29,7 @@ class ApiGateway:
         auth_header = norm_headers.get("authorization", "")
         session_header = norm_headers.get("x-demo-session-id", "")
         email_header = norm_headers.get("x-demo-email", "")
+        user_agent = norm_headers.get("user-agent", "")
 
         api_token = ""
         if auth_header.startswith("Bearer "):
@@ -45,6 +46,7 @@ class ApiGateway:
             org_id=email_header.strip() if email_header else "public_demo",
             tier="demo",
             client_ip=client_ip,
+            user_agent=user_agent,
             is_authenticated=bool(session_header or email_header or is_admin),
             is_admin=is_admin,
             api_key_id=api_token[:8] + "..." if api_token else None,

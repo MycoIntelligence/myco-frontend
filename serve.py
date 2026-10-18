@@ -16,6 +16,12 @@ from pipeline.gateway import gateway
 
 
 class Handler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_GET(self):
         if self.path == '/api/v1/health':
             health_data = {
@@ -51,9 +57,26 @@ class Handler(SimpleHTTPRequestHandler):
             headers = dict(self.headers)
             client_ip = self.client_address[0] if self.client_address else "127.0.0.1"
             user = gateway.authenticate_request(headers, client_ip)
-            session_key = quota_service.get_session_fingerprint(user.user_id, client_ip)
-            allowance_info = quota_service.get_allowance_info(session_key)
+            session_key = quota_service.get_session_key(user.user_id) or quota_service.get_session_fingerprint(user.user_id, client_ip, getattr(user, "user_agent", ""))
+            ip_key = quota_service.get_ip_key(client_ip, getattr(user, "user_agent", ""))
+            allowance_info = quota_service.get_allowance_info(session_key, ip_key)
             body = json.dumps(allowance_info).encode("utf-8")
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        if self.path in ('/api/v1/demo/reset', '/api/v1/quota/reset'):
+            headers = dict(self.headers)
+            client_ip = self.client_address[0] if self.client_address else "127.0.0.1"
+            user = gateway.authenticate_request(headers, client_ip)
+            session_key = quota_service.get_session_key(user.user_id) or quota_service.get_session_fingerprint(user.user_id, client_ip, getattr(user, "user_agent", ""))
+            ip_key = quota_service.get_ip_key(client_ip, getattr(user, "user_agent", ""))
+            quota_service.reset_allowance(session_key, ip_key)
+            allowance_info = quota_service.get_allowance_info(session_key, ip_key)
+            body = json.dumps({"success": True, "message": "Demo allowance reset successfully.", "quota": allowance_info}).encode("utf-8")
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', str(len(body)))
@@ -65,6 +88,22 @@ class Handler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
+        if self.path in ('/api/v1/demo/reset', '/api/v1/quota/reset'):
+            headers = dict(self.headers)
+            client_ip = self.client_address[0] if self.client_address else "127.0.0.1"
+            user = gateway.authenticate_request(headers, client_ip)
+            session_key = quota_service.get_session_key(user.user_id) or quota_service.get_session_fingerprint(user.user_id, client_ip, getattr(user, "user_agent", ""))
+            ip_key = quota_service.get_ip_key(client_ip, getattr(user, "user_agent", ""))
+            quota_service.reset_allowance(session_key, ip_key)
+            allowance_info = quota_service.get_allowance_info(session_key, ip_key)
+            body = json.dumps({"success": True, "message": "Demo allowance reset successfully.", "quota": allowance_info}).encode("utf-8")
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
         if self.path == '/api/leads':
             data = json.dumps({'detail': 'This local preview is not connected to lead delivery. No request has been sent.'}).encode()
             self.send_response(503)

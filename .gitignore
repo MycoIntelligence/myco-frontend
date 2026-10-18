@@ -5,3 +5,5 @@ node_modules/
 .env
 .env.*
 !.env.example
+.demo_allowance.json
+.demo_allowance.json.tmp

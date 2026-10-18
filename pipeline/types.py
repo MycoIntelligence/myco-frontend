@@ -91,6 +91,7 @@ class UserContext:
     org_id: str
     tier: str = "free"
     client_ip: str = "127.0.0.1"
+    user_agent: str = ""
     is_authenticated: bool = False
     is_admin: bool = False
     api_key_id: Optional[str] = None
@@ -100,6 +101,8 @@ class UserContext:
             "userId": self.user_id,
             "orgId": self.org_id,
             "tier": self.tier,
+            "clientIp": self.client_ip,
+            "userAgent": self.user_agent,
             "isAuthenticated": self.is_authenticated,
             "isAdmin": self.is_admin,
         }

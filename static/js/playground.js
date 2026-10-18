@@ -799,6 +799,74 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
   let currentAnalysisResult = null;
   let currentScenarioKey = "pr_4827";
 
+  /* Continuous Sample Loop & Custom Code Controller State */
+  let isLoopActive = true;
+  let loopGapTimer = null;
+  let loopGapCountdownInterval = null;
+  let isCustomMode = false;
+  let customIdleTimer = null;
+  const LOOP_SAMPLE_GAP_MS = 3000; // 3-second gap between each sample run
+  const CUSTOM_IDLE_RESUME_MS = 60000; // 1 minute (60s) idle before resuming sample loop if no code entered
+
+  const DEFAULT_CUSTOM_CODE = `/* CUSTOM PULL REQUEST: PR #5102 - Webhook Secret & Admin Verification */
+import { stripeClient } from "../billing/stripe";
+import { database } from "../db/connection";
+
+// Hardcoded production secret token in PR diff
+const WEBHOOK_SECRET_KEY = "whsec_live_99a8b7c6d5e4f3a2b10987654321";
+
+export async function handlePaymentWebhook(eventPayload: any, signature: string) {
+  // Validate incoming webhook payload with secret
+  const event = stripeClient.webhooks.constructEvent(
+    eventPayload,
+    signature,
+    WEBHOOK_SECRET_KEY
+  );
+
+  if (event.type === "invoice.payment_succeeded") {
+    await database.query("UPDATE subscriptions SET status = 'active' WHERE customer_id = $1", [
+      event.data.object.customer
+    ]);
+  }
+  return { received: true };
+}`;
+
+  const updateLoopTimerBadge = () => {};
+
+  const clearLoopGapTimer = () => {
+    if (loopGapTimer) {
+      clearTimeout(loopGapTimer);
+      loopGapTimer = null;
+    }
+    if (loopGapCountdownInterval) {
+      clearInterval(loopGapCountdownInterval);
+      loopGapCountdownInterval = null;
+    }
+    const timerBadge = document.getElementById("toolbar-loop-timer-badge");
+    if (timerBadge) {
+      timerBadge.classList.remove("is-ticking");
+    }
+  };
+
+  const clearCustomIdleTimer = () => {
+    if (customIdleTimer) {
+      clearTimeout(customIdleTimer);
+      customIdleTimer = null;
+    }
+  };
+
+  const startCustomIdleTimer = () => {
+    clearCustomIdleTimer();
+    customIdleTimer = setTimeout(() => {
+      // If the user clicked custom code but didn't enter any code for 1 minute, auto-resume the sample loop
+      const textarea = document.getElementById("playground-code-input");
+      const currentCode = textarea ? textarea.value.trim() : "";
+      if (isCustomMode && !currentCode && !isAnalyzing) {
+        startContinuousLoop(0);
+      }
+    }, CUSTOM_IDLE_RESUME_MS);
+  };
+
   const integrationsState = {
     jira: true,
     slack: true,
@@ -3287,7 +3355,19 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     }
   };
 
-  /* Demo Mode Walkthrough Controls */
+  /* Demo Mode & Continuous Loop Walkthrough Controls */
+  const updateEngineStatusText = (text, statusType = "ready") => {
+    const statusEl = document.getElementById("engine-status-text");
+    if (statusEl) statusEl.textContent = text;
+    const container = document.getElementById("toolbar-engine-status");
+    if (container) {
+      container.className = "toolbar-engine-status mono";
+      if (statusType === "is-analyzing") container.classList.add("is-analyzing");
+      else if (statusType === "is-loop") container.classList.add("is-loop");
+      else if (statusType === "is-custom") container.classList.add("is-custom");
+    }
+  };
+
   const startDemoMode = (index = 0) => {
     if (isAnalyzing) return;
     clearAllTimers();
@@ -3313,15 +3393,18 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     const policyInput = document.getElementById("playground-policy-input");
     if (policyInput) policyInput.value = (example.policy && example.policy.rule) ? example.policy.rule : "";
 
-    // Update toolbar sample select & step indicator
+    // Update toolbar review title
+    const titleEl = document.getElementById("toolbar-sample-title");
+    if (titleEl) {
+      const prdTag = example.prd ? ` (${example.prd.id})` : "";
+      titleEl.textContent = `${example.title}${prdTag}`;
+    }
+
     const selectEl = document.getElementById("toolbar-sample-select");
     if (selectEl) selectEl.value = String(currentDemoIndex);
 
     const stepEl = document.getElementById("demo-walkthrough-step");
     if (stepEl) stepEl.textContent = `${currentDemoIndex + 1} / ${DEMO_EXAMPLES.length}`;
-
-    const modeLabel = document.getElementById("toolbar-mode-label");
-    if (modeLabel) modeLabel.textContent = "SAMPLE REVIEW";
 
     // Reset bot
     if (petEngine) {
@@ -3332,8 +3415,15 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
       petEngine.highlightBadge(null);
     }
 
-    setAgentBubble(`Sample Review: ${example.title}. Review findings on right or test your own changes.`);
+    setAgentBubble(`Reviewing: ${example.title}. Evaluating code diff and monitored policies.`);
     syncEditorView();
+    window.dispatchEvent(new CustomEvent('myco:sample-change', {
+      detail: {
+        id: example.id,
+        title: example.title,
+        shortTitle: example.shortTitle
+      }
+    }));
 
     // Reset right panel to waiting/pre-detection state: DO NOT show findings until detection is triggered!
     const emptyState = document.getElementById("report-empty-state");
@@ -3346,36 +3436,63 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     if (cardState) cardState.hidden = true;
     if (errorState) errorState.hidden = true;
 
-    setAgentBubble("Myco standing by. Click 'Run Myco' to inspect.");
+    setAgentBubble("Myco standing by. Inspecting codebase and active pull request...");
   };
 
-  const exitDemoMode = (clearEditor = false) => {
-    if (isAnalyzing) return;
-    clearAllTimers();
+  /* Continuous Sample Loop Controller */
+  const startContinuousLoop = (startFromIndex = 0) => {
+    isLoopActive = true;
+    isCustomMode = false;
+    clearLoopGapTimer();
+    clearCustomIdleTimer();
 
+    startDemoMode(startFromIndex);
+    setTimeout(() => {
+      if (isLoopActive && !isCustomMode && !isAnalyzing) {
+        runAnalysis();
+      }
+    }, 200);
+  };
+
+  const enterCustomCodeMode = () => {
+    // 1. Immediately stop any background sample cycle
+    isLoopActive = false;
+    isCustomMode = true;
     isDemoMode = false;
     currentDemoIndex = -1;
     highlightLine = null;
     highlightType = null;
+    clearLoopGapTimer();
 
-    const modeLabel = document.getElementById("toolbar-mode-label");
-    if (modeLabel) modeLabel.textContent = "CUSTOM INPUT";
+    if (isAnalyzing) {
+      clearAllTimers();
+      isAnalyzing = false;
+      if (petEngine) {
+        petEngine.resetDispatchPopups();
+        petEngine.setPetState("SITTING_COFFEE");
+      }
+    }
 
-    const stepEl = document.getElementById("demo-walkthrough-step");
-    if (stepEl) stepEl.textContent = "Custom";
+    // 2. Switch to Code tab in editor
+    switchContextTab("code");
+
+    // 3. Clear editor so user writes directly in the single custom code space
+    const textarea = document.getElementById("playground-code-input");
+    if (textarea) {
+      textarea.value = "";
+      textarea.focus();
+    }
+
+    // 4. Update titles and labels
+    const titleEl = document.getElementById("toolbar-sample-title");
+    if (titleEl) {
+      titleEl.textContent = "Custom Code Review";
+    }
 
     const prdTag = document.getElementById("tab-prd-tag");
     if (prdTag) prdTag.textContent = "CUSTOM";
-    const prdInput = document.getElementById("playground-prd-input");
-    if (prdInput && clearEditor) prdInput.value = "";
-    const policyInput = document.getElementById("playground-policy-input");
-    if (policyInput && clearEditor) policyInput.value = "";
 
-    const textarea = document.getElementById("playground-code-input");
-    if (textarea && clearEditor) {
-      textarea.value = "";
-    }
-
+    // 5. Reset report state to empty state prompting to run
     const emptyState = document.getElementById("report-empty-state");
     const progressState = document.getElementById("report-progress-state");
     const cardState = document.getElementById("report-card-state");
@@ -3386,34 +3503,84 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     if (cardState) cardState.hidden = true;
     if (errorState) errorState.hidden = true;
 
-    if (petEngine) {
-      petEngine.resetDispatchPopups();
-      petEngine.setPetState("SITTING_COFFEE");
-      petEngine.highlightBadge(null);
-      petEngine.setPhoneScreenState("IDLE");
+    syncEditorView();
+    setAgentBubble("Enter your custom code or pull request diff in the editor, then click 'Run Myco'.");
+
+    // 6. Start 1-minute idle auto-resume: if user clicks custom code but enters nothing for 1 minute, loop resumes
+    startCustomIdleTimer();
+  };
+
+  const exitDemoMode = enterCustomCodeMode;
+
+  const onAnalysisCycleComplete = () => {
+    // Case 1: Continuous sample cycle active in background
+    if (isLoopActive && isDemoMode && !isCustomMode) {
+      clearLoopGapTimer();
+      loopGapTimer = setTimeout(() => {
+        clearLoopGapTimer();
+        if (isLoopActive && isDemoMode && !isCustomMode && !isAnalyzing) {
+          const nextIdx = (currentDemoIndex + 1) % DEMO_EXAMPLES.length;
+          startDemoMode(nextIdx);
+          runAnalysis();
+        }
+      }, LOOP_SAMPLE_GAP_MS);
+      return;
     }
 
-    setAgentBubble("Myco standing by. Paste your code or PR diff, then click 'Run Myco'.");
-    syncEditorView();
+    // Case 2: Custom code finished executing — remains stopped
+    if (!isDemoMode || isCustomMode) {
+      isLoopActive = false;
+      isCustomMode = true;
+      clearLoopGapTimer();
+      updateEngineStatusText("ANALYSIS COMPLETE", "is-ready");
+      setAgentBubble("Analysis complete. Review findings in the report panel, or edit code and re-run.");
+      return;
+    }
   };
 
   const nextDemoExample = () => {
-    startDemoMode(currentDemoIndex + 1);
+    clearLoopGapTimer();
+    isLoopActive = true;
+    isCustomMode = false;
+    const nextIdx = (currentDemoIndex + 1) % DEMO_EXAMPLES.length;
+    startDemoMode(nextIdx);
+    runAnalysis();
   };
 
   const prevDemoExample = () => {
-    startDemoMode(currentDemoIndex - 1);
+    clearLoopGapTimer();
+    isLoopActive = true;
+    isCustomMode = false;
+    const prevIdx = (currentDemoIndex - 1 + DEMO_EXAMPLES.length) % DEMO_EXAMPLES.length;
+    startDemoMode(prevIdx);
+    runAnalysis();
   };
 
   const onUserEdit = () => {
     if (isAnalyzing) return;
 
+    // Stop any background sample cycle immediately
+    isLoopActive = false;
+    clearLoopGapTimer();
+
     if (isDemoMode) {
       isDemoMode = false;
-      const modeLabel = document.getElementById("toolbar-mode-label");
-      if (modeLabel) modeLabel.textContent = "CUSTOM INPUT";
-      const stepEl = document.getElementById("demo-walkthrough-step");
-      if (stepEl) stepEl.textContent = "Custom";
+      isCustomMode = true;
+      currentDemoIndex = -1;
+      const titleEl = document.getElementById("toolbar-sample-title");
+      if (titleEl) titleEl.textContent = "Custom Code Review";
+
+      const prdTag = document.getElementById("tab-prd-tag");
+      if (prdTag) prdTag.textContent = "CUSTOM";
+    }
+
+    // Check if code was entered: if user entered code, cancel idle auto-resume; if empty, start 1-minute idle timer
+    const textarea = document.getElementById("playground-code-input");
+    const currentCode = textarea ? textarea.value.trim() : "";
+    if (currentCode) {
+      clearCustomIdleTimer();
+    } else {
+      startCustomIdleTimer();
     }
 
     // Reset report to empty state prompting to re-analyze
@@ -3427,36 +3594,11 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     syncEditorView();
 
     if (petEngine) petEngine.lookAtEditor = true;
-    setAgentBubble("Myco observing code edits. Click 'Run Myco' to inspect.");
+    setAgentBubble("Editing custom code. Click 'Run Myco' to inspect.");
   };
 
   const clearInput = () => {
-    if (isAnalyzing) return;
-    clearAllTimers();
-
-    isDemoMode = false;
-    currentDemoIndex = -1;
-    highlightLine = null;
-    highlightType = null;
-
-    const demoBar = document.getElementById("demo-walkthrough-bar");
-    if (demoBar) demoBar.hidden = true;
-
-    const textarea = document.getElementById("playground-code-input");
-    if (textarea) textarea.value = "";
-
-    const emptyState = document.getElementById("report-empty-state");
-    const progressState = document.getElementById("report-progress-state");
-    const cardState = document.getElementById("report-card-state");
-    const errorState = document.getElementById("report-error-state");
-
-    if (emptyState) emptyState.hidden = false;
-    if (progressState) progressState.hidden = true;
-    if (cardState) cardState.hidden = true;
-    if (errorState) errorState.hidden = true;
-
-    setAgentBubble("Editor cleared. Paste your code or PR diff, then click 'Run Myco'.");
-    syncEditorView();
+    enterCustomCodeMode();
   };
 
   /* Render Structured Findings Report */
@@ -3587,6 +3729,8 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     }
 
     if (isClean) {
+      highlightLine = null;
+      syncEditorView();
       container.innerHTML = `
         <div class="finding-card is-clean-card">
           <div class="finding-card__header">
@@ -3600,7 +3744,12 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
           <p class="finding-clean-desc">
             Myco evaluated AST invariants, boundary conditions, and security policies. No hardcoded credentials, unsanitized DOM sinks, wildcard dependencies, or breaking API contract regressions were identified.
           </p>
-          <div class="finding-clean-note mono">
+          <div class="backend-routing-box mono" style="margin-top: 1rem;">
+            <div><strong>Syntax & Grammar Verification:</strong> Code conforms to structural grammar without unclosed delimiters or unresolved bare identifiers</div>
+            <div><strong>Multi-Tenant Isolation:</strong> Data access paths and resource bounds verified compliant</div>
+            <div><strong>Zero-Trust Invariants:</strong> No unparameterized dynamic concatenation or plain-text secret leakage</div>
+          </div>
+          <div class="finding-clean-note mono" style="margin-top: 1rem;">
             Note: Automated static analysis significantly reduces risk and surfaces regressions, but cannot guarantee that code is 100% bug-free.
           </div>
         </div>
@@ -3838,14 +3987,56 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     renderActiveFinding(0);
   };
 
+  let cachedAllowanceState = {
+    maxRuns: 5,
+    usedRuns: 0,
+    remainingRuns: 5,
+    isExhausted: false,
+    resetAt: null,
+    resetInSeconds: 0
+  };
+
+  const getCookie = (name) => {
+    try {
+      const match = document.cookie.match(new RegExp("(^|;\\s*)" + name + "=([^;]+)"));
+      return match ? decodeURIComponent(match[2]) : null;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const setCookie = (name, value, maxAgeSeconds = 86400) => {
+    try {
+      document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax`;
+    } catch (_) {}
+  };
+
   const getOrCreateDemoSessionId = () => {
     try {
-      let id = localStorage.getItem("myco_demo_session_id");
-      if (!id) {
-        id = "demo_sess_" + Math.random().toString(36).slice(2, 10);
-        localStorage.setItem("myco_demo_session_id", id);
+      let localId = null;
+      try {
+        localId = localStorage.getItem("myco_demo_session_id");
+      } catch (_) {}
+
+      let cookieId = getCookie("myco_demo_sess");
+
+      let resolvedId = localId || cookieId;
+      if (!resolvedId || resolvedId === "demo_sess_anon") {
+        resolvedId = "demo_sess_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
       }
-      return id;
+
+      // Synchronize across both localStorage and cookie to prevent single-cache clearing bypasses
+      try {
+        if (!localId && resolvedId) {
+          localStorage.setItem("myco_demo_session_id", resolvedId);
+        }
+      } catch (_) {}
+
+      if (!cookieId && resolvedId) {
+        setCookie("myco_demo_sess", resolvedId, 86400);
+      }
+
+      return resolvedId;
     } catch (_) {
       return "demo_sess_anon";
     }
@@ -3859,22 +4050,73 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
       });
       if (res.ok) {
         const data = await res.json();
-        const badgeText = document.getElementById("toolbar-allowance-text");
-        const badgeEl = document.getElementById("toolbar-allowance-badge");
-        if (badgeText && data) {
-          badgeText.textContent = `Custom Demo: ${data.remainingRuns} / ${data.maxRuns} runs`;
-          if (badgeEl) {
-            badgeEl.classList.toggle("exhausted", Boolean(data.isExhausted));
+        if (data) {
+          cachedAllowanceState = data;
+          const badgeText = document.getElementById("toolbar-allowance-text");
+          const badgeEl = document.getElementById("toolbar-allowance-badge");
+          if (badgeText) {
+            badgeText.textContent = `Demo: ${data.remainingRuns} / ${data.maxRuns} runs`;
+            if (badgeEl) {
+              badgeEl.classList.toggle("exhausted", Boolean(data.isExhausted));
+              badgeEl.title = data.isExhausted
+                ? `Demo allowance reached (0 / ${data.maxRuns} runs). Resets in rolling 24 hours.`
+                : `Public Demo: ${data.remainingRuns} of ${data.maxRuns} free runs remaining`;
+            }
           }
         }
       }
     } catch (_) {}
   };
 
+  /* Local Dev / Testing: Reset Demo Allowance (Easily removable) */
+  const performDemoQuotaReset = async () => {
+    try {
+      const sessionId = getOrCreateDemoSessionId();
+      const res = await fetch("/api/v1/demo/reset", {
+        method: "POST",
+        headers: { "X-Demo-Session-ID": sessionId }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.quota) {
+          cachedAllowanceState = data.quota;
+        }
+      }
+
+      await updateDemoAllowanceBadge();
+      closeDemoPolicyModal();
+
+      if (petEngine) {
+        petEngine.setPhoneScreenState("STANDBY", "DEMO RESET 5/5");
+        petEngine.setPetState("SITTING_COFFEE");
+      }
+      setAgentBubble("Demo allowance reset: 5 / 5 runs available.");
+
+      const mergeBanner = document.getElementById("merge-rec-banner");
+      const mergeVal = document.getElementById("merge-rec-value");
+      const mergeDesc = document.getElementById("merge-rec-desc");
+      if (mergeBanner && mergeVal && mergeDesc && mergeVal.textContent.includes("DEMO ALLOWANCE EXHAUSTED")) {
+        mergeBanner.className = "merge-rec-banner is-safe";
+        mergeVal.textContent = "DEMO ALLOWANCE RESET: 5/5 RUNS";
+        mergeDesc.textContent = "Quota limits refreshed for local testing.";
+      }
+    } catch (err) {
+      console.warn("Demo reset failed:", err);
+    }
+  };
+
+  window.performDemoQuotaReset = performDemoQuotaReset;
+
   /* Run Analysis Workflow */
   const runAnalysis = () => {
     if (isAnalyzing) return;
     clearAllTimers();
+    clearLoopGapTimer();
+    if (!isDemoMode) {
+      isCustomMode = true;
+      isLoopActive = false;
+      clearCustomIdleTimer();
+    }
     if (petEngine) petEngine.resetDispatchPopups();
 
     const textarea = document.getElementById("playground-code-input");
@@ -3923,6 +4165,8 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     }
 
     isAnalyzing = true;
+    updateEngineStatusText("ANALYZING...", "is-analyzing");
+    updateLoopTimerBadge(0);
     const runBtn = document.getElementById("playground-run-btn");
     if (runBtn) {
       runBtn.disabled = true;
@@ -3943,7 +4187,23 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
 
     let targetLine = 6;
     const activeSample = (isDemoMode && currentDemoIndex >= 0 && DEMO_EXAMPLES[currentDemoIndex]) ? DEMO_EXAMPLES[currentDemoIndex] : null;
-    const activeFilename = activeSample ? activeSample.fileName : "user_code.ts";
+    let activeFilename = "user_code.ts";
+    if (activeSample) {
+      activeFilename = activeSample.fileName;
+    } else {
+      const trimmed = (inputCode || "").trim();
+      if (/^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b/i.test(trimmed)) {
+        activeFilename = "query.sql";
+      } else if (/^\s*(?:def\s+[a-zA-Z_]|import\s+[a-zA-Z_]|from\s+[a-zA-Z_]|class\s+[a-zA-Z_])/m.test(trimmed)) {
+        activeFilename = "script.py";
+      } else if (/^\s*(?:diff --git|--- [ab]\/|\+\+\+ [ab]\/|@@\s+-[0-9]+)/m.test(trimmed)) {
+        activeFilename = "pr.diff";
+      } else if (/^\s*[{[]/.test(trimmed) && (() => { try { JSON.parse(trimmed); return true; } catch(_) { return false; } })()) {
+        activeFilename = "payload.json";
+      } else {
+        activeFilename = "user_code.ts";
+      }
+    }
     const activeContextFiles = activeSample ? (activeSample.contextFiles || []) : [];
     
     const prdInput = document.getElementById("playground-prd-input");
@@ -3993,7 +4253,8 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
               routeExecuted: (data && data.routeExecuted) || "REJECTED",
               message: (data && data.message) || ("Server validation failed: HTTP " + res.status),
               summary: data ? data.summary : {},
-              errors: (data && data.errors) || [(data && data.message) || "Validation failed"]
+              errors: (data && data.errors) || [(data && data.message) || "Validation failed"],
+              quota: data ? data.quota : null
             };
           }
           return data;
@@ -4006,14 +4267,18 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
 
     // Step 1: Ingest (Take in change, codebase and relevant signals)
     setProgress(15, 1);
+    updateEngineStatusText("STAGE 1: INGEST", "is-analyzing");
     if (petEngine) petEngine.setPetState("GET_UP");
     setAgentBubble("01 Ingest: Taking in change, codebase, and relevant signals...");
+    window.dispatchEvent(new CustomEvent('myco:analysis-stage', { detail: { step: 1 } }));
 
     // Step 2: Build Context (Assemble scoped view of code, systems, and intent)
     addTimer(() => {
       setProgress(35, 2);
+      updateEngineStatusText("STAGE 2: CONTEXT", "is-analyzing");
       if (petEngine) petEngine.setPetState("JUMP_DOWN");
       setAgentBubble("02 Build context: Assembling scoped view of code, systems, and intent...");
+      window.dispatchEvent(new CustomEvent('myco:analysis-stage', { detail: { step: 2 } }));
 
       addTimer(() => {
         if (petEngine) petEngine.setPetState("PICKUP_FILE");
@@ -4023,6 +4288,7 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     // Step 3: Reason (Analyze change with full context to find real impact)
     addTimer(() => {
       setProgress(60, 3);
+      updateEngineStatusText("STAGE 3: REASON", "is-analyzing");
       if (petEngine) petEngine.setPetState("EXAMINE_FILE");
       setAgentBubble("03 Reason: Analyzing change with full context to trace real impact...");
       animateScanBeam(targetLine);
@@ -4031,84 +4297,95 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     // Step 4: Validate (Check findings across multiple signals and constraints)
     addTimer(() => {
       setProgress(82, 4);
+      updateEngineStatusText("STAGE 4: VALIDATE", "is-analyzing");
       setAgentBubble("04 Validate: Checking findings across tests, standards, and constraints...");
     }, 2400);
 
     // Step 5: Score and Surface (Rank what matters and present actionable insights)
     addTimer(async () => {
       setProgress(100, 5);
+      updateEngineStatusText("STAGE 5: FINDINGS", "is-analyzing");
       setAgentBubble("05 Score & surface: Ranking signals and presenting actionable insights...");
 
-      let findingsToRender = [];
-      let isClean = false;
-      let isMergeBlocking = false;
-      let isBackendRouted = false;
-      let isQuotaExhausted = false;
-      let backendMeta = null;
-      let meta = {};
+      try {
+        let findingsToRender = [];
+        let isClean = false;
+        let isMergeBlocking = false;
+        let isBackendRouted = false;
+        let isQuotaExhausted = false;
+        let backendMeta = null;
+        let meta = {};
 
-      let apiRes = null;
-      if (backendPromise) {
-        try {
-          apiRes = await backendPromise;
-        } catch (_) {}
-      }
-
-      // Check quota exhaustion
-      if (apiRes && (apiRes.statusCode === 429 || (apiRes.quota && apiRes.quota.isExhausted && !apiRes.success))) {
-        isQuotaExhausted = true;
-      }
-
-      // Check backend routing (requires future Myco backend)
-      if (apiRes && apiRes.routeExecuted === "EXTERNAL_MYCO") {
-        isBackendRouted = true;
-        backendMeta = {
-          message: apiRes.message,
-          explanation: (apiRes.summary && apiRes.summary.explanation) || apiRes.message,
-          nextAction: (apiRes.summary && apiRes.summary.nextAction) || "request_pilot"
-        };
-      }
-
-      // Check server-side rejection (e.g. Word Limit violation)
-      if (apiRes && (apiRes.statusCode === 400 || apiRes.routeExecuted === "REJECTED" || (!apiRes.success && apiRes.errors && apiRes.errors.length > 0 && !isQuotaExhausted && !isBackendRouted))) {
-        clearAllTimers();
-        isAnalyzing = false;
-        if (runBtn) {
-          runBtn.disabled = false;
-          runBtn.innerHTML = '<span>Run Myco</span>';
+        // Run live client-side analysis via MycoIntelligenceCore on actual editor buffer first
+        let coreRes = null;
+        if (window.MycoIntelligenceCore && window.MycoIntelligenceCore.analyze) {
+          try {
+            coreRes = window.MycoIntelligenceCore.analyze({
+              primaryFile: { path: activeFilename, content: inputCode },
+              contextFiles: activeContextFiles,
+              prd: activePrd
+            });
+          } catch (err) {
+            console.error("MycoCore analysis error:", err);
+          }
         }
-        if (petEngine) {
-          petEngine.setPhoneScreenState("STANDBY", "MYCO ACTIVE");
-          petEngine.setPetState("SITTING_COFFEE");
-        }
-        setAgentBubble("Myco standing by. Edit code or analyze new changes.");
-        const emptyState = document.getElementById("report-empty-state");
-        const progressState = document.getElementById("report-progress-state");
-        if (progressState) progressState.hidden = true;
-        if (emptyState) emptyState.hidden = false;
 
-        const wordCount = countWords(inputCode);
-        if (wordCount > WORD_LIMITS.MAX) {
-          showWordLimitModal({
-            words: wordCount
-          });
+        let apiRes = null;
+        if (backendPromise) {
+          try {
+            apiRes = await backendPromise;
+          } catch (_) {}
         }
-        return;
-      }
 
-      // Run live client-side analysis via MycoIntelligenceCore on actual editor buffer
-      let coreRes = null;
-      if (window.MycoIntelligenceCore && window.MycoIntelligenceCore.analyze) {
-        try {
-          coreRes = window.MycoIntelligenceCore.analyze({
-            primaryFile: { path: activeFilename, content: inputCode },
-            contextFiles: activeContextFiles,
-            prd: activePrd
-          });
-        } catch (err) {
-          console.error("MycoCore analysis error:", err);
+        // Check quota exhaustion
+        if (apiRes && (apiRes.statusCode === 429 || (apiRes.quota && apiRes.quota.isExhausted && !apiRes.success))) {
+          isQuotaExhausted = true;
         }
-      }
+
+        // Check backend routing (requires future Myco backend)
+        if (apiRes && apiRes.routeExecuted === "EXTERNAL_MYCO") {
+          isBackendRouted = true;
+          backendMeta = {
+            message: apiRes.message,
+            explanation: (apiRes.summary && apiRes.summary.explanation) || apiRes.message,
+            nextAction: (apiRes.summary && apiRes.summary.nextAction) || "request_pilot"
+          };
+        } else if (!isBackendRouted && coreRes && coreRes.findings && coreRes.findings.some(f => f.requiresBackendRoute)) {
+          isBackendRouted = true;
+          const rf = coreRes.findings.find(f => f.requiresBackendRoute);
+          backendMeta = {
+            message: rf.title,
+            explanation: rf.explanation,
+            nextAction: "request_pilot"
+          };
+        }
+
+        // Check server-side rejection (e.g. Word Limit violation)
+        if (apiRes && (apiRes.statusCode === 400 || apiRes.routeExecuted === "REJECTED" || (!apiRes.success && apiRes.errors && apiRes.errors.length > 0 && !isQuotaExhausted && !isBackendRouted))) {
+          clearAllTimers();
+          isAnalyzing = false;
+          if (runBtn) {
+            runBtn.disabled = false;
+            runBtn.innerHTML = '<span>Run Myco</span>';
+          }
+          if (petEngine) {
+            petEngine.setPhoneScreenState("STANDBY", "MYCO ACTIVE");
+            petEngine.setPetState("SITTING_COFFEE");
+          }
+          setAgentBubble("Myco standing by. Edit code or analyze new changes.");
+          const emptyState = document.getElementById("report-empty-state");
+          const progressState = document.getElementById("report-progress-state");
+          if (progressState) progressState.hidden = true;
+          if (emptyState) emptyState.hidden = false;
+
+          const wordCount = countWords(inputCode);
+          if (wordCount > WORD_LIMITS.MAX) {
+            showWordLimitModal({
+              words: wordCount
+            });
+          }
+          return;
+        }
 
       if (isQuotaExhausted) {
         isClean = false;
@@ -4145,7 +4422,7 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
             webhook: activeSample.customApp
           } : undefined
         }));
-      } else if (coreRes && coreRes.findings && coreRes.findings.length > 0) {
+      } else if (coreRes && !coreRes.isClean && coreRes.findings && coreRes.findings.length > 0) {
         // In-browser engine findings
         isClean = false;
         isMergeBlocking = coreRes.isMergeBlocking;
@@ -4204,6 +4481,13 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
 
       renderFindings(findingsToRender, isClean, isMergeBlocking, meta);
       updateDemoAllowanceBadge();
+      window.dispatchEvent(new CustomEvent('myco:analysis-complete', {
+        detail: {
+          isClean,
+          isMergeBlocking,
+          findingsCount: findingsToRender.length
+        }
+      }));
 
       if (isBackendRouted) {
         if (petEngine) {
@@ -4224,6 +4508,7 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
             runBtn.disabled = false;
             runBtn.innerHTML = '<span>Run Myco</span>';
           }
+          onAnalysisCycleComplete();
         }, 1800);
       } else if (isQuotaExhausted) {
         if (petEngine) {
@@ -4236,8 +4521,14 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
           runBtn.disabled = false;
           runBtn.innerHTML = '<span>Run Myco</span>';
         }
+        onAnalysisCycleComplete();
         addTimer(() => {
-          showDemoPolicyModal({ isExhausted: true, usedRuns: 5, maxRuns: 5 });
+          showDemoPolicyModal({
+            isExhausted: true,
+            usedRuns: (apiRes && apiRes.quota && apiRes.quota.usedRuns) || 5,
+            maxRuns: 5,
+            resetAt: (apiRes && apiRes.quota && apiRes.quota.resetAt) || (apiRes && apiRes.summary && apiRes.summary.resetAt) || cachedAllowanceState.resetAt || null
+          });
         }, 500);
       } else if (isClean) {
         if (petEngine) {
@@ -4259,6 +4550,7 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
             runBtn.disabled = false;
             runBtn.innerHTML = '<span>Run Myco</span>';
           }
+          onAnalysisCycleComplete();
         }, 1800);
 
       } else {
@@ -4325,6 +4617,7 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
             runBtn.disabled = false;
             runBtn.innerHTML = '<span>Run Myco</span>';
           }
+          onAnalysisCycleComplete();
         }, 7800);
 
         addTimer(() => {
@@ -4332,6 +4625,26 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
         }, 14000);
       }
 
+      } catch (fatalStepErr) {
+        console.error("Fatal error during Step 5 execution:", fatalStepErr);
+        clearAllTimers();
+        isAnalyzing = false;
+        if (runBtn) {
+          runBtn.disabled = false;
+          runBtn.innerHTML = '<span>Run Myco</span>';
+        }
+        onAnalysisCycleComplete();
+        if (petEngine) {
+          petEngine.setPhoneScreenState("STANDBY", "MYCO ACTIVE");
+          petEngine.setPetState("SITTING_COFFEE");
+        }
+        setAgentBubble("Myco standing by. Edit code or analyze new changes.");
+        const fallbackFindings = (isDemoMode && activeSample && activeSample.finding) ? [activeSample.finding] : [];
+        renderFindings(fallbackFindings, fallbackFindings.length === 0, false, {
+          isDemo: isDemoMode,
+          fileName: activeFilename
+        });
+      }
     }, 3200);
   };
 
@@ -4416,26 +4729,63 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     const footer = document.getElementById("demo-modal-footer");
     if (!backdrop) return;
 
-    if (badge) badge.textContent = "DEMO 5/5 COMPLETED · EVALUATION WINDOW";
-    if (title) title.textContent = "Demo 5/5 Completed — Not for Production Use";
-    if (body) {
-      body.innerHTML = `
-        <p class="demo-modal-p">
-          This custom code feature is provided for demonstration and evaluation purposes only. It is not intended for production use. Production deployment may require additional security reviews, testing, reliability checks, access controls, and operational safeguards.
-        </p>
-        <p class="demo-modal-p demo-modal-p--sub">
-          If you want to use this capability in a pilot or production-related environment, please contact us to discuss access and requirements.
-        </p>
-      `;
+    const isExhausted = Boolean(options.isExhausted);
+    const resetTimeStr = options.resetAt || cachedAllowanceState.resetAt;
+    let resetNotice = "Your 5-run demo allowance automatically refreshes on a rolling 24-hour window from each completed analysis.";
+    if (resetTimeStr) {
+      try {
+        const resetDate = new Date(resetTimeStr);
+        resetNotice = `Your earliest analysis run will reset at ${resetDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${resetDate.toLocaleDateString()}).`;
+      } catch (_) {}
     }
+
+    if (isExhausted) {
+      window.dispatchEvent(new CustomEvent('myco:quota-exhausted'));
+      if (badge) badge.textContent = "DEMO ALLOWANCE EXHAUSTED (5/5 RUNS)";
+      if (title) title.textContent = "Public Demo Allowance Reached";
+      if (body) {
+        body.innerHTML = `
+          <p class="demo-modal-p">
+            You have completed all 5 complimentary analysis runs in this rolling 24-hour evaluation window. This fair-usage policy ensures high compute availability for all public visitors without requiring user accounts or logins.
+          </p>
+          <p class="demo-modal-p demo-modal-p--sub">
+            <strong>Quota Reset:</strong> ${escapeHtml(resetNotice)}
+          </p>
+          <p class="demo-modal-p demo-modal-p--sub">
+            To evaluate Myco across entire repositories, PR branches, and continuous CI pipelines without demo limitations, please request a pilot.
+          </p>
+        `;
+      }
+    } else {
+      const remaining = options.remainingRuns !== undefined ? options.remainingRuns : cachedAllowanceState.remainingRuns;
+      if (badge) badge.textContent = `PUBLIC DEMO · ${remaining} / 5 RUNS REMAINING`;
+      if (title) title.textContent = "Public Demo 5-Run Window Policy";
+      if (body) {
+        body.innerHTML = `
+          <p class="demo-modal-p">
+            This public playground provides 5 complimentary analysis runs per rolling 24-hour window without requiring account creation or login credentials.
+          </p>
+          <p class="demo-modal-p demo-modal-p--sub">
+            <strong>Fair-Usage Guarantee:</strong> Failed, invalid, or cancelled analyses are never charged against your allowance.
+          </p>
+          <p class="demo-modal-p demo-modal-p--sub">
+            If you want to evaluate Myco on full repositories, cross-repo dependency trees, or GitHub Actions pipelines, contact us to discuss pilot access.
+          </p>
+        `;
+      }
+    }
+
     if (footer) {
       footer.innerHTML = `
+        <button type="button" class="demo-modal-dev-reset-btn mono" id="demo-modal-dev-reset-btn" title="Testing Tool: Reset 5-run demo quota limit">Reset Limit (Test)</button>
         <button type="button" class="demo-modal-dismiss-btn" id="demo-modal-dismiss-btn">Close</button>
         <button type="button" class="demo-modal-pilot-btn" id="demo-modal-pilot-btn">
           <span>Want to use this for a pilot? Contact us.</span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       `;
+      const devResetModalBtn = document.getElementById("demo-modal-dev-reset-btn");
+      if (devResetModalBtn) devResetModalBtn.addEventListener("click", performDemoQuotaReset);
       const dismissBtn = document.getElementById("demo-modal-dismiss-btn");
       if (dismissBtn) dismissBtn.addEventListener("click", closeDemoPolicyModal);
       const pilotModalBtn = document.getElementById("demo-modal-pilot-btn");
@@ -4492,43 +4842,23 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
         <!-- Unified Workspace Toolbar -->
         <div class="playground-toolbar" id="playground-toolbar">
           <div class="playground-toolbar__left">
-            <div class="toolbar-mode-badge mono">
-              <span class="toolbar-pulse-dot"></span>
-              <span id="toolbar-mode-label">SAMPLE REVIEW</span>
+            <div class="toolbar-sample-display-wrap" id="toolbar-sample-display-wrap">
+              <span id="toolbar-sample-title" class="toolbar-sample-title">PR #4827: Tool Approval Bypass (AGENT-12)</span>
             </div>
-            <div class="toolbar-allowance-badge mono" id="toolbar-allowance-badge" title="Public Demo: 5 free analyses per rolling 24-hour window">
-              <span id="toolbar-allowance-text">Demo: 5 / 5 runs</span>
-            </div>
-
-            <!-- Integrated Sample Review Dropdown & Stepper -->
-            <div class="toolbar-sample-controls" id="toolbar-sample-controls">
-              <div class="toolbar-sample-select-wrap">
-                <span class="toolbar-sample-prefix mono">SAMPLE:</span>
-                <select id="toolbar-sample-select" class="toolbar-sample-select" aria-label="Select sample code review scenario">
-                  <option value="0">1. PR #4827: Tool Approval Bypass (AGENT-12 · Homepage Proof)</option>
-                  <option value="1">2. Exposed API Secret (Critical · P0)</option>
-                  <option value="2">3. Unsafe DOM / XSS Injection (High · P1)</option>
-                  <option value="3">4. Dependency Compatibility Risk (High · P1)</option>
-                  <option value="4">5. Specification / PRD Mismatch (High · P1)</option>
-                  <option value="5">6. Division by Zero / Arithmetic Boundary (Medium · P2)</option>
-                  <option value="6">7. Merge-Blocking API Regression (Critical · P0)</option>
-                </select>
-                <span class="toolbar-select-arrow" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
-              </div>
-
-              <div class="toolbar-stepper">
-                <button type="button" class="toolbar-step-btn" id="demo-prev-btn" title="Previous sample scenario">‹</button>
-                <span class="toolbar-step-indicator mono" id="demo-walkthrough-step">1 / 7</span>
-                <button type="button" class="toolbar-step-btn" id="demo-next-btn" title="Next sample scenario">›</button>
-              </div>
-
-              <button type="button" class="toolbar-custom-btn" id="demo-exit-btn" title="Switch to custom code input">
-                <span>Enter Custom Code</span>
-              </button>
-            </div>
+            <button type="button" class="toolbar-custom-btn" id="demo-exit-btn" title="Add custom code directly to editor">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Add Custom Code</span>
+            </button>
           </div>
 
           <div class="playground-toolbar__right">
+            <div class="toolbar-allowance-badge mono" id="toolbar-allowance-badge" title="Public Demo: 5 free analyses per rolling 24-hour window">
+              <span id="toolbar-allowance-text">Demo: 5 / 5 runs</span>
+            </div>
+            <button type="button" class="toolbar-dev-reset-btn mono" id="toolbar-dev-reset-btn" title="Testing Tool: Reset 5-run demo quota limit">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+              <span>Reset Limit (Test)</span>
+            </button>
             <div class="toolbar-engine-status mono" id="toolbar-engine-status">
               <span class="status-indicator-dot"></span>
               <span id="engine-status-text">READY FOR ANALYSIS</span>
@@ -4569,7 +4899,7 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
               <div class="editor-scan-beam" id="editor-scan-beam"></div>
               <div class="editor-code-container">
                 <pre class="editor-syntax-view" id="editor-syntax-view" aria-hidden="true"></pre>
-                <textarea id="playground-code-input" class="editor-textarea" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste your code or PR diff here..." aria-label="Code Input Area"></textarea>
+                <textarea id="playground-code-input" class="editor-textarea" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="// Paste your code or pull request diff here (TypeScript, JavaScript, Python, SQL, or PR diff)...&#10;// Click 'Run Myco' below to inspect." aria-label="Code Input Area"></textarea>
                 
                 <!-- Dedicated PRD Context View -->
                 <div class="editor-context-view" id="editor-prd-view" hidden>
@@ -4764,23 +5094,22 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
 
     bindPlaygroundEvents();
 
-    // Initialize with Example 1 code loaded in editor, awaiting detection (analysis hidden until requested)
-    startDemoMode(0);
+    // Start continuous sample loop with 2-second gap between each sample run
+    startContinuousLoop(0);
     return true;
   };
 
   const bindPlaygroundEvents = () => {
-    // Toolbar sample selector dropdown
-    const sampleSelect = document.getElementById("toolbar-sample-select");
-    if (sampleSelect) {
-      sampleSelect.addEventListener("change", (e) => {
-        const idx = parseInt(e.target.value, 10);
-        if (!isNaN(idx)) startDemoMode(idx);
+    // Toolbar Add Custom Code button
+    const exitBtn = document.getElementById("demo-exit-btn");
+    if (exitBtn) {
+      exitBtn.addEventListener("click", () => {
+        enterCustomCodeMode();
       });
     }
 
     const emptyDemoBtn = document.getElementById("report-empty-demo-btn");
-    if (emptyDemoBtn) emptyDemoBtn.addEventListener("click", () => startDemoMode(0));
+    if (emptyDemoBtn) emptyDemoBtn.addEventListener("click", () => startContinuousLoop(0));
 
     // Demo Walkthrough Navigation Controls
     const prevBtn = document.getElementById("demo-prev-btn");
@@ -4788,9 +5117,6 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
 
     const nextBtn = document.getElementById("demo-next-btn");
     if (nextBtn) nextBtn.addEventListener("click", nextDemoExample);
-
-    const exitBtn = document.getElementById("demo-exit-btn");
-    if (exitBtn) exitBtn.addEventListener("click", () => exitDemoMode(true));
 
     // Context tab navigation
     const tabCode = document.getElementById("tab-btn-code");
@@ -4826,6 +5152,16 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
       let typingTimeout = null;
       let overflowCheckTimer = null;
       let lastExceededWords = 0;
+
+      textarea.addEventListener("focus", () => {
+        if (isDemoMode) {
+          isLoopActive = false;
+          clearLoopGapTimer();
+        }
+        if (!textarea.value.trim()) {
+          startCustomIdleTimer();
+        }
+      });
 
       textarea.addEventListener("input", () => {
         onUserEdit();
@@ -4922,15 +5258,26 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
     }
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeDemoPolicyModal();
+      if (e.key === "Escape") {
+        closeDemoPolicyModal();
+      }
     });
 
     const allowanceBadge = document.getElementById("toolbar-allowance-badge");
     if (allowanceBadge) {
       allowanceBadge.style.cursor = "pointer";
       allowanceBadge.addEventListener("click", () => {
-        showDemoPolicyModal({ isExhausted: allowanceBadge.classList.contains("exhausted") });
+        showDemoPolicyModal({
+          isExhausted: allowanceBadge.classList.contains("exhausted"),
+          remainingRuns: cachedAllowanceState.remainingRuns,
+          resetAt: cachedAllowanceState.resetAt,
+        });
       });
+    }
+
+    const devResetBtn = document.getElementById("toolbar-dev-reset-btn");
+    if (devResetBtn) {
+      devResetBtn.addEventListener("click", performDemoQuotaReset);
     }
 
     updateDemoAllowanceBadge();

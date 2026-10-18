@@ -42,6 +42,282 @@ class InternalProcessingEngine:
         code = primary_file.content or ""
         file_path = primary_file.path or "code.ts"
         lines = code.splitlines()
+        trimmed_code = code.strip()
+
+        # 0. Rule: Grammar & Syntax Integrity (Bare Identifier & Delimiter Stack)
+        clean_tokens = re.sub(r"/\*[\s\S]*?\*/|//.*|#.*", "", trimmed_code).strip()
+        if re.match(r"^[a-zA-Z_$][a-zA-Z0-9_$]*$", clean_tokens):
+            bare_token = clean_tokens
+            if bare_token not in ("return", "break", "continue", "debugger", "pass", "yield"):
+                findings.append(
+                    AnalysisFinding(
+                        id="SYNTAX-1-bare_identifier",
+                        category="syntax",
+                        severity=FindingSeverity.CRITICAL,
+                        title=f"Syntax Error: Unresolved Bare Identifier '{bare_token}'",
+                        explanation=f"The bare identifier '{bare_token}' exists outside any statement, declaration, or function invocation. In TypeScript/JavaScript, this throws a ReferenceError at runtime (TS2304); in SQL or Python, this is invalid syntax.",
+                        impact="Code cannot execute or compile. Evaluation raises an immediate ReferenceError or SyntaxError.",
+                        file_path=file_path,
+                        source_range=SourceRange(start_line=1, end_line=1),
+                        evidence_snippet=bare_token,
+                        evidence_rule="SYNTAX-01 · GRAMMAR & REFERENCE INTEGRITY",
+                        suggested_action=f"Declare '{bare_token}' with a declaration keyword (e.g., 'const {bare_token} = ...;') or provide a valid statement or query.",
+                        is_merge_blocking=True,
+                    )
+                )
+
+        # Delimiter balancing check
+        bracket_stack = []
+        for l_idx, l_text in enumerate(lines, start=1):
+            for c_char in l_text:
+                if c_char in "({[":
+                    bracket_stack.append((c_char, l_idx))
+                elif c_char in ")}]":
+                    if not bracket_stack:
+                        findings.append(
+                            AnalysisFinding(
+                                id=f"SYNTAX-UNMATCHED-DELIM-L{l_idx}",
+                                category="syntax",
+                                severity=FindingSeverity.CRITICAL,
+                                title=f"Syntax Error: Unexpected Closing Delimiter '{c_char}'",
+                                explanation=f"Found unmatched closing delimiter '{c_char}' without an opening counterpart.",
+                                impact="Unbalanced delimiters break code parsing and execution.",
+                                file_path=file_path,
+                                source_range=SourceRange(start_line=l_idx, end_line=l_idx),
+                                evidence_snippet=l_text.strip(),
+                                evidence_rule="SYNTAX-02 · DELIMITER INTEGRITY",
+                                suggested_action=f"Remove the extra '{c_char}' or provide matching opening bracket.",
+                                is_merge_blocking=True,
+                            )
+                        )
+                        break
+                    last_open, last_line = bracket_stack.pop()
+                    expected = ")" if last_open == "(" else "}" if last_open == "{" else "]"
+                    if c_char != expected:
+                        findings.append(
+                            AnalysisFinding(
+                                id=f"SYNTAX-MISMATCHED-DELIM-L{l_idx}",
+                                category="syntax",
+                                severity=FindingSeverity.CRITICAL,
+                                title=f"Syntax Error: Mismatched Delimiter: Opened '{last_open}' but closed with '{c_char}'",
+                                explanation=f"Opened delimiter '{last_open}' at line {last_line} was closed with '{c_char}' at line {l_idx}.",
+                                impact="Mismatched delimiters break structural compilation.",
+                                file_path=file_path,
+                                source_range=SourceRange(start_line=l_idx, end_line=l_idx),
+                                evidence_snippet=l_text.strip(),
+                                evidence_rule="SYNTAX-02 · DELIMITER INTEGRITY",
+                                suggested_action=f"Replace '{c_char}' with matching '{expected}'.",
+                                is_merge_blocking=True,
+                            )
+                        )
+                        break
+            if findings:
+                break
+
+        # Python Native AST Parsing & Rules
+        if (file_path.endswith(".py") or re.search(r"^\s*(?:def\s+[a-zA-Z_]|import\s+[a-zA-Z_]|from\s+[a-zA-Z_]|class\s+[a-zA-Z_])", code, re.MULTILINE)) and not findings:
+            import ast
+            try:
+                tree = ast.parse(code)
+                for node in ast.walk(tree):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        for default in node.args.defaults:
+                            if isinstance(default, (ast.List, ast.Dict, ast.Set)):
+                                findings.append(
+                                    AnalysisFinding(
+                                        id=f"BUG-PY-MUTABLE-DEFAULT-L{node.lineno}",
+                                        category="logic",
+                                        severity=FindingSeverity.HIGH,
+                                        title=f"Mutable Default Argument in Function '{node.name}'",
+                                        explanation=f"Function '{node.name}' defines a mutable default argument. Mutable defaults are shared across all calls, leaking state between invocations.",
+                                        impact="Silent state accumulation and cross-call data pollution.",
+                                        file_path=file_path,
+                                        source_range=SourceRange(start_line=node.lineno, end_line=node.lineno),
+                                        evidence_snippet=lines[node.lineno - 1] if node.lineno <= len(lines) else f"def {node.name}(...)",
+                                        evidence_rule="BUG-02 · IMMUTABLE_DEFAULT_ARGUMENTS",
+                                        suggested_action="Use None as default parameter and assign inside function body.",
+                                        is_merge_blocking=True,
+                                    )
+                                )
+                    if isinstance(node, ast.ExceptHandler) and node.type is None:
+                        findings.append(
+                            AnalysisFinding(
+                                id=f"REL-PY-BARE-EXCEPT-L{node.lineno}",
+                                category="reliability",
+                                severity=FindingSeverity.HIGH,
+                                title="Bare Except Handler (Catches BaseException)",
+                                explanation="Using 'except:' without specifying an exception class suppresses critical interrupts and process termination signals.",
+                                impact="Hangs background tasks and masks crash diagnostics.",
+                                file_path=file_path,
+                                source_range=SourceRange(start_line=node.lineno, end_line=node.lineno),
+                                evidence_snippet=lines[node.lineno - 1] if node.lineno <= len(lines) else "except:",
+                                evidence_rule="REL-02 · EXPLICIT_EXCEPTION_HANDLING",
+                                suggested_action="Catch explicit exceptions, e.g. 'except Exception as err:'.",
+                                is_merge_blocking=True,
+                            )
+                        )
+            except SyntaxError as e:
+                findings.append(
+                    AnalysisFinding(
+                        id=f"SYNTAX-PY-L{e.lineno or 1}",
+                        category="syntax",
+                        severity=FindingSeverity.CRITICAL,
+                        title=f"Python Syntax Error: {e.msg}",
+                        explanation=f"Python parser encountered an unrecoverable syntax error: '{e.msg}' at line {e.lineno}, column {e.offset}.",
+                        impact="Code fails compilation and throws an immediate SyntaxError on execution.",
+                        file_path=file_path,
+                        source_range=SourceRange(start_line=e.lineno or 1, end_line=e.lineno or 1),
+                        evidence_snippet=lines[e.lineno - 1] if e.lineno and e.lineno <= len(lines) else (e.text or code[:60]),
+                        evidence_rule="SYNTAX-01 · AST_PARSE_INTEGRITY",
+                        suggested_action=f"Correct syntax near line {e.lineno}.",
+                        is_merge_blocking=True,
+                    )
+                )
+
+        # SQL Query Intelligence
+        is_sql = file_path.endswith(".sql") or bool(re.search(r"^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b", trimmed_code, re.IGNORECASE))
+        if is_sql:
+            mod_match = re.search(r"\b(UPDATE\s+([a-zA-Z0-9_.]+)\s+SET\b|DELETE\s+FROM\s+([a-zA-Z0-9_.]+)\b)", code, re.IGNORECASE)
+            if mod_match and not re.search(r"\bWHERE\b", code, re.IGNORECASE):
+                line_no = self._find_line_number(lines, mod_match.group(0)[:15])
+                table = mod_match.group(2) or mod_match.group(3) or "table"
+                findings.append(
+                    AnalysisFinding(
+                        id=f"SQL-UNBOUNDED-MOD-L{line_no}",
+                        category="security",
+                        severity=FindingSeverity.CRITICAL,
+                        title="Critical: Unbounded Table Modification (Missing WHERE Clause)",
+                        explanation=f"The operation executes without a WHERE clause filter. In production, this query will permanently modify or delete all records across the entire '{table}' table.",
+                        impact="Catastrophic permanent data loss or database corruption across all tenants.",
+                        file_path=file_path,
+                        source_range=SourceRange(start_line=line_no, end_line=line_no),
+                        evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else mod_match.group(0),
+                        evidence_rule="SQL-01 · UNBOUNDED_TABLE_MODIFICATION",
+                        suggested_action="Specify a bounded WHERE clause (e.g. 'WHERE id = :id').",
+                        is_merge_blocking=True,
+                    )
+                )
+            select_match = re.search(r"\bSELECT\s+\*\s+FROM\s+([a-zA-Z0-9_.]+)", code, re.IGNORECASE)
+            if select_match and not re.search(r"\bLIMIT\s+\d+|\bFETCH\s+FIRST|\bTOP\s+\d+", code, re.IGNORECASE):
+                line_no = self._find_line_number(lines, "SELECT")
+                table = select_match.group(1)
+                findings.append(
+                    AnalysisFinding(
+                        id=f"SQL-UNBOUNDED-SELECT-L{line_no}",
+                        category="performance",
+                        severity=FindingSeverity.MEDIUM,
+                        title=f"Advisory: Unbounded Column Projection (SELECT * Without LIMIT)",
+                        explanation=f"Query executes 'SELECT * FROM {table}' without a LIMIT or pagination boundary. In production, this causes high I/O overhead and memory buffer saturation.",
+                        impact="Database connection pool exhaustion and memory pressure under scale.",
+                        file_path=file_path,
+                        source_range=SourceRange(start_line=line_no, end_line=line_no),
+                        evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else select_match.group(0),
+                        evidence_rule="SQL-02 · UNBOUNDED_PROJECTION",
+                        suggested_action=f"Explicitly project required columns and append a LIMIT clause.",
+                        is_merge_blocking=False,
+                    )
+                )
+            sens_match = re.search(r"\bFROM\s+([a-zA-Z0-9_.]*(?:users|accounts|invoices|tenants|organizations|projects|records|billing|orders|profiles)[a-zA-Z0-9_.]*)", code, re.IGNORECASE)
+            if sens_match and not re.search(r"\b(?:tenant_id|org_id|tenantId|orgId|account_id|accountId)\b", code, re.IGNORECASE):
+                line_no = self._find_line_number(lines, "FROM")
+                table = sens_match.group(1)
+                findings.append(
+                    AnalysisFinding(
+                        id=f"SQL-TENANT-LEAK-L{line_no}",
+                        category="security",
+                        severity=FindingSeverity.HIGH,
+                        title=f"Tenant Boundary Violation: Missing Tenant Isolation Filter on '{table}'",
+                        explanation=f"The query accesses the multi-tenant collection '{table}' without filtering by 'tenant_id' or 'org_id'. In multi-tenant systems, this permits cross-tenant data exposure.",
+                        impact="Cross-tenant authorization bypass and zero-trust policy violation.",
+                        file_path=file_path,
+                        source_range=SourceRange(start_line=line_no, end_line=line_no),
+                        evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else sens_match.group(0),
+                        evidence_rule="TENANT-02 · STRICT_MULTI_TENANT_ISOLATION",
+                        suggested_action="Append tenant filter to WHERE clause: 'WHERE tenant_id = :tenant_id'.",
+                        is_merge_blocking=True,
+                    )
+                )
+
+        # JS/TS Logic & Defect Rules
+        assign_if = re.search(r"\bif\s*\(\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*([^=][^)]*)\)", code)
+        if assign_if:
+            line_no = self._find_line_number(lines, "if")
+            findings.append(
+                AnalysisFinding(
+                    id=f"LOGIC-ACCIDENTAL-ASSIGN-L{line_no}",
+                    category="logic",
+                    severity=FindingSeverity.HIGH,
+                    title="Logic Defect: Accidental Variable Assignment in 'if' Condition",
+                    explanation=f"Condition assigns a value to '{assign_if.group(1)}' ('=') instead of testing equality ('===').",
+                    impact="Severe logical defect: branch behaves unpredictably and mutates variable.",
+                    file_path=file_path,
+                    source_range=SourceRange(start_line=line_no, end_line=line_no),
+                    evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else assign_if.group(0),
+                    evidence_rule="LOGIC-01 · ACCIDENTAL_ASSIGNMENT",
+                    suggested_action=f"Replace assignment '=' with strict equality '==='.",
+                    is_merge_blocking=True,
+                )
+            )
+
+        nan_match = re.search(r"(?:===|==|!==|!=)\s*NaN\b|\bNaN\s*(?:===|==|!==|!=)", code)
+        if nan_match:
+            line_no = self._find_line_number(lines, "NaN")
+            findings.append(
+                AnalysisFinding(
+                    id=f"LOGIC-NAN-EQUALITY-L{line_no}",
+                    category="logic",
+                    severity=FindingSeverity.HIGH,
+                    title="Logic Defect: Invalid Direct Equality Comparison Against NaN",
+                    explanation="In IEEE 754 floating-point standard, NaN !== NaN is always true. Direct comparison with NaN will never match.",
+                    impact="Conditional check will never match, causing unreachable code paths.",
+                    file_path=file_path,
+                    source_range=SourceRange(start_line=line_no, end_line=line_no),
+                    evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else nan_match.group(0),
+                    evidence_rule="LOGIC-02 · IEEE754_NAN_EQUALITY",
+                    suggested_action="Use 'Number.isNaN(value)' instead of direct equality comparison.",
+                    is_merge_blocking=False,
+                )
+            )
+
+        empty_catch = re.search(r"\bcatch\s*(?:\([^)]*\))?\s*\{\s*(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/|\s*)*\}", code)
+        if empty_catch:
+            line_no = self._find_line_number(lines, "catch")
+            findings.append(
+                AnalysisFinding(
+                    id=f"REL-EMPTY-CATCH-L{line_no}",
+                    category="reliability",
+                    severity=FindingSeverity.HIGH,
+                    title="Reliability Risk: Silent Exception Swallowing in Catch Block",
+                    explanation="Catch block completely swallows exceptions without logging, telemetry, or rethrowing.",
+                    impact="Masks runtime failures and leaves systems in an inconsistent state.",
+                    file_path=file_path,
+                    source_range=SourceRange(start_line=line_no, end_line=line_no),
+                    evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else "catch (err) {}",
+                    evidence_rule="REL-01 · EXPLICIT_ERROR_HANDLING",
+                    suggested_action="Add structured logging with logger.error(err) or implement a fallback recovery path.",
+                    is_merge_blocking=True,
+                )
+            )
+
+        insecure_http = re.search(r'["\']http://(?!(?:localhost|127\.0\.0\.1|0\.0\.0\.0|example\.com)[/:"\'])([a-zA-Z0-9_.-]+[^"\']*)', code, re.IGNORECASE)
+        if insecure_http:
+            line_no = self._find_line_number(lines, "http://")
+            findings.append(
+                AnalysisFinding(
+                    id=f"SEC-INSECURE-HTTP-L{line_no}",
+                    category="security",
+                    severity=FindingSeverity.HIGH,
+                    title="Security Risk: Insecure Plaintext HTTP Protocol in Remote Endpoint",
+                    explanation=f"Endpoint '{insecure_http.group(0)}' uses unencrypted 'http://' protocol. Plaintext transmission is vulnerable to interception and MitM tampering.",
+                    impact="Violates transport security standards. Exposes tokens and data in transit.",
+                    file_path=file_path,
+                    source_range=SourceRange(start_line=line_no, end_line=line_no),
+                    evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else insecure_http.group(0),
+                    evidence_rule="SEC-01 · ENCRYPTED_TRANSPORT_ENFORCEMENT",
+                    suggested_action="Upgrade endpoint URL to use TLS encryption ('https://').",
+                    is_merge_blocking=False,
+                )
+            )
 
         # 1. Rule: Secret Credential Detection (SEC-04)
         stripe_match = re.search(r"['\"](sk_live_[a-zA-Z0-9]{24,})['\"]", code)

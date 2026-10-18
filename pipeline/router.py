@@ -11,6 +11,7 @@ Orchestrates the public demo request lifecycle:
 7. Normalization & Telemetry (Sanitization, Structured Audit Logging, Metrics)
 """
 
+import re
 import time
 from typing import Any, Dict, List, Optional
 
@@ -66,7 +67,8 @@ class PipelineRouter:
         # Stage 1: API Gateway & Session Resolution
         # -------------------------------------------------------------
         user: UserContext = gateway.authenticate_request(headers, client_ip)
-        session_key = quota_service.get_session_fingerprint(user.user_id, client_ip)
+        session_key = quota_service.get_session_key(user.user_id) or quota_service.get_session_fingerprint(user.user_id, client_ip, getattr(user, "user_agent", ""))
+        ip_key = quota_service.get_ip_key(client_ip, getattr(user, "user_agent", ""))
 
         is_valid, payload, error_msg = gateway.parse_and_validate_payload(raw_body)
         if not is_valid:
@@ -80,7 +82,7 @@ class PipelineRouter:
                 findings=[],
                 summary={"rejected": True},
                 usage=UsageMetadata(0, 0, 0, 0, 0, 0.0, 0, 0, 0),
-                quota_info=quota_service.get_allowance_info(session_key),
+                quota_info=quota_service.get_allowance_info(session_key, ip_key),
                 errors=[error_msg or "Invalid JSON payload"],
             )
 
@@ -103,7 +105,7 @@ class PipelineRouter:
                     findings=[],
                     summary={"securityViolation": "SSRF_GUARD_TRIGGERED"},
                     usage=UsageMetadata(0, 0, 0, 0, 0, 0.0, 0, 0, 0),
-                    quota_info=quota_service.get_allowance_info(session_key),
+                    quota_info=quota_service.get_allowance_info(session_key, ip_key),
                     errors=[ssrf_err or "SSRF check failed"],
                 )
 
@@ -123,8 +125,18 @@ class PipelineRouter:
                 content=SecurityManager.sanitize_untrusted_code(primary_file_dict.get("content", "")),
             )
         elif raw_code:
+            raw_stripped = raw_code.strip()
+            if payload.get("fileName"):
+                v_path = payload.get("fileName")
+            elif re.search(r"^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b", raw_stripped, re.IGNORECASE):
+                v_path = "query.sql"
+            elif re.search(r"^\s*(?:def\s+[a-zA-Z_]|import\s+[a-zA-Z_]|from\s+[a-zA-Z_]|class\s+[a-zA-Z_])", raw_stripped, re.MULTILINE):
+                v_path = "script.py"
+            else:
+                v_path = "input.ts"
+
             primary_file = CodeInputFile(
-                path="input.ts",
+                path=v_path,
                 content=SecurityManager.sanitize_untrusted_code(raw_code),
             )
         elif raw_diff:
@@ -198,7 +210,7 @@ class PipelineRouter:
                         "preservedCode": code_to_validate,
                     },
                     usage=UsageMetadata(0, 0, 0, 0, 0, 0.0, 0, 0, word_count),
-                    quota_info=quota_service.get_allowance_info(session_key),
+                    quota_info=quota_service.get_allowance_info(session_key, ip_key),
                     errors=[word_err or "Word count outside permitted range (1,000 - 1,200 words)"],
                 )
 
@@ -215,6 +227,7 @@ class PipelineRouter:
             diff_lines=diff_lines,
             is_admin_bypass=user.is_admin,
             is_sample_demo=is_sample_demo,
+            ip_key=ip_key,
         )
 
         # Idempotency hit: Return identical response without decrementing allowance
@@ -222,7 +235,7 @@ class PipelineRouter:
             cached_res = dict(quota_check.cached_response)
             cached_res["requestId"] = request_id
             cached_res["message"] = "Result retrieved from deduplication cache (demo allowance preserved)."
-            cached_res["quota"] = quota_service.get_allowance_info(session_key)
+            cached_res["quota"] = quota_service.get_allowance_info(session_key, ip_key)
             return NormalizedResponse(
                 request_id=request_id,
                 status_code=cached_res.get("statusCode", 200),
@@ -255,7 +268,7 @@ class PipelineRouter:
                 },
             )
 
-            allowance_snapshot = quota_service.get_allowance_info(session_key)
+            allowance_snapshot = quota_service.get_allowance_info(session_key, ip_key)
             return response_normalizer.normalize(
                 request_id=request_id,
                 status_code=quota_check.status_code,
@@ -380,7 +393,7 @@ class PipelineRouter:
 
         if success and status_code in (200, 201):
             # Format normalized response to cache
-            allowance_snapshot = quota_service.get_allowance_info(session_key)
+            allowance_snapshot = quota_service.get_allowance_info(session_key, ip_key)
             norm_res = response_normalizer.normalize(
                 request_id=request_id,
                 status_code=status_code,
@@ -400,16 +413,17 @@ class PipelineRouter:
                 response_data=norm_res.to_dict(),
                 is_admin_bypass=user.is_admin,
                 is_sample_demo=is_sample_demo,
+                ip_key=ip_key,
             )
         else:
             # Release concurrency WITHOUT charging against the user's demo allowance!
-            quota_service.release_on_failure(session_key)
+            quota_service.release_on_failure(session_key, ip_key=ip_key)
 
         # -------------------------------------------------------------
         # Stage 7: Telemetry, Normalization & Return
         # -------------------------------------------------------------
         metrics.record_latency(route_executed, duration_ms)
-        allowance_snapshot = quota_service.get_allowance_info(session_key)
+        allowance_snapshot = quota_service.get_allowance_info(session_key, ip_key)
 
         usage = UsageMetadata(
             character_count=total_chars,
