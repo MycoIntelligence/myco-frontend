@@ -339,7 +339,40 @@ class PipelineRouter:
                 summary["route"] = "INTERNAL"
                 summary["isClean"] = internal_res.get("isClean", True)
                 summary["isMergeBlocking"] = internal_res.get("isMergeBlocking", False)
+                summary["escalationRequired"] = internal_res.get("escalation_required", False)
+                summary["escalationReason"] = internal_res.get("escalation_reason")
+                summary["unsupportedFiles"] = internal_res.get("unsupported_files", [])
+                summary["unresolvedCases"] = internal_res.get("unresolved_cases", [])
                 message = "Analysis completed via internal AST engine."
+
+                # If Little My encounters an unsupported construct, language, or inconclusive pattern,
+                # escalate to the Myco backend workflow automatically
+                if internal_res.get("escalation_required"):
+                    metrics.increment("requests_escalated_to_myco")
+                    routing_req = BackendRoutingRequest(
+                        request_id=request_id,
+                        user_id=user.user_id,
+                        org_id=user.org_id,
+                        tier="demo",
+                        target_repository=repo_url,
+                        pr_number=payload.get("prNumber"),
+                        primary_file=primary_file.to_dict() if primary_file else None,
+                        context_files=[cf.to_dict() for cf in context_files],
+                        diff_text=raw_diff,
+                        requested_features=requested_features or [internal_res.get("escalation_reason", "fallback_review")],
+                        timeout_seconds=config.myco_backend_timeout_seconds,
+                        client_metadata=payload.get("metadata", {}),
+                    )
+                    ext_res = self._backend_provider.route_request(routing_req)
+                    summary["provider"] = ext_res.provider_id
+                    summary["backendStatus"] = ext_res.status
+                    summary["requiresMyco"] = True
+                    summary["fallbackExecuted"] = True
+                    for ef in ext_res.findings:
+                        if ef not in findings:
+                            findings.append(ef)
+                    if ext_res.error_message:
+                        message = ext_res.error_message
 
             elif classification.route == ProcessingRoute.EXTERNAL_MYCO:
                 metrics.increment("requests_external_myco")
