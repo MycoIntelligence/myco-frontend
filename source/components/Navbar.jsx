@@ -16,7 +16,10 @@ export default function Navbar() {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    useEffect(() => {
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
     const closeOutside = event => { if (!navRef.current?.contains(event.target)) setMenuOpen(false); };
     const closeEscape = event => { if (event.key === "Escape" && menuOpen) { setMenuOpen(false); toggleRef.current?.focus(); } };
     const media = window.matchMedia("(max-width:900px)");
@@ -24,12 +27,16 @@ export default function Navbar() {
     document.addEventListener("click", closeOutside);
     document.addEventListener("keydown", closeEscape);
     media.addEventListener("change", closeResize);
-    return () => { document.removeEventListener("click", closeOutside); document.removeEventListener("keydown", closeEscape); media.removeEventListener("change", closeResize); };
+    return () => {
+      document.removeEventListener("click", closeOutside);
+      document.removeEventListener("keydown", closeEscape);
+      media.removeEventListener("change", closeResize);
+    };
   }, [menuOpen]);
-  useEffect(() => { if (menuOpen) navRef.current?.querySelector(".mobile-navigation a")?.focus(); }, [menuOpen]);
 
-  return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  useEffect(() => {
+    if (menuOpen) navRef.current?.querySelector(".mobile-navigation a")?.focus();
+  }, [menuOpen]);
 
   return (
     <div
