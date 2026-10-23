@@ -11,7 +11,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/pricing.css?v=2">
+<link rel="stylesheet" href="/static/css/pricing.css?v=3">
 <script defer src="/static/js/pricing-config.js"></script><script defer src="/static/js/pricing.js?v=1"></script>
 </head>
 <body>
@@ -30,36 +30,38 @@
 <div class="plan-toolbar"><p>30-day trial. No credit card required.</p><fieldset class="billing"><legend class="sr-only">Billing period</legend><label><input type="radio" name="billing" value="monthly" checked><span>Monthly</span></label><label><input type="radio" name="billing" value="annual"><span>Annually <small>Save 20%</small></span></label></fieldset></div>
 <div class="plans">
 <article class="plan team" aria-labelledby="team-title">
-<div class="plan-heading"><span class="plan-index">01 / TEAM</span><h2 id="team-title">For your engineering team.</h2><p>The complete Myco review pipeline, on every pull request.</p></div>
+<div class="plan-heading"><span class="plan-index">01 / PLAN</span><h2 id="team-title">Team</h2><p>The complete Myco review pipeline, on every pull request.</p></div>
 <div class="price-region" aria-live="polite" aria-atomic="true"><p class="price"><span id="team-price">$20</span><span class="price-unit">/ developer / month</span></p><p id="billing-detail">Billed monthly.</p></div>
-<p class="cost-note">Your LLM API key. Usage paid separately.</p>
-<a class="button primary" data-pricing-cta="trial" href="https://calendly.com/rodriguesgrege_/myco-introduction">Start 30-day trial <span aria-hidden="true">↗</span></a>
+<div class="cost-note"><strong>LLM usage is additional.</strong><p>Use your own API key and pay your provider directly, including during the trial.</p></div>
+<a class="button primary" data-pricing-cta="trial" href="https://calendly.com/rodriguesgrege_/myco-introduction">Start 30-day free trial <span aria-hidden="true">↗</span></a>
 <p class="cta-note">No credit card. Start with a Myco introduction.</p>
-<div class="feature-section"><h3>Everything you need to review</h3><ul class="features"><li>Full review and validation pipeline</li><li>Unlimited reviews and repositories</li><li>Admin-approved developer seats</li><li>Free access for viewers</li><li>Dedicated Slack channel</li></ul></div>
+<div class="feature-section"><h3>The complete review foundation</h3><ul class="features"><li>Full review and validation pipeline</li><li>Unlimited reviews and repositories</li><li>Dedicated Slack channel</li></ul></div>
 </article>
 <article class="plan enterprise" aria-labelledby="enterprise-title">
-<div class="plan-heading"><span class="plan-index">02 / ENTERPRISE</span><h2 id="enterprise-title">For your organization.</h2><p>Advanced governance, flexible deployment and dedicated support.</p></div>
+<div class="plan-heading"><span class="plan-index">02 / PLAN</span><h2 id="enterprise-title">Enterprise</h2><p>Advanced governance, flexible deployment and dedicated support.</p></div>
 <div class="price-region"><p class="custom-price">Custom pricing</p><p>A plan tailored to your organization.</p></div>
-<p class="cost-note">Your LLM API key. Usage paid separately.</p>
+<div class="cost-note"><strong>LLM usage is additional.</strong><p>Use your own API key and pay your provider directly, including during the trial.</p></div>
 <a class="button secondary" data-pricing-cta="sales" href="https://calendly.com/rodriguesgrege_/myco-introduction">Talk to us <span aria-hidden="true">↗</span></a>
 <p class="cta-note">Discuss deployment, governance and support.</p>
-<div class="feature-section"><h3>Everything in Team, plus</h3><ul class="features"><li>Custom connectors</li><li>SSO / SAML and audit logs</li><li>Governance analytics dashboard</li><li>Advanced self-learning</li><li>Single-tenant SaaS or on-prem deployment</li><li>Priority Slack support and dedicated CSM</li></ul></div>
+<div class="feature-section"><h3>Everything in Team, plus</h3><ul class="features"><li>Identity controls, governance and self-learning</li><li>Custom connectors and deployment options</li><li>Priority support and dedicated CSM</li></ul></div>
 </article>
 </div>
-<div class="billing-principles"><div><span class="small-label">PAY FOR REVIEWED DEVELOPERS</span><p>Admins approve paid seats.<br> Viewing findings is always free.</p></div><div><span class="small-label">KEEP MODEL COSTS SEPARATE</span><p>Pay your LLM provider directly.<br> This also applies during your trial.</p></div></div>
+<p class="seat-note"><strong>Paid seats are admin-approved.</strong> Only developers whose PRs Myco reviews need a seat. Viewing findings is free.</p>
 </section>
-<section class="comparison" aria-labelledby="compare-title"><div class="section-heading"><p class="eyebrow">SIDE BY SIDE</p><h2 id="compare-title">The right level of control.</h2><p>The complete review pipeline is included in both plans.</p></div>
-<div class="table-wrap"><table><caption class="sr-only">Compare Myco Team and Enterprise features</caption><thead><tr><th scope="col">Included capabilities</th><th scope="col">Team</th><th scope="col">Enterprise</th></tr></thead><tbody>
-<tr><th scope="row">Full review pipeline</th><td>Included</td><td>Included</td></tr><tr><th scope="row">Reviews and repositories</th><td>Unlimited</td><td>Unlimited</td></tr><tr><th scope="row">Viewer access</th><td>Free</td><td>Free</td></tr><tr><th scope="row">Dedicated Slack channel</th><td>Included</td><td>Priority support</td></tr><tr><th scope="row">Custom connectors</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">SSO / SAML and audit logs</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">Governance analytics dashboard</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">Advanced self-learning</th><td>Not included</td><td>Included</td></tr><tr><th scope="row">Single-tenant SaaS or on-prem deployment</th><td>Not included</td><td>Available</td></tr><tr><th scope="row">Dedicated customer success manager</th><td>Not included</td><td>Included</td></tr>
+<section class="comparison" aria-labelledby="compare-title"><div class="section-heading"><p class="eyebrow">SIDE BY SIDE</p><h2 id="compare-title">The right level of control.</h2><p>Both plans include the complete review pipeline. Here’s what changes.</p></div>
+<div class="table-wrap"><table role="table"><caption class="sr-only">Compare Myco Team and Enterprise features</caption><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Included capabilities</th><th scope="col" role="columnheader">Team</th><th scope="col" role="columnheader">Enterprise</th></tr></thead><tbody role="rowgroup">
+<tr role="row"><th scope="row" role="rowheader">Custom connectors</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
+<tr role="row"><th scope="row" role="rowheader">SSO / SAML and audit logs</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
+<tr role="row"><th scope="row" role="rowheader">Governance analytics dashboard</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
+<tr role="row"><th scope="row" role="rowheader">Advanced self-learning</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
+<tr role="row"><th scope="row" role="rowheader">Single-tenant SaaS or on-prem deployment</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Available</td></tr>
+<tr role="row"><th scope="row" role="rowheader">Support</th><td role="cell" data-plan="Team">Dedicated Slack channel</td><td role="cell" data-plan="Enterprise">Priority Slack support and dedicated CSM</td></tr>
 </tbody></table></div></section>
 <section class="faq" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">THE DETAILS</p><h2 id="faq-title">Clear before you connect.</h2></div><div class="questions">
 <details><summary>Who needs a paid seat?</summary><p>Only admin-approved developers whose pull requests Myco reviews need paid seats. People who only view findings are free.</p></details>
 <details><summary>What does the 30-day trial include?</summary><p>Book a Myco introduction to get started. Your 30-day trial includes the full Team review pipeline, with unlimited reviews and repositories. No credit card is required. Bring your own LLM API key; your provider charges you for model usage during the trial.</p></details>
 <details><summary>What happens after 30 days?</summary><p>Reviews pause until you subscribe. The trial does not automatically turn into a paid subscription.</p></details>
-<details><summary>How are LLM costs billed?</summary><p>Your Myco subscription covers the review platform. You supply your own LLM API key and pay model usage directly to your provider. These costs are separate from Myco pricing, including during the trial.</p></details>
-<details><summary>Are there limits on reviews or repositories?</summary><p>Both plans include unlimited reviews and repositories. Model usage is billed separately by your LLM provider and depends on your review activity.</p></details>
 <details><summary>How does annual billing work?</summary><p>Team costs $16 per developer per month when billed annually, paid as $192 per developer per year. Monthly billing is $20 per developer per month.</p></details>
-<details><summary>What deployment options does Enterprise offer?</summary><p>Enterprise offers single-tenant SaaS or on-prem deployment, alongside custom connectors, identity controls, audit logs and dedicated support. Talk to us about your requirements.</p></details>
 </div></section>
 </main>
 <footer class="page"><a class="logo" href="/" aria-label="Myco home"><img src="/assets/myco-icon.svg" width="30" height="32" alt=""><img src="/assets/myco-wordmark.svg" width="72" height="24" alt="myco"></a><p>Agentic intelligence for engineering.</p><div><a href="/">Overview</a><a href="/#security">Security</a><span>© 2026 Myco</span></div></footer>
