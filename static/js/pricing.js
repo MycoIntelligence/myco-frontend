@@ -6,6 +6,8 @@
       const annual = input.value === 'annual';
       price.textContent = annual ? '$16' : '$20';
       detail.textContent = annual ? '$192 per developer, billed yearly. Save 20%.' : 'Billed monthly.';
+      document.getElementById('comparison-price').textContent = annual ? '$16 / developer / month' : '$20 / developer / month';
+      document.getElementById('comparison-billing').textContent = annual ? '$192 per developer, billed yearly' : 'Billed monthly';
     });
   });
   const links = window.MYCO_PRICING_LINKS || {};
