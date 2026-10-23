@@ -21,7 +21,7 @@ Capability panels have labelled, explanatory headers. Color is secondary to the 
 | --- | --- | --- | --- |
 | Governance | #38634F | #EAF1E9 | Access, oversight and team standards |
 | Deployment | #3D5D74 | #EAF0F5 | Infrastructure and internal connections |
-| Support | #755F3F | #F3EFE6 | Slack support and customer success |
+| Support | #755F3F | #F3EFE6 | Community, email and enterprise support |
 
 Below 720px, plans stack and each comparison row becomes a labelled Team/Enterprise record. Each family retains its own accessible table and caption. The pricing summary is hidden on mobile; plan-card pricing remains visible.
 
@@ -30,7 +30,7 @@ Below 720px, plans stack and each comparison row becomes a labelled Team/Enterpr
 - Team: $20 per reviewed developer/month; $16/month billed as $192/developer/year.
 - Monthly is the default. Prices in the card and comparison summary change together.
 - Paid seats are admin-approved; viewers are free.
-- Both plans include unlimited reviews and repositories. Enterprise features and support are listed in full in the comparison.
+- Both plans include unlimited reviews and repositories, dashboard and analytics. Team includes community and email support, with no Slack channel. Enterprise includes priority Slack support and a dedicated CSM. Enterprise features and support are listed in full in the comparison.
 - A 30-day trial requires no credit card. Reviews pause after the trial without subscription.
 - Customers supply their own LLM API keys and pay usage separately, including during the trial.
 - Keep the approved “Start 30-day free trial” label. Both current CTAs open the founder-provided Calendly URL. The nearby copy explains that the journey starts with an introduction.
