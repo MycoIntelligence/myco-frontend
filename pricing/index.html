@@ -6,12 +6,12 @@
 <meta name="description" content="Myco Team is $20 per developer monthly or $16 billed annually. Start a 30-day trial with no credit card. LLM usage is paid separately to your provider.">
 <link rel="canonical" href="https://mycointelligence.com/pricing/">
 <meta property="og:type" content="website"><meta property="og:title" content="Pricing - Myco"><meta property="og:url" content="https://mycointelligence.com/pricing/">
-<meta property="og:description" content="Full-context review. Straightforward pricing. Team and Enterprise plans, with a 30-day trial.">
+<meta property="og:description" content="Unlimited code review with Team and Enterprise plans. Team starts at $20 per reviewed developer per month, with a 30-day trial.">
 <meta property="og:image" content="https://mycointelligence.com/assets/myco-social-preview-v1.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/pricing.css?v=4">
+<link rel="stylesheet" href="/static/css/pricing.css?v=5">
 <script defer src="/static/js/pricing-config.js"></script><script defer src="/static/js/pricing.js?v=2"></script>
 </head>
 <body>
@@ -23,8 +23,8 @@
 </nav></header>
 <main id="main" class="page">
 <section class="intro" aria-labelledby="pricing-title">
-<div><p class="eyebrow">PRICING</p><h1 id="pricing-title">Full-context review. Straightforward pricing.</h1></div>
-<p class="intro-copy">Choose the plan that fits your team. Pay only for approved developers whose pull requests Myco reviews.</p>
+<div><p class="eyebrow">PRICING</p><h1 id="pricing-title">Unlimited code review.<br><span>Pay per developer.</span></h1></div>
+<p class="intro-copy">Review every pull request with Team. Add governance, deployment options and priority support with Enterprise.</p>
 </section>
 <section id="plans" aria-label="Plans and billing">
 <div class="plan-toolbar"><p>30-day trial. No credit card required.</p><fieldset class="billing"><legend class="sr-only">Billing period</legend><label><input type="radio" name="billing" value="monthly" checked><span>Monthly</span></label><label><input type="radio" name="billing" value="annual"><span>Annually <small>Save 20%</small></span></label></fieldset></div>
@@ -33,15 +33,15 @@
 <article class="plan team" aria-labelledby="team-title">
 <header class="plan-heading"><h2 id="team-title">Team</h2></header>
 <div class="price-region" aria-live="polite" aria-atomic="true"><p class="price"><span id="team-price">$20</span><span class="price-unit">/ developer / month</span></p><p id="billing-detail">Billed monthly.</p></div>
-<p class="plan-description">The complete Myco review pipeline, on every pull request.</p>
-<div class="feature-section"><h3>The complete review foundation</h3><ul class="features"><li>Full review and validation pipeline</li><li>Unlimited reviews and repositories</li><li>Dedicated Slack channel</li></ul></div>
+<p class="plan-description">For engineering teams reviewing every pull request.</p>
+<div class="feature-section"><h3>Included in Team</h3><ul class="features"><li>Full review and validation pipeline</li><li>Unlimited reviews and repositories</li><li>Dedicated Slack channel</li></ul></div>
 <a class="button primary" data-pricing-cta="trial" href="https://calendly.com/rodriguesgrege_/myco-introduction">Start 30-day free trial <span aria-hidden="true">↗</span></a>
 <p class="cta-note">No credit card. Start with a Myco introduction.</p>
 </article>
 <article class="plan enterprise" aria-labelledby="enterprise-title">
 <header class="plan-heading"><h2 id="enterprise-title">Enterprise</h2></header>
 <div class="price-region"><p class="custom-price">Custom pricing</p><p>A plan tailored to your organization.</p></div>
-<p class="plan-description">Advanced governance, flexible deployment and dedicated support.</p>
+<p class="plan-description">For organizations that need governance, custom deployment and dedicated support.</p>
 <div class="feature-section"><h3>Everything in Team, plus</h3><ul class="features"><li>Identity controls, governance and self-learning</li><li>Custom connectors and deployment options</li><li>Priority support and dedicated CSM</li></ul></div>
 <a class="button secondary" data-pricing-cta="sales" href="https://calendly.com/rodriguesgrege_/myco-introduction">Talk to us <span aria-hidden="true">↗</span></a>
 <p class="cta-note">Discuss deployment, governance and support.</p>
@@ -49,24 +49,39 @@
 </div>
 <p class="seat-note"><strong>Paid seats are admin-approved.</strong> Only developers whose PRs Myco reviews need a seat. Viewing findings is free.</p>
 </section>
-<section class="comparison" aria-labelledby="compare-title"><div class="section-heading"><p class="eyebrow">SIDE BY SIDE</p><h2 id="compare-title">The right level of control.</h2><p>Both plans include the complete review pipeline. Here’s what changes.</p></div>
-<div class="table-wrap"><table role="table"><caption class="sr-only">Compare Myco Team and Enterprise features</caption><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Included capabilities</th><th scope="col" role="columnheader"><strong>Team</strong><span id="comparison-price">$20 / developer / month</span><small id="comparison-billing">Billed monthly</small></th><th scope="col" role="columnheader"><strong>Enterprise</strong><span>Custom pricing</span></th></tr></thead><tbody role="rowgroup" aria-labelledby="group-governance">
-<tr class="comparison-group" role="row"><th id="group-governance" colspan="3" scope="rowgroup">Governance</th></tr>
+<section class="comparison" aria-labelledby="compare-title"><div class="section-heading"><p class="eyebrow">SIDE BY SIDE</p><h2 id="compare-title">Choose your level of control.</h2><p>Both plans include the complete review pipeline. Here’s what changes.</p></div>
+<div class="comparison-overview" aria-label="Plan pricing summary">
+<div><span class="comparison-intro-label">PLAN COMPARISON</span><p>Core review in both.<br>More control in Enterprise.</p></div>
+<div><strong>Team</strong><span id="comparison-price">$20 / developer / month</span><small id="comparison-billing">Billed monthly</small></div>
+<div><strong>Enterprise</strong><span>Custom pricing</span></div>
+</div>
+<div class="capability-groups">
+<section class="capability-group governance" aria-labelledby="group-governance">
+<header class="capability-heading"><p class="capability-label">ACCESS &amp; OVERSIGHT</p><h3 id="group-governance">Governance</h3><p>Control who can access Myco, understand review activity and adapt to your team’s standards.</p></header>
+<div class="table-wrap"><table role="table"><caption class="sr-only">Governance: compare Myco Team and Enterprise</caption>
+<thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Governance capabilities</th><th scope="col" role="columnheader">Team</th><th scope="col" role="columnheader">Enterprise</th></tr></thead><tbody role="rowgroup">
 <tr role="row"><th scope="row" role="rowheader">SSO / SAML and audit logs</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
 <tr role="row"><th scope="row" role="rowheader">Governance analytics dashboard</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
 <tr role="row"><th scope="row" role="rowheader">Advanced self-learning</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
-</tbody>
-<tbody role="rowgroup" aria-labelledby="group-deployment">
-<tr class="comparison-group" role="row"><th id="group-deployment" colspan="3" scope="rowgroup">Deployment</th></tr>
+</tbody></table></div>
+</section>
+<section class="capability-group deployment" aria-labelledby="group-deployment">
+<header class="capability-heading"><p class="capability-label">INFRASTRUCTURE &amp; INTEGRATIONS</p><h3 id="group-deployment">Deployment</h3><p>Choose single-tenant SaaS or on-prem deployment, and connect the internal tools your team relies on.</p></header>
+<div class="table-wrap"><table role="table"><caption class="sr-only">Deployment: compare Myco Team and Enterprise</caption>
+<thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Deployment capabilities</th><th scope="col" role="columnheader">Team</th><th scope="col" role="columnheader">Enterprise</th></tr></thead><tbody role="rowgroup">
 <tr role="row"><th scope="row" role="rowheader">Custom connectors</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Included</td></tr>
 <tr role="row"><th scope="row" role="rowheader">Single-tenant SaaS or on-prem deployment</th><td role="cell" data-plan="Team">Not included</td><td role="cell" data-plan="Enterprise">Available</td></tr>
-</tbody>
-<tbody role="rowgroup" aria-labelledby="group-support">
-<tr class="comparison-group" role="row"><th id="group-support" colspan="3" scope="rowgroup">Support</th></tr>
-<tr role="row"><th scope="row" role="rowheader">Support</th><td role="cell" data-plan="Team">Dedicated Slack channel</td><td role="cell" data-plan="Enterprise">Priority Slack support and dedicated CSM</td></tr>
-</tbody>
-</table></div></section>
-<section class="faq" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">THE DETAILS</p><h2 id="faq-title">Clear before you connect.</h2></div><div class="questions">
+</tbody></table></div>
+</section>
+<section class="capability-group support" aria-labelledby="group-support">
+<header class="capability-heading"><p class="capability-label">SERVICE &amp; PARTNERSHIP</p><h3 id="group-support">Support</h3><p>Get a dedicated Slack channel in Team, or priority support and a dedicated customer success manager in Enterprise.</p></header>
+<div class="table-wrap"><table role="table"><caption class="sr-only">Support: compare Myco Team and Enterprise</caption>
+<thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Support capabilities</th><th scope="col" role="columnheader">Team</th><th scope="col" role="columnheader">Enterprise</th></tr></thead><tbody role="rowgroup">
+<tr role="row"><th scope="row" role="rowheader">Slack support and account management</th><td role="cell" data-plan="Team">Dedicated Slack channel</td><td role="cell" data-plan="Enterprise">Priority Slack support and a dedicated customer success manager</td></tr>
+</tbody></table></div>
+</section>
+</div></section>
+<section class="faq" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">THE DETAILS</p><h2 id="faq-title">Billing, trials and seats.</h2></div><div class="questions">
 <details><summary>Who needs a paid seat?</summary><p>Only admin-approved developers whose pull requests Myco reviews need paid seats. People who only view findings are free.</p></details>
 <details><summary>What does the 30-day trial include?</summary><p>Book a Myco introduction to get started. Your 30-day trial includes the full Team review pipeline, with unlimited reviews and repositories. No credit card is required. Bring your own LLM API key; your provider charges you for model usage during the trial.</p></details>
 <details><summary>What happens after 30 days?</summary><p>Reviews pause until you subscribe. The trial does not automatically turn into a paid subscription.</p></details>
