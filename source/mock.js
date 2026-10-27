@@ -7,7 +7,6 @@ export const nav = {
   links: [
     { label: "Overview", href: "#overview" },
     { label: "Playground", href: "#playground" },
-    { label: "How it works", href: "#how" },
     { label: "Integrate", href: "#integrate" },
     { label: "Security", href: "#security" },
   ],
@@ -19,7 +18,7 @@ export const hero = {
   titleLines: ["AI writes the code.", "Myco understands it."],
   body:
     "Myco builds context across your engineering system, reasons over every relevant change, and surfaces the signals that deserve attention.",
-  primary: { label: "See how it works", href: "#how" },
+  primary: { label: "Explore Playground", href: "#playground" },
   secondary: { label: "Request a pilot", href: LINKEDIN_URL },
   graphLabel: "LIVE CONTEXT GRAPH \u00B7 1,284 ARTIFACTS",
 };

@@ -2,8 +2,8 @@
 Custom Code Word Limit Validator for Demo Submissions.
 
 Implements word counting and boundary validation for custom code submissions:
-- Maximum: 1,200 words.
-- Permitted range: 0 <= word_count <= 1,200 (inclusive).
+- Maximum: 500 words.
+- Permitted range: 0 <= word_count <= 500 (inclusive).
 - Consistent token-based algorithm: [A-Za-z0-9_]+
   - Identifiers, keywords, numbers, and string tokens are words.
   - Punctuation, symbols, and whitespace are token separators.
@@ -16,7 +16,7 @@ from typing import Optional, Tuple
 WORD_PATTERN = re.compile(r"[A-Za-z0-9_]+")
 
 MIN_CUSTOM_CODE_WORDS = 0
-MAX_CUSTOM_CODE_WORDS = 1200
+MAX_CUSTOM_CODE_WORDS = 500
 
 
 class CustomCodeWordValidator:

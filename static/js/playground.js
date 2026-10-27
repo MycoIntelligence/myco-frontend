@@ -1,9 +1,9 @@
 /* Myco — AI-Powered Code Analysis & Risk Intelligence Interface */
 (() => {
-  /* Word limit boundaries for custom PR code submissions (0 to 1,200 words) */
+  /* Word limit boundaries for custom PR code submissions (0 to 500 words) */
   const WORD_LIMITS = {
     MIN: 0,
-    MAX: 1200
+    MAX: 500
   };
 
   /* Official contact destination for enterprise pilot evaluations */
@@ -806,7 +806,7 @@ export function calculateConversionMetrics(stageCompleters: number, totalEntrant
   let isCustomMode = false;
   let customIdleTimer = null;
   const LOOP_SAMPLE_GAP_MS = 3000; // 3-second gap between each sample run
-  const CUSTOM_IDLE_RESUME_MS = 60000; // 1 minute (60s) idle before resuming sample loop if no code entered
+  const CUSTOM_IDLE_RESUME_MS = 120000; // 2 minutes (120s) idle before resuming sample loop
 
   const DEFAULT_CUSTOM_CODE = `/* CUSTOM PULL REQUEST: PR #5102 - Webhook Secret & Admin Verification */
 import { stripeClient } from "../billing/stripe";
@@ -858,10 +858,9 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
   const startCustomIdleTimer = () => {
     clearCustomIdleTimer();
     customIdleTimer = setTimeout(() => {
-      // If the user clicked custom code but didn't enter any code for 1 minute, auto-resume the sample loop
-      const textarea = document.getElementById("playground-code-input");
-      const currentCode = textarea ? textarea.value.trim() : "";
-      if (isCustomMode && !currentCode && !isAnalyzing) {
+      // If user has been idle in custom mode for 2 minutes without running code, auto-resume the sample loop
+      if (isCustomMode && !isAnalyzing) {
+        console.log("[Myco Playground] Idle timeout reached (2 minutes without custom activity). Resuming automated sample loop.");
         startContinuousLoop(0);
       }
     }, CUSTOM_IDLE_RESUME_MS);
@@ -3527,13 +3526,14 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       return;
     }
 
-    // Case 2: Custom code finished executing — remains stopped
+    // Case 2: Custom code finished executing — arm 2-minute idle timer
     if (!isDemoMode || isCustomMode) {
       isLoopActive = false;
       isCustomMode = true;
       clearLoopGapTimer();
       updateEngineStatusText("ANALYSIS COMPLETE", "is-ready");
       setAgentBubble("Analysis complete. Review findings in the report panel, or edit code and re-run.");
+      startCustomIdleTimer();
       return;
     }
   };
@@ -3574,14 +3574,8 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       if (prdTag) prdTag.textContent = "CUSTOM";
     }
 
-    // Check if code was entered: if user entered code, cancel idle auto-resume; if empty, start 1-minute idle timer
-    const textarea = document.getElementById("playground-code-input");
-    const currentCode = textarea ? textarea.value.trim() : "";
-    if (currentCode) {
-      clearCustomIdleTimer();
-    } else {
-      startCustomIdleTimer();
-    }
+    // Reset 2-minute idle timer on every edit: if no new code/run happens for 2 minutes, auto-resume sample loop
+    startCustomIdleTimer();
 
     // Reset report to empty state prompting to re-analyze
     const emptyState = document.getElementById("report-empty-state");
@@ -3738,7 +3732,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
               <span class="report-badge is-clean">CLEAN · VERIFIED</span>
               <span class="report-file mono">${escapeHtml(metadata.fileName || "Input")}</span>
             </div>
-            <span class="report-verified mono">ALL INVARIANTS SATISFIED</span>
+            <span class="report-verified mono">ALL INVARIANTS SATISFIED · #${metadata.engineCode || 1}</span>
           </div>
           <h3 class="finding-title display">No Issues Detected in Submitted Content</h3>
           <p class="finding-clean-desc">
@@ -3795,14 +3789,17 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
           </div>
         </div>
 
-        <div class="finding-card active" id="finding-card-${idx}">
+        <div class="finding-card active" id="finding-card-${idx}" data-engine-code="${f.engineCode || 1}">
           <header class="finding-card__header">
             <div class="finding-card__badges">
               <span class="report-badge ${sevClass}">${escapeHtml(f.severity)}</span>
               <span class="report-file mono">${loc}</span>
               ${blockerTag}
             </div>
-            ${f.confidence ? `<span class="report-confidence mono">Confidence: ${escapeHtml(f.confidence)}</span>` : ""}
+            <div class="report-header-meta mono" style="display: flex; align-items: center; gap: 8px;">
+              ${f.confidence ? `<span class="report-confidence mono">Confidence: ${escapeHtml(f.confidence)}</span>` : ""}
+              <span class="report-engine-indicator mono" style="opacity: 0.55; font-size: 11px; font-weight: 600;" title="Trace #${f.engineCode || 1}">#${f.engineCode || 1}</span>
+            </div>
           </header>
 
           <h3 class="finding-title display">${escapeHtml(f.title)}</h3>
@@ -3919,7 +3916,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
                       </span>
                       <span class="int-card__badge">SYNCED</span>
                     </div>
-                    <span class="int-card__desc">200 OK (${escapeHtml(webhook.latency || "32ms")})</span>
+                    <span class="int-card__desc">200 OK (${escapeHtml(webhook.latency || "32ms")} · #${f.engineCode || 1})</span>
                   </div>
                 </div>
               </div>
@@ -4106,6 +4103,8 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
   };
 
   window.performDemoQuotaReset = performDemoQuotaReset;
+  window.startContinuousLoop = startContinuousLoop;
+  window.startCustomIdleTimer = startCustomIdleTimer;
 
   /* Run Analysis Workflow */
   const runAnalysis = () => {
@@ -4152,14 +4151,16 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       if (cardState) cardState.hidden = true;
 
       setAgentBubble("Please paste code or a pull request diff to analyze.");
+      startCustomIdleTimer();
       return;
     }
 
-    // 2. Strict Custom Code Word Limit Validation (not more than 1,200 words)
+    // 2. Strict Custom Code Word Limit Validation (not more than 500 words)
     if (!isDemoMode) {
       const wordCount = countWords(inputCode);
       if (wordCount > WORD_LIMITS.MAX) {
         showWordLimitModal({ words: wordCount });
+        startCustomIdleTimer();
         return;
       }
     }
@@ -4342,15 +4343,18 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
           isQuotaExhausted = true;
         }
 
-        // Check backend routing (requires future Myco backend)
-        if (apiRes && apiRes.routeExecuted === "EXTERNAL_MYCO") {
+        // Check backend routing (only route as unhandled placeholder if no findings or clean verification returned)
+        const hasBackendFindings = Boolean(apiRes && apiRes.findings && apiRes.findings.length > 0);
+        const hasBackendClean = Boolean(apiRes && apiRes.summary && (apiRes.summary.cleanVerified || apiRes.summary.isClean));
+
+        if (apiRes && apiRes.routeExecuted === "EXTERNAL_MYCO" && !hasBackendFindings && !hasBackendClean) {
           isBackendRouted = true;
           backendMeta = {
             message: apiRes.message,
             explanation: (apiRes.summary && apiRes.summary.explanation) || apiRes.message,
             nextAction: (apiRes.summary && apiRes.summary.nextAction) || "request_pilot"
           };
-        } else if (!isBackendRouted && coreRes && coreRes.findings && coreRes.findings.some(f => f.requiresBackendRoute)) {
+        } else if (!isBackendRouted && coreRes && coreRes.findings && coreRes.findings.some(f => f.requiresBackendRoute) && !hasBackendFindings) {
           isBackendRouted = true;
           const rf = coreRes.findings.find(f => f.requiresBackendRoute);
           backendMeta = {
@@ -4390,26 +4394,25 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       if (isQuotaExhausted) {
         isClean = false;
         findingsToRender = [];
-      } else if (isBackendRouted) {
-        isClean = false;
-        findingsToRender = [];
       } else if (apiRes && apiRes.success && apiRes.findings && apiRes.findings.length > 0) {
-        // Backend pipeline findings from InternalProcessingEngine
+        // Live findings from Myco Backend or Internal Engine
+        const resEngineCode = (apiRes.summary && apiRes.summary.engineCode) || (apiRes.routeExecuted === "EXTERNAL_MYCO" ? 2 : 1);
         isClean = false;
         isMergeBlocking = Boolean(apiRes.summary && apiRes.summary.isMergeBlocking);
         findingsToRender = apiRes.findings.map(f => ({
           id: f.id,
+          engineCode: f.engineCode || resEngineCode,
           title: f.title,
-          description: f.explanation,
-          severity: f.severity,
+          description: f.explanation || f.title,
+          severity: f.severity || "MEDIUM",
           category: f.category || "Logic",
           filePath: f.filePath || activeFilename,
           lineStart: f.sourceRange ? f.sourceRange.startLine : 1,
           lineEnd: f.sourceRange ? f.sourceRange.endLine : 1,
           evidence: f.evidenceSnippet || "",
           evidenceRule: f.evidenceRule || "POLICY INVARIANT",
-          explanation: f.explanation,
-          impact: f.impact || "Evaluated by internal Myco engine.",
+          explanation: f.explanation || f.title,
+          impact: f.impact || "Evaluated by Myco Backend engine.",
           suggestedFix: f.suggestedAction || "Review the flagged code and apply remediation.",
           suggestedPatch: f.suggestedPatch || (coreRes && coreRes.findings && coreRes.findings[0] && coreRes.findings[0].suggestedPatch) || (activeSample && activeSample.finding ? activeSample.finding.suggestedPatch : null),
           fixedCode: (coreRes && coreRes.findings && coreRes.findings[0] && coreRes.findings[0].fixedCode) || (activeSample && activeSample.finding ? activeSample.finding.fixedCode : null),
@@ -4420,14 +4423,25 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
             jira: activeSample.jiraTicket,
             slack: activeSample.slackAlert,
             webhook: activeSample.customApp
-          } : undefined
+          } : {
+            jira: { id: `MYCO-ENG-${resEngineCode}`, status: "Analyzed" },
+            slack: { channel: "#code-review" },
+            webhook: { latency: `${apiRes.summary?.provider || (resEngineCode === 2 ? "Myco Backend" : "Little Myco")}` }
+          }
         }));
+      } else if (apiRes && apiRes.success && apiRes.summary && (apiRes.summary.cleanVerified || apiRes.summary.isClean)) {
+        isClean = true;
+        findingsToRender = [];
+      } else if (isBackendRouted) {
+        isClean = false;
+        findingsToRender = [];
       } else if (coreRes && !coreRes.isClean && coreRes.findings && coreRes.findings.length > 0) {
-        // In-browser engine findings
+        // In-browser engine findings (Little Myco)
         isClean = false;
         isMergeBlocking = coreRes.isMergeBlocking;
         findingsToRender = coreRes.findings.map(f => ({
           id: f.id,
+          engineCode: 1,
           title: f.title,
           description: f.explanation,
           severity: f.severity,
@@ -4452,19 +4466,26 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
           } : undefined)
         }));
       } else if (isDemoMode && activeSample && activeSample.finding) {
-        // Guaranteed fallback for sample scenarios
+        // Guaranteed fallback for sample scenarios (Little Myco)
         isClean = false;
         isMergeBlocking = activeSample.finding.mergeBlocking || false;
-        findingsToRender = [activeSample.finding];
+        findingsToRender = [{ ...activeSample.finding, engineCode: 1 }];
       } else {
         // Clean verified
         isClean = true;
         findingsToRender = [];
       }
 
+      const activeEngineCode = (findingsToRender[0] && findingsToRender[0].engineCode) 
+        || (apiRes && apiRes.summary && apiRes.summary.engineCode) 
+        || (apiRes && apiRes.routeExecuted === "EXTERNAL_MYCO" ? 2 : 1);
+
+      console.log(`[Myco Engine] Analysis completed via Code: ${activeEngineCode} (${activeEngineCode === 2 ? "Myco Backend" : "Little Myco"})`);
+
       meta = {
         isDemo: isDemoMode,
         fileName: activeFilename,
+        engineCode: activeEngineCode,
         isBackendRouted: isBackendRouted,
         backendExplanation: backendMeta ? backendMeta.explanation : null,
         isQuotaExhausted: isQuotaExhausted,
@@ -4671,7 +4692,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
           Your custom code submission contains <strong>${formattedWords} words</strong>, which exceeds the maximum limit of <strong>${WORD_LIMITS.MAX.toLocaleString()} words</strong> (exceeds limit by <strong>${excess} words</strong>).
         </p>
         <p class="demo-modal-p demo-modal-p--sub">
-          Submissions cannot exceed 1,200 words. Please reduce your code to 1,200 words or fewer before running analysis.
+          Submissions cannot exceed 500 words. Please reduce your code to 500 words or fewer before running analysis.
         </p>
       `;
     }
@@ -4890,7 +4911,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
               <div class="editor-meta">
                 <span class="mono" id="editor-lines-count">0 lines</span>
                 <span class="editor-lang mono" id="editor-lang-badge">Code</span>
-                <span class="editor-word-count-badge mono" id="editor-word-count-badge">Words: 0 / 1,000–1,200</span>
+                <span class="editor-word-count-badge mono" id="editor-word-count-badge">Words: 0 / 500</span>
               </div>
             </div>
 
@@ -4923,7 +4944,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
 
             <div class="editor-footer">
               <div class="editor-word-counter mono" id="editor-gt-footer-counter">
-                <span id="gt-footer-words">0</span> / 1,200
+                <span id="gt-footer-words">0</span> / 500
               </div>
               <div class="editor-footer__actions">
                 <button type="button" class="btn-text" id="editor-clear-btn">Clear</button>

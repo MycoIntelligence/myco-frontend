@@ -1,4 +1,5 @@
-/* Approved reference: one quiet, static composition with vector geometry. */
+/* Approved reference: how journey section removed per user request. */
+#how, .how-journey, .how-journey-wrap { display: none !important; }
 .how-journey{background:#faf9f6;padding:54px 34px 58px;border-top:0}
 .how-journey__eyebrow{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;letter-spacing:.25em;font-weight:400;color:#214a44}
 .how-journey__headline{grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr);gap:64px;align-items:start;margin-top:20px}

@@ -44,10 +44,10 @@ class PipelineConfig:
     demo_policy: DemoAllowancePolicy = field(default_factory=DemoAllowancePolicy)
 
     # Future Myco External Backend Integration Settings
-    myco_backend_enabled: bool = os.getenv("MYCO_BACKEND_ENABLED", "false").lower() in ("true", "1", "yes")
-    myco_backend_url: str = os.getenv("MYCO_BACKEND_URL", "https://api.myco.internal/v1")
+    myco_backend_enabled: bool = os.getenv("MYCO_BACKEND_ENABLED", "true").lower() in ("true", "1", "yes")
+    myco_backend_url: str = os.getenv("MYCO_BACKEND_URL", "http://localhost:3000/api/review")
     myco_backend_api_key: str = os.getenv("MYCO_BACKEND_API_KEY", "")
-    myco_backend_timeout_seconds: float = float(os.getenv("MYCO_BACKEND_TIMEOUT_SEC", "15.0"))
+    myco_backend_timeout_seconds: float = float(os.getenv("MYCO_BACKEND_TIMEOUT_SEC", "30.0"))
     myco_backend_max_retries: int = int(os.getenv("MYCO_BACKEND_MAX_RETRIES", "2"))
     myco_backend_retry_backoff: float = float(os.getenv("MYCO_BACKEND_RETRY_BACKOFF", "0.5"))
     

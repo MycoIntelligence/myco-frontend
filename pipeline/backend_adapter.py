@@ -10,7 +10,11 @@ Establishes:
 - MockBackendProvider strictly for automated test suites and local integration testing.
 """
 
+import json
+import os
 import time
+import urllib.request
+import urllib.error
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
@@ -258,20 +262,157 @@ class FutureMycoAdapter(BackendProvider):
                 retry_recommended=True,
             )
 
-        # 3. Connection Hook for Future Real Implementation:
-        # When official API contract is released, the HTTP client call with exponential backoff
-        # and authentication headers will be executed here.
-        # Currently, since Myco backend is unreleased, report unconfigured.
-        return BackendRoutingResponse(
-            request_id=request.request_id,
-            provider_id=self.provider_id,
-            status="rejected",
-            status_code=503,
-            findings=[],
-            summary={"backend": "unconnected"},
-            provider_metadata={"endpoint": config.myco_backend_url},
-            error_message="Myco backend adapter interface is active, but live connection endpoint is pending official API release.",
-        )
+        # 3. Live Myco Backend HTTP Routing
+        try:
+            content = ""
+            filename = "code.py"
+            if request.primary_file:
+                content = request.primary_file.get("content", "")
+                filename = request.primary_file.get("path", "code.py")
+            elif request.diff_text:
+                content = request.diff_text
+                filename = "diff.patch"
+
+            if not content and request.context_files:
+                content = request.context_files[0].get("content", "")
+                filename = request.context_files[0].get("path", "code.py")
+
+            ext = os.path.splitext(filename)[1].lower()
+            lang_map = {
+                ".py": "python",
+                ".js": "javascript",
+                ".ts": "typescript",
+                ".tsx": "typescript",
+                ".jsx": "javascript",
+                ".sql": "sql",
+                ".json": "json",
+                ".java": "java",
+                ".go": "go",
+                ".rs": "rust",
+            }
+            language = lang_map.get(ext, "plaintext")
+            if language == "plaintext":
+                import re
+                if re.search(r"^\s*(?:def\s+[a-zA-Z_]|import\s+[a-zA-Z_]|from\s+[a-zA-Z_]|class\s+[a-zA-Z_])", content, re.MULTILINE):
+                    language = "python"
+                elif re.search(r"\b(const|let|var|function|export|import)\b", content):
+                    language = "typescript"
+                elif re.search(r"^\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|WITH)\b", content.strip(), re.IGNORECASE):
+                    language = "sql"
+
+            post_data = json.dumps({
+                "code": content,
+                "language": language,
+                "filename": filename,
+                "title": f"Playground Review: {filename}",
+                "minSeverity": "P3",
+            }).encode("utf-8")
+
+            req_headers = {
+                "Content-Type": "application/json",
+            }
+            if config.myco_backend_api_key:
+                req_headers["Authorization"] = f"Bearer {config.myco_backend_api_key}"
+
+            http_req = urllib.request.Request(
+                config.myco_backend_url,
+                data=post_data,
+                headers=req_headers,
+                method="POST",
+            )
+
+            with urllib.request.urlopen(http_req, timeout=config.myco_backend_timeout_seconds) as resp:
+                resp_data = json.loads(resp.read().decode("utf-8"))
+                self._circuit_breaker.record_success()
+
+                raw_findings = resp_data.get("findings", [])
+                mapped_findings = []
+                for idx, f in enumerate(raw_findings):
+                    sev_raw = (f.get("severity") or "P2").upper()
+                    if sev_raw in ("BLOCKER", "P1"):
+                        mapped_sev = "HIGH"
+                        is_mb = True
+                    elif sev_raw == "P2":
+                        mapped_sev = "MEDIUM"
+                        is_mb = False
+                    else:
+                        mapped_sev = "LOW"
+                        is_mb = False
+
+                    mapped_findings.append({
+                        "id": f.get("id") or f"MYCO-{idx+1}",
+                        "engineCode": 2,
+                        "category": "logic_boundary",
+                        "severity": mapped_sev,
+                        "validationStatus": "CONFIRMED",
+                        "title": f.get("title") or "Code finding",
+                        "explanation": f.get("rootCause") or f.get("title") or "",
+                        "impact": f.get("impact") or "Potential unexpected behavior or failure.",
+                        "filePath": f.get("filePath") or filename,
+                        "sourceRange": {
+                            "startLine": f.get("line") or 1,
+                            "endLine": f.get("line") or 1,
+                            "startCol": 1,
+                            "endCol": 1,
+                        },
+                        "evidenceSnippet": f.get("file") or "",
+                        "evidenceRule": "MYCO · SDET REVIEW RULE",
+                        "suggestedAction": f.get("fix") or "Review and sanitize edge cases.",
+                        "isMergeBlocking": is_mb,
+                    })
+
+                resp_summary = resp_data.get("summary", {})
+                crit_count = sum(1 for mf in mapped_findings if mf.get("isMergeBlocking"))
+                total_f = len(mapped_findings)
+
+                return BackendRoutingResponse(
+                    request_id=request.request_id,
+                    provider_id=self.provider_id,
+                    status="completed",
+                    status_code=200,
+                    findings=mapped_findings,
+                    summary={
+                        "totalFindings": total_f,
+                        "criticalCount": crit_count,
+                        "highCount": crit_count,
+                        "mediumCount": total_f - crit_count,
+                        "cleanVerified": total_f == 0,
+                        "escalationRequired": False,
+                        "route": "EXTERNAL_MYCO",
+                        "isClean": total_f == 0,
+                        "isMergeBlocking": crit_count > 0,
+                        "riskLevel": resp_summary.get("riskLevel", "Low" if total_f == 0 else "Medium"),
+                        "recommendation": resp_summary.get("recommendation", "Approve" if total_f == 0 else "Request Changes"),
+                        "provider": "Myco Backend",
+                        "engineCode": 2,
+                        "tier": resp_data.get("tier"),
+                        "tierName": resp_data.get("tierName"),
+                    },
+                    provider_metadata={
+                        "endpoint": config.myco_backend_url,
+                        "backendConfigured": True,
+                        "status": "connected",
+                        "durationMs": resp_data.get("durationMs", 0),
+                        "tier": resp_data.get("tier"),
+                        "tierName": resp_data.get("tierName"),
+                    },
+                    error_message=None,
+                )
+
+        except Exception as err:
+            self._circuit_breaker.record_failure()
+            metrics.increment("backend_failures")
+            return BackendRoutingResponse(
+                request_id=request.request_id,
+                provider_id=self.provider_id,
+                status="failed",
+                status_code=502,
+                findings=[],
+                summary={"backend": "connection_error", "error": str(err)},
+                provider_metadata={"endpoint": config.myco_backend_url},
+                error_message=f"Could not connect to Myco backend at {config.myco_backend_url}: {err}",
+                retry_recommended=True,
+            )
 
 
 class MockBackendProvider(BackendProvider):

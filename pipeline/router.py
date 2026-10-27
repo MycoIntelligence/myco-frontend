@@ -23,12 +23,14 @@ from pipeline.backend_adapter import (
 from pipeline.classifier import classifier
 from pipeline.config import config
 from pipeline.gateway import gateway
+from pipeline.github_service import github_service
 from pipeline.internal_engine import internal_engine
 from pipeline.normalizer import response_normalizer
 from pipeline.observability import StructuredLogger, metrics
 from pipeline.quota import TokenEstimator, quota_service
 from pipeline.security import SecurityManager
 from pipeline.types import (
+    ClassificationResult,
     CodeInputFile,
     NormalizedResponse,
     ProcessingRoute,
@@ -110,14 +112,43 @@ class PipelineRouter:
                 )
 
         # -------------------------------------------------------------
-        # Extract Code Inputs & Compute Metrics
+        # Extract Code Inputs & Compute Metrics (supporting GitHub fetch)
         # -------------------------------------------------------------
         raw_code = payload.get("code") or ""
         raw_diff = payload.get("diff") or ""
         prd_text = payload.get("prd") or ""
         requested_features = payload.get("requestedFeatures") or payload.get("features") or []
-
         primary_file_dict = payload.get("primaryFile")
+
+        # Stage 2.1: Fetch code or PR diff from GitHub if repository URL provided without explicit code
+        fetched_from_github = False
+        if repo_url and not raw_code and not raw_diff and not primary_file_dict:
+            gh_token = headers.get("x-github-token") or headers.get("authorization", "").replace("Bearer ", "")
+            ok_gh, gh_res, gh_msg = github_service.fetch_from_url(repo_url, token=gh_token)
+            if ok_gh and gh_res:
+                fetched_from_github = True
+                if gh_res.diff:
+                    raw_diff = gh_res.diff
+                elif gh_res.content:
+                    raw_code = gh_res.content
+                if gh_res.metadata.get("title") and not prd_text:
+                    prd_text = f"PR #{gh_res.metadata.get('number', '')}: {gh_res.metadata['title']}\n{gh_res.metadata.get('body', '')}"
+            else:
+                metrics.increment("requests_rejected")
+                status_code = 404 if "not found" in gh_msg.lower() else (403 if "rate limit" in gh_msg.lower() else 400)
+                return response_normalizer.normalize(
+                    request_id=request_id,
+                    status_code=status_code,
+                    success=False,
+                    route_executed="REJECTED",
+                    message=f"GitHub fetch failed: {gh_msg}",
+                    findings=[],
+                    summary={"githubError": gh_msg},
+                    usage=UsageMetadata(0, 0, 0, 0, 0, 0.0, 0, 0, 0),
+                    quota_info=quota_service.get_allowance_info(session_key, ip_key),
+                    errors=[gh_msg],
+                )
+
         primary_file: Optional[CodeInputFile] = None
         if primary_file_dict and isinstance(primary_file_dict, dict):
             primary_file = CodeInputFile(
@@ -166,7 +197,7 @@ class PipelineRouter:
         content_hash = quota_service.compute_content_hash(all_content_str)
 
         # -------------------------------------------------------------
-        # Stage 2.5: Custom Code Demo Word Limit Validation (1,000 - 1,200 words)
+        # Stage 2.5: Custom Code Demo Word Limit Validation (0 - 500 words)
         # -------------------------------------------------------------
         is_sample_demo = bool(payload.get("isDemo") or payload.get("is_demo") or payload.get("isSample"))
         is_custom_submission = (
@@ -211,7 +242,7 @@ class PipelineRouter:
                     },
                     usage=UsageMetadata(0, 0, 0, 0, 0, 0.0, 0, 0, word_count),
                     quota_info=quota_service.get_allowance_info(session_key, ip_key),
-                    errors=[word_err or "Word count outside permitted range (1,000 - 1,200 words)"],
+                    errors=[word_err or "Word count outside permitted range (0 - 500 words)"],
                 )
 
         # -------------------------------------------------------------
@@ -300,6 +331,23 @@ class PipelineRouter:
             requested_features=requested_features,
         )
 
+        # If custom code is submitted and live Myco backend is enabled, route to live Myco backend
+        if (is_custom_submission or not is_sample_demo) and config.myco_backend_enabled and classification.route != ProcessingRoute.REJECTED:
+            classification = ClassificationResult(
+                route=ProcessingRoute.EXTERNAL_MYCO,
+                confidence=1.0,
+                detected_format=classification.detected_format,
+                is_code=classification.is_code,
+                is_diff=classification.is_diff,
+                file_count=file_count,
+                total_characters=total_chars,
+                estimated_tokens=TokenEstimator.estimate_tokens(all_content_str),
+                requires_cross_repo_graph=False,
+                requires_deep_symbolic=True,
+                reason="Custom playground code routed to live Myco backend.",
+                structural_features=classification.structural_features,
+            )
+
         StructuredLogger.log(
             level="INFO",
             event="REQUEST_CLASSIFIED",
@@ -335,8 +383,12 @@ class PipelineRouter:
                     prd_text=prd_text,
                 )
                 findings = internal_res.get("findings", [])
+                for f in findings:
+                    f["engineCode"] = 1
                 summary = internal_res.get("summary", {})
                 summary["route"] = "INTERNAL"
+                summary["provider"] = "Little Myco"
+                summary["engineCode"] = 1
                 summary["isClean"] = internal_res.get("isClean", True)
                 summary["isMergeBlocking"] = internal_res.get("isMergeBlocking", False)
                 summary["escalationRequired"] = internal_res.get("escalation_required", False)
@@ -398,6 +450,7 @@ class PipelineRouter:
                 summary["provider"] = ext_res.provider_id
                 summary["backendStatus"] = ext_res.status
                 summary["requiresMyco"] = True
+                summary["engineCode"] = 2
                 message = ext_res.error_message or "External backend candidate processed."
                 success = (status_code in (200, 201, 202))
                 if ext_res.error_message:
