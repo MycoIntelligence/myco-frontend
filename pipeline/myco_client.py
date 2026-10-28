@@ -148,7 +148,7 @@ class MycoReviewClient:
                     time.sleep(self.base_backoff_sec * (2 ** (attempt - 1)))
 
         # Sanitize error to prevent accidental token leakage
-        sanitized_error = re.sub(r"(?:sk_[a-zA-Z0-9_\-]+|AKIA[A-Z0-9]{16})", "[REDACTED_SECRET]", last_error or "Unknown error")
+        sanitized_error = re.sub(r"(?:gsk_[a-zA-Z0-9_\-]+|sk_[a-zA-Z0-9_\-]+|AKIA[A-Z0-9]{16})", "[REDACTED_SECRET]", last_error or "Unknown error")
         return False, None, f"Myco escalation failed after {self.max_retries} attempts: {sanitized_error}"
 
 

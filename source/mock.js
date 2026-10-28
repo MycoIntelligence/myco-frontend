@@ -8,6 +8,7 @@ export const nav = {
     { label: "Overview", href: "#overview" },
     { label: "Playground", href: "#playground" },
     { label: "Integrate", href: "#integrate" },
+    { label: "Pricing", href: "#pricing" },
     { label: "Security", href: "#security" },
   ],
   cta: { label: "Request a pilot", href: LINKEDIN_URL },

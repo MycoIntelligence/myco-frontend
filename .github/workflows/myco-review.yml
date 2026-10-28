@@ -78,13 +78,19 @@ jobs:
 
       - name: Invoke Official Myco Action
         id: official_myco_action
-        uses: MycoIntelligence/myco-bundled-action@v1
+        uses: MycoIntelligence/myco-bundled-action@v1-groq
         with:
           pr_link: ${{ github.event.pull_request.html_url }}
+          llm_provider: groq
           api_key: ${{ secrets.MYCO_LLM_API_KEY }}
+          groq_model: qwen/qwen3.8-27b
           metrics_endpoint: ${{ vars.MYCO_METRICS_ENDPOINT }}
           metrics_api_key: ${{ secrets.MYCO_METRICS_API_KEY }}
           client_id: ${{ vars.MYCO_CLIENT_ID }}
+        env:
+          LLM_PROVIDER: groq
+          GROQ_API_KEY: ${{ secrets.MYCO_LLM_API_KEY }}
+          GROQ_MODEL: qwen/qwen3.8-27b
 
       - name: Fallback Failure Notice
         if: failure()

@@ -10,6 +10,7 @@ import ContextEngine from "./components/ContextEngine";
 import Playground from "./components/Playground";
 import ProofSection from "./components/ProofSection";
 import Integration from "./components/Integration";
+import Pricing from "./components/Pricing";
 import Security from "./components/Security";
 import Footer from "./components/Footer";
 import ChatWidget from "./components/chat/ChatWidget";
@@ -27,6 +28,7 @@ function App() {
           <DiffSection />
           <ProofSection />
           <Integration />
+          <Pricing />
           <Security />
           <Footer />
           <ChatWidget />

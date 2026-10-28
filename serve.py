@@ -38,6 +38,12 @@ class Handler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self):
+        if self.path in ('/pricing', '/pricing/'):
+            self.send_response(302)
+            self.send_header('Location', '/#pricing')
+            self.end_headers()
+            return
+
         if self.path == '/api/v1/health':
             health_data = {
                 "status": "healthy",

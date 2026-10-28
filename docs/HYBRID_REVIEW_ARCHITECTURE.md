@@ -9,7 +9,7 @@ The pipeline ensures:
 2. **Little My handles all cases it can reliably detect and process**, including syntax validation, delimiter balancing, SQL injection boundaries, tenant isolation, hardcoded secret exposure, arithmetic boundaries, and unhandled asynchronous Promise boundaries.
 3. **Escalation occurs only for uncertain, unsupported, or unclassified cases**, such as unsupported programming languages, parser failures, stage timeouts, and cross-repository dependencies.
 4. **Clean scans are never escalated** simply because zero findings were detected; a fully completed clean scan is treated as complete and merge-ready.
-5. **Myco receives pull requests conditionally** via GitHub Actions workflow orchestration, invoking the official Myco Action (`MycoIntelligence/myco-bundled-action@v1`).
+5. **Myco receives pull requests conditionally** via GitHub Actions workflow orchestration, invoking the official Myco Action (`MycoIntelligence/myco-bundled-action@v1-groq`).
 
 ```
 +---------------------------------------------------------------------------------------------------+
@@ -50,7 +50,7 @@ The pipeline ensures:
                         |                       |  Step 1: Validate Secrets & Variables             |
                         |                       |          (MYCO_LLM_API_KEY, MYCO_CLIENT_ID, etc.) |
                         |                       |  Step 2: Invoke Myco Action                       |
-                        |                       |          (MycoIntelligence/myco-bundled-action@v1)|
+                        |                       |          (MycoIntelligence/myco-bundled-action@v1-groq)|
                         |                       |  Step 3: Fallback Failure Notice if Action fails   |
                         |                       +---------------------------------------------------+
                         v                                                   v
@@ -120,7 +120,7 @@ To enforce the hybrid model, the workflow employs two dependent jobs:
    - Executes only when Little My explicitly flags escalation.
    - Invokes the official action:
      ```yaml
-     - uses: MycoIntelligence/myco-bundled-action@v1
+     - uses: MycoIntelligence/myco-bundled-action@v1-groq
        with:
          pr_link: ${{ github.event.pull_request.html_url }}
          api_key: ${{ secrets.MYCO_LLM_API_KEY }}
@@ -152,7 +152,7 @@ Configure the following parameters in your repository under:
 
 ## 6. Private Action Collaborator Access Requirement
 
-Because `MycoIntelligence/myco-bundled-action@v1` resides in a private repository:
+Because `MycoIntelligence/myco-bundled-action@v1-groq` resides in a private repository:
 1. The repository administrator must accept the Myco collaborator invitation sent to the organization or repository owner.
 2. Under **Organization Settings -> Actions -> General -> Access**, ensure that workflows have access to private actions shared within the organization.
 3. If GitHub Actions reports `Action not found` or `Resource not accessible`, verify that the GitHub token permissions include `actions: read` and that the collaborator invitation has been formally accepted.
