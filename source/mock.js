@@ -6,7 +6,6 @@ export const LINKEDIN_URL = "https://www.linkedin.com/in/abhishika-agarwal/";
 export const nav = {
   links: [
     { label: "Overview", href: "#overview" },
-    { label: "How it works", href: "#how" },
     { label: "Integrate", href: "#integrate" },
     { label: "Security", href: "#security" },
   ],
@@ -18,7 +17,7 @@ export const hero = {
   titleLines: ["AI writes the code.", "Myco understands it."],
   body:
     "Myco builds context across your engineering system, reasons over every relevant change, and surfaces the signals that deserve attention.",
-  primary: { label: "See how it works", href: "#how" },
+  primary: { label: "See a review example", href: "#workflow-proof-title" },
   secondary: { label: "Request a pilot", href: LINKEDIN_URL },
   graphLabel: "LIVE CONTEXT GRAPH \u00B7 1,284 ARTIFACTS",
 };
@@ -85,33 +84,6 @@ export const proof = {
     { t: "finding", text: "VALIDATED FINDING" },
     { t: "result", text: "Retry path bypasses the tool approval policy. ", link: "Evidence attached." },
   ],
-};
-
-export const how = {
-  eyebrow: "HOW MYCO WORKS",
-  titleLines: ["Context first.", "Then reasoning."],
-  body:
-    "Myco builds a scoped engineering view of your codebase, systems and intent before evaluating a change. This gives the model the right context to reason, validate and surface what matters.",
-  steps: [
-    { num: "01", title: "Ingest", body: "We take in your change, codebase and relevant signals." },
-    { num: "02", title: "Build context", body: "We assemble a scoped view of the code, systems and intent." },
-    { num: "03", title: "Reason", body: "We analyze the change with full context to find real impact.", accent: true },
-    { num: "04", title: "Validate", body: "We check findings across multiple signals and constraints." },
-    { num: "05", title: "Score and surface", body: "We rank what matters and present clear, actionable insights." },
-  ],
-};
-
-export const traced = {
-  eyebrow: "One finding, traced",
-  traceId: "TRACE ID 482-11",
-  rows: [
-    { k: "Requirement", v: "TAX-19. Exemption must persist on amendment" },
-    { k: "Changed module", v: "checkout.amendment.ts" },
-    { k: "Dependency", v: "tax calculator, retry state" },
-    { k: "Prior behavior", v: "exemption held across retry path" },
-  ],
-  headline: "Tax exemption is lost when the amendment retries.",
-  footer: "4 artifacts connected \u00B7 3 paths traced \u00B7 1 validated conflict",
 };
 
 export const integration = {
