@@ -21,7 +21,7 @@
 
     set(hero, '.eyebrow', 'Software Quality in the Development Workflow');
     lines(hero.querySelector('h1'), ['AI made writing code faster.', 'Shipping is still the bottleneck.']);
-    set(hero, '.hero-grid p', 'Myco reviews pull requests against product requirements, codebase context and dependencies, helping engineers catch bugs while the change is still fresh.');
+    set(hero, '.hero-grid p', 'Bringing Quality Assurance in a development workflow');
     hero.classList.add('product-hero');
 
     // Explain the problem before introducing the current review mechanism.
