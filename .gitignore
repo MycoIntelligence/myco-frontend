@@ -1,7 +1,42 @@
+# Python cache & bytecode
 __pycache__/
-*.pyc
-.DS_Store
-node_modules/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment configurations & secrets
 .env
 .env.*
 !.env.example
+
+# Runtime caches, indexes, and logs
+*.log
+**/.demo_allowance.json*
+**/.pr_review_cache.json*
+pipeline/rag/index_cache.json
+index_cache.json
+
+# Dependencies & build artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# Operating System & IDE metadata
+.DS_Store
+**/.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Root duplicate reference file (canonical version is in pipeline/rag/documents/myco_public_knowledge.md)
+/Myco-public-knowledge.md
+

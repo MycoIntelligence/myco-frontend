@@ -21,6 +21,7 @@
     menu.className = 'mobile-navigation';
     menu.hidden = true;
     links.querySelectorAll('a').forEach(link => {
+      if (link.getAttribute('href') === '#playground') return;
       const item = document.createElement('a');
       item.href = link.getAttribute('href');
       item.textContent = link.textContent.trim();
