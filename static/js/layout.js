@@ -170,6 +170,46 @@
     return true;
   };
 
+  const applyHowJourneyRedesign = () => {
+    const how = document.querySelector('#how');
+    if (!how || how.dataset.howJourneyApplied !== undefined) return Boolean(how);
+
+    how.dataset.howJourneyApplied = 'true';
+    how.classList.add('how-journey-wrap');
+    how.innerHTML = `
+      <section class="how-journey" aria-labelledby="how-journey-title">
+        <header class="how-journey__header">
+          <span class="how-journey__eyebrow">HOW MYCO WORKS</span>
+          <div class="how-journey__headline">
+            <h2 class="display" id="how-journey-title"><span>Context first.</span><span>Then reasoning.</span></h2>
+            <p>Myco builds a scoped engineering view of your codebase, systems and intent before evaluating a change. This gives the model the right context to reason, validate and surface what matters.</p>
+          </div>
+        </header>
+        <ol class="how-journey__steps">
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-layers.svg" alt="" width="124" height="120"></div>
+            <span class="how-journey__number">01</span><h3 class="display">Ingest</h3><p>We take in your change, codebase and relevant signals.</p>
+          </li>
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-overlap.svg" alt="" width="124" height="120"></div>
+            <span class="how-journey__number">02</span><h3 class="display">Build context</h3><p>We assemble a scoped view of the code, systems and intent.</p>
+          </li>
+          <li class="is-reason">
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-reason.svg" alt="" width="124" height="120"></div>
+            <span class="how-journey__number">03</span><h3 class="display">Reason</h3><p>We analyze the change with full context to find real impact.</p>
+          </li>
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-validate.svg" alt="" width="124" height="120"></div>
+            <span class="how-journey__number">04</span><h3 class="display">Validate</h3><p>We check findings across multiple signals and constraints.</p>
+          </li>
+          <li>
+            <div class="how-journey__symbol" aria-hidden="true"><img class="how-journey__art" src="assets/how-surface.svg" alt="" width="124" height="120"></div>
+            <span class="how-journey__number">05</span><h3 class="display">Score and surface</h3><p>We rank what matters and present clear, actionable insights.</p>
+          </li>
+        </ol>
+      </section>`;
+    return true;
+  };
   const applyIntegrationWorkflowRedesign = () => {
     const grid = document.querySelector('#integrate .wf-grid');
     if (!grid) return Boolean(document.querySelector('.integration-workflow'));
@@ -198,8 +238,9 @@
     const diffReady = applyDiffRedesign();
     const workflowProofReady = applyWorkflowProofRedesign();
     const signalsReady = removeLiveFindings();
+    const howJourneyReady = applyHowJourneyRedesign();
     const integrationReady = applyIntegrationWorkflowRedesign();
     const securityReady = applySecurityRedesign();
-    if ((proofReady && layoutReady && diffReady && workflowProofReady && signalsReady && integrationReady && securityReady) || attempts === 20) clearInterval(timer);
+    if ((proofReady && layoutReady && diffReady && workflowProofReady && signalsReady && howJourneyReady && integrationReady && securityReady) || attempts === 20) clearInterval(timer);
   }, 50);
 })();

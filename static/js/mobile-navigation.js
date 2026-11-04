@@ -40,8 +40,7 @@
       const link = event.target.closest('a');
       if (!link) return;
       setOpen(false);
-      const href = link.getAttribute('href');
-      const section = href?.startsWith('#') ? document.querySelector(href) : null;
+      const section = document.querySelector(link.getAttribute('href'));
       if (section) { section.setAttribute('tabindex', '-1'); section.focus({preventScroll:true}); }
     });
     document.addEventListener('keydown', event => {
@@ -58,8 +57,7 @@
       const items = [...menu.querySelectorAll('a')];
       let current = items[0];
       items.forEach(item => {
-        const href = item.getAttribute('href');
-        const section = href?.startsWith('#') ? document.querySelector(href) : null;
+        const section = document.querySelector(item.getAttribute('href'));
         if (section && section.getBoundingClientRect().top <= 160) current = item;
       });
       items.forEach(item => item === current ? item.setAttribute('aria-current','location') : item.removeAttribute('aria-current'));
