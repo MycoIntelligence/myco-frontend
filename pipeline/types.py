@@ -124,6 +124,8 @@ class AnalysisFinding:
     is_merge_blocking: bool
     evidence_rule: Optional[str] = None
     validation_status: str = "CONFIRMED"
+    suggested_patch: Optional[str] = None
+    fixed_code: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -139,6 +141,8 @@ class AnalysisFinding:
             "evidenceSnippet": self.evidence_snippet,
             "evidenceRule": self.evidence_rule or "SYSTEM_RULE",
             "suggestedAction": self.suggested_action,
+            "suggestedPatch": self.suggested_patch,
+            "fixedCode": self.fixed_code,
             "isMergeBlocking": self.is_merge_blocking,
         }
 

@@ -24,14 +24,12 @@ class TestPricingPage(unittest.TestCase):
         self.assertIn('aria-label="Main navigation"', self.html)
         self.assertIn('class="logo" href="/"', self.html)
         self.assertIn('href="/#overview">Overview</a>', self.html)
-        self.assertIn('href="/#how">How it works</a>', self.html)
         self.assertIn('href="/#integrate">Integrate</a>', self.html)
         self.assertIn('href="/#security">Security</a>', self.html)
         self.assertIn('href="/pricing/" aria-current="page">Pricing</a>', self.html)
-        self.assertIn('class="nav-action" href="#plans">Explore plans', self.html)
+        self.assertIn('Request a pilot', self.html)
 
     def test_intro_heading_and_copy(self):
-        self.assertIn('<p class="eyebrow">PRICING</p>', self.html)
         self.assertIn('<h1 id="pricing-title">Unlimited code review.<br><span>Pay per developer.</span></h1>', self.html)
         self.assertIn(
             '<p class="intro-copy">Review every pull request with Team. Add governance, deployment options and priority support with Enterprise.</p>',
@@ -124,9 +122,11 @@ class TestPricingPage(unittest.TestCase):
 
     def test_footer(self):
         self.assertIn('Agentic intelligence for engineering.', self.html)
-        self.assertIn('<a href="/">Overview</a>', self.html)
-        self.assertIn('<a href="/#security">Security</a>', self.html)
-        self.assertIn('© 2026 Myco', self.html)
+        self.assertIn('See Myco in your workflow.', self.html)
+        self.assertIn('Request a pilot', self.html)
+        self.assertIn('href="/#overview">Overview</a>', self.html)
+        self.assertIn('href="/#security">Security</a>', self.html)
+        self.assertIn('© 2026 Myco. Engineering intelligence.', self.html)
 
     def test_js_pricing_toggle_script(self):
         with open(self.js_path, "r", encoding="utf-8") as f:
@@ -138,6 +138,46 @@ class TestPricingPage(unittest.TestCase):
         self.assertIn("comparison-price", js)
         self.assertIn("comparison-billing", js)
         self.assertIn("MYCO_PRICING_LINKS", js)
+
+
+    def test_pricing_page_not_redirecting(self):
+        self.assertNotIn('http-equiv="refresh"', self.html)
+        self.assertNotIn('/#pricing', self.html)
+
+    def test_pricing_css_no_colored_top_lines(self):
+        with open(self.css_path, "r", encoding="utf-8") as f:
+            css = f.read()
+        self.assertNotIn("border-top: 3px", css)
+        self.assertNotIn("border-left: 3px solid var(--sage)", css)
+        self.assertNotIn("#38634f", css)
+        self.assertNotIn("#3d5d74", css)
+
+    def test_assistant_pricing_answers(self):
+        from pipeline.rag.pipeline import rag_pipeline
+        rag_pipeline.initialize()
+        resp = rag_pipeline.answer_question("How much does Myco cost?")
+        self.assertTrue(resp.success)
+        self.assertEqual(resp.status, "ANSWERED")
+        self.assertIn("$20", resp.answer)
+        self.assertIn("30-Day Free Trial", resp.answer)
+        self.assertIn("Enterprise", resp.answer)
+
+    def test_assistant_logo_and_no_green_dot(self):
+        widget_path = Path(__file__).parent / "static" / "js" / "chat" / "chat-widget.js"
+        config_path = Path(__file__).parent / "static" / "js" / "chat" / "chat-config.js"
+        css_widget_path = Path(__file__).parent / "static" / "css" / "chat-widget.css"
+
+        with open(widget_path, "r", encoding="utf-8") as f:
+            widget = f.read()
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = f.read()
+        with open(css_widget_path, "r", encoding="utf-8") as f:
+            css = f.read()
+
+        self.assertIn("myco-icon.svg", config)
+        self.assertNotIn("myco-icon.png", config)
+        self.assertNotIn('<span class="myco-chat-header__status-dot"', widget)
+        self.assertIn("display: none !important;", css)
 
 
 if __name__ == "__main__":

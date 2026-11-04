@@ -56,10 +56,10 @@ const VERIFIED_KNOWLEDGE_CONTEXT = `
 - Myco is a context-first code intelligence platform designed for fast-moving engineering teams building mission-critical software.
 - Core Differentiator: Unlike surface linters or single-file LLM reviewers, Myco builds a holistic semantic understanding of the codebase across modules, contracts, schema migrations, and business invariants before analyzing a pull request.
 - Focus: Prioritizes P0/P1 invariants over cosmetic styling. Flags critical defects such as breaking database migrations, unhandled concurrency edge cases, agent tool approval bypasses, and security privilege escalations.
-- Pilot Program: 14-day production pilot on GitHub Enterprise or GitLab with dedicated engineering slack channel, zero model training guarantee, and custom invariant onboarding.
+- Pilot & Trial Program: 30-day free trial on GitHub Enterprise or GitLab with no credit card required, zero model training guarantee, and full review pipeline access.
 - Supported Languages: TypeScript, JavaScript, Python, Go, Rust, Java, and polyglot microservice repositories.
 - Integrations: GitHub (Enterprise/Cloud), GitLab, Linear, Jira, Slack (real-time notification digests), CI/CD webhooks.
-- Pricing & Deployment: Tiered by active contributing developers. Free tier for open-source / small teams (<5 devs). Team Tier ($39/dev/month). Enterprise Tier (custom, dedicated VPC, custom SLA, compliance exports).
+- Pricing Plans: Team Plan ($20/dev/month, or $16/month billed annually at $192/year saving 20%), 30-day free trial with no credit card. Enterprise Plan (custom pricing, SSO/SAML, audit logs, custom connectors, advanced self-learning, single-tenant SaaS or on-prem/VPC, priority Slack support, dedicated CSM). Subscriptions cover Myco; LLM costs are paid separately via customer API keys (BYO key). Paid seats are admin-approved only for reviewed developers.
 
 [Document: Competitor Comparison: Myco vs CodeRabbit, Graptile, and CodeAnt]
 - Comparison targets: CodeRabbit, Graptile (Greptile), and CodeAnt (CodeAnt AI). (Note: Legacy tools like SonarQube and Copilot are deprecated from this comparison).
@@ -149,7 +149,7 @@ export default async function handler(request, response) {
       const messages = [
         {
           role: "system",
-          content: `You are Myco Assistant, the official AI assistant for Myco (https://mycointelligence.com).
+          content: `You are Myco Assistant, the official assistant for Myco (https://mycointelligence.com).
 Your role is to explain Myco's product capabilities, context-first engineering intelligence, security posture, and objective competitor comparisons based strictly on the verified knowledge provided below.
 
 === RETRIEVED CONTEXT START ===

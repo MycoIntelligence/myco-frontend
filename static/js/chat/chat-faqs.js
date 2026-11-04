@@ -109,7 +109,7 @@
       id: 'faq_features_interactive_playground',
       category: 'Features and Capabilities',
       question: 'Can I try Myco in an interactive playground?',
-      answer: 'Yes! Our website features an interactive live Playground right on the homepage where you can inspect real pull requests (like PR #4827 tool approval bypasses and schema changes) and run instant context-aware analysis.',
+      answer: 'You can request a collaborative 30-day pilot to test Myco directly on your team’s pull requests, or reach out to our team at pilot@mycointelligence.com for a guided walkthrough.',
       keywords: ['playground', 'try', 'demo', 'interactive', 'test', 'sample', 'preview'],
       alternatePhrasings: [
         'Is there an interactive demo?',
@@ -127,15 +127,17 @@
       id: 'faq_pricing_plans',
       category: 'Pricing and Plans',
       question: 'How much does Myco cost and what are the pricing plans?',
-      answer: 'Myco offers tailored enterprise tier plans based on repository volume, active developer seats, and deployment model (cloud-managed or self-hosted VPC). We begin with a collaborative 30-day pilot so your team can evaluate Myco on production PRs.',
-      keywords: ['pricing', 'cost', 'plans', 'price', 'tier', 'subscription', 'how', 'much', 'expensive', 'free'],
+      answer: 'Myco offers two plans tailored for engineering teams:\n\n• Team: $20 per reviewed developer per month (or $16/month billed annually at $192/year, saving 20%). Includes the full review and validation pipeline, unlimited reviews and repositories, dashboard analytics, and community/email support. A 30-day free trial is available with no credit card required.\n• Enterprise: Custom pricing for organizations needing SSO/SAML, audit logs, custom connectors, advanced self-learning, single-tenant SaaS or on-prem/VPC deployment, priority Slack support, and a dedicated CSM.\n\nNote: Subscriptions cover Myco. LLM usage is paid separately through your own provider API key (BYO key), and paid seats are admin-approved only for developers whose pull requests Myco reviews.',
+      keywords: ['pricing', 'cost', 'plans', 'price', 'tier', 'subscription', 'how', 'much', 'expensive', 'free', 'trial', 'team', 'enterprise'],
       alternatePhrasings: [
         'What are the pricing options?',
         'How much does a subscription cost?',
         'Is there a free trial?',
-        'What does Myco cost per seat?'
+        'What does Myco cost per seat?',
+        'How much is the Team plan?',
+        'What does Enterprise cost?'
       ],
-      tags: ['pricing', 'plans', 'cost']
+      tags: ['pricing', 'plans', 'cost', 'trial']
     },
     {
       id: 'faq_pricing_request_pilot',

@@ -9,7 +9,7 @@ last_updated: 2026-10-27
 # Myco — Public Knowledge Base
 
 Prepared: 27 October 2026  
-Purpose: Customer-facing product knowledge and response guidance for Myco’s website AI assistant.
+Purpose: Customer-facing product knowledge and response guidance for Myco’s website assistant.
 
 ## 1. What Myco does
 
@@ -224,7 +224,12 @@ No certification, deployment-option, or data-residency claim is established here
 
 ### What does it cost, and how long does setup take?
 
-Current pricing, trial terms, usage limits, support commitments, and setup times are not specified here. Use the website’s current approved pricing or contact route. Do not invent a price, deadline, URL, or guarantee.
+Myco offers two clear plans:
+- **Team**: $20 per developer per month (or $16 per developer per month billed annually at $192/year, saving 20%). Includes full review and validation pipeline, unlimited reviews and repositories, dashboard and analytics, and community/email support. A 30-day free trial is available with no credit card required.
+- **Enterprise**: Custom pricing tailored to organizational scale. Includes identity controls (SSO / SAML), audit logs, advanced self-learning, custom connectors, single-tenant SaaS or on-premises / VPC deployment, priority Slack support, and a dedicated Customer Success Manager.
+- **LLM Usage**: Subscriptions cover Myco. LLM usage is paid separately through your own provider API key (Bring Your Own Key), which also applies during the trial.
+- **Seat Model**: Paid seats are admin-approved; only developers whose pull requests are reviewed by Myco require a seat. Viewing findings is free.
+- **Setup Time**: Initial onboarding takes under 15 minutes to connect your repository and configure automated review webhooks.
 
 ### How should we evaluate Myco?
 

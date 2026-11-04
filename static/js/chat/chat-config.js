@@ -10,8 +10,8 @@
   var ChatConfig = {
     // Identity & Branding
     assistantName: 'Myco Assistant',
-    assistantAvatar: 'assets/myco-icon.svg',
-    assistantAvatarFallback: 'assets/myco-icon.png',
+    assistantAvatar: '/assets/myco-icon.svg',
+    assistantAvatarFallback: '/assets/myco-icon.svg',
 
     // Typewriter greeting callout
     typewriter: {

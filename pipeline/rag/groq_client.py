@@ -286,18 +286,21 @@ class GroqClient:
             )
 
         # 3. Pilot / pricing query
-        if any(w in q_lower for w in ("pilot", "pricing", "cost", "trial", "tier")):
+        if any(w in q_lower for w in ("pilot", "pricing", "cost", "trial", "tier", "subscription", "price", "plan")):
             body_text = (
-                "**Myco Pilot & Pricing Overview:**\n\n"
-                "- **14-Day Pilot**: Production evaluation on GitHub Enterprise or GitLab with dedicated Slack support and custom invariant onboarding.\n"
-                "- **Flexible Tiers**: Free tier for small teams (<5 devs), Team Tier ($39/dev/mo), and Dedicated VPC Enterprise deployments."
+                "**Myco Pricing & Trial Overview:**\n\n"
+                "- **Team Plan**: $20 per developer per month, or $16 per developer per month billed annually ($192/year, saving 20%). Includes full review and validation pipeline, unlimited reviews and repositories, dashboard and analytics, and community/email support.\n"
+                "- **30-Day Free Trial**: Full Team plan capabilities with no credit card required.\n"
+                "- **Enterprise Plan**: Custom pricing tailored to organization scale. Includes SSO/SAML, audit logs, custom connectors, advanced self-learning, single-tenant SaaS or on-premises / VPC deployment, priority Slack support, and a dedicated Customer Success Manager.\n"
+                "- **LLM Usage**: Subscriptions cover Myco. LLM usage is paid separately through your own provider API key (BYO key).\n"
+                "- **Seat Model**: Paid seats are admin-approved only for developers whose pull requests Myco reviews. Viewing findings is free."
             )
             return LLMResponse(
                 content=body_text,
                 model="local-grounded-fallback",
                 finish_reason="stop",
                 is_fallback=True,
-                usage={"prompt_tokens": len(user_msg.split()), "completion_tokens": len(body_text.split()), "total_tokens": 100},
+                usage={"prompt_tokens": len(user_msg.split()), "completion_tokens": len(body_text.split()), "total_tokens": 120},
             )
 
         # 4. How Myco works, backend architecture, error detection & developer benefit

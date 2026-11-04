@@ -169,7 +169,7 @@ class RAGPipeline:
     def build_system_prompt(self, context_blocks: List[str]) -> str:
         """Constructs a strict grounding system prompt with source instructions."""
         joined_context = "\n\n".join(context_blocks)
-        prompt = f"""You are **Myco Assistant**, the official AI assistant for Myco (https://mycointelligence.com).
+        prompt = f"""You are **Myco Assistant**, the official assistant for Myco (https://mycointelligence.com).
 Your role is to explain Myco's product capabilities, context-first engineering intelligence, security posture, and objective competitor comparisons based strictly on the verified knowledge provided below.
 
 === RETRIEVED CONTEXT START ===

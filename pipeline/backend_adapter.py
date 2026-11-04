@@ -237,13 +237,12 @@ class FutureMycoAdapter(BackendProvider):
                 status="rejected",
                 status_code=503,
                 findings=[],
-                summary={"status": "external_backend_unavailable", "canProcessInternally": False},
+                summary={"status": "external_backend_unavailable", "canProcessInternally": False, "errorCode": "ERR_SRV_503"},
                 provider_metadata={
                     "backendConfigured": False,
-                    "targetUrl": config.myco_backend_url,
                     "fallbackPolicy": "reject_503",
                 },
-                error_message="External Myco backend is not yet configured. This request requires multi-repository indexing or deep symbolic analysis not supported by internal AST engine.",
+                error_message="Unable to process; sorry for the inconvenience. (Error Code: ERR_SRV_503)",
                 retry_recommended=False,
             )
 
@@ -256,9 +255,9 @@ class FutureMycoAdapter(BackendProvider):
                 status="failed",
                 status_code=503,
                 findings=[],
-                summary={"circuitBreaker": "OPEN"},
+                summary={"circuitBreaker": "OPEN", "errorCode": "ERR_CIRCUIT_OPEN"},
                 provider_metadata={"state": "CIRCUIT_OPEN"},
-                error_message="Circuit breaker is currently OPEN for external Myco backend due to consecutive failures. Request rejected to prevent service cascading.",
+                error_message="Unable to process; sorry for the inconvenience. (Error Code: ERR_CIRCUIT_OPEN)",
                 retry_recommended=True,
             )
 
@@ -306,6 +305,8 @@ class FutureMycoAdapter(BackendProvider):
                 "filename": filename,
                 "title": f"Playground Review: {filename}",
                 "minSeverity": "P3",
+                "littleMyFindings": request.client_metadata.get("littleMyFindings", []) if request.client_metadata else [],
+                "unresolvedScope": "Escalated from Little My for full reasoning",
             }).encode("utf-8")
 
             req_headers = {
@@ -408,9 +409,9 @@ class FutureMycoAdapter(BackendProvider):
                 status="failed",
                 status_code=502,
                 findings=[],
-                summary={"backend": "connection_error", "error": str(err)},
-                provider_metadata={"endpoint": config.myco_backend_url},
-                error_message=f"Could not connect to Myco backend at {config.myco_backend_url}: {err}",
+                summary={"backend": "connection_error", "errorCode": "ERR_PROC_502"},
+                provider_metadata={"status": "unavailable"},
+                error_message="Unable to process; sorry for the inconvenience. (Error Code: ERR_PROC_502)",
                 retry_recommended=True,
             )
 

@@ -24,7 +24,7 @@ python3 -m unittest test_rag_pipeline.py -v
 
 ## 2. Myco Assistant: Architecture & RAG Pipeline
 
-Myco Assistant is a production-ready, grounded conversational AI assistant designed to answer visitor questions about Myco's product capabilities, context-first engineering intelligence, security posture, and competitor comparisons without hallucinating or leaking confidential implementation details.
+Myco Assistant is a production-ready, grounded conversational assistant designed to answer visitor questions about Myco's product capabilities, context-first engineering intelligence, security posture, and competitor comparisons without hallucinating or leaking confidential implementation details.
 
 ### System Architecture
 
@@ -176,7 +176,7 @@ When an inquiry is unanswerable (`status: "UNKNOWN"`) or targets restricted ente
 ## 8. Frontend Branding & Visual Assets
 
 - **Assistant Name**: Rebranded throughout to **Myco Assistant**.
-- **Official Logo**: Uses official vector icon `assets/myco-icon.svg` with automated fallback to `assets/myco-icon.png`.
+- **Official Logo**: Uses the official vector icon `assets/myco-icon.svg` across all assistant surfaces without any screenshot artifact or status indicator dot.
 - **Typewriter Effect**: Proactive typewriter callout on landing highlighting capabilities and competitor comparisons.
 - **Markdown Rendering**: Safe client-side parser rendering tables, bold text, lists, and discrete verified source badges (`[Source: Document > Section]`).
 

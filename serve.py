@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 import os
 import sys
+import socket
 
 # Ensure pipeline package is discoverable
 sys.path.insert(0, str(Path(__file__).parent))
@@ -38,9 +39,9 @@ class Handler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self):
-        if self.path in ('/pricing', '/pricing/'):
-            self.send_response(302)
-            self.send_header('Location', '/#pricing')
+        if self.path == '/pricing':
+            self.send_response(301)
+            self.send_header('Location', '/pricing/')
             self.end_headers()
             return
 
@@ -235,6 +236,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_header('Content-Length', str(len(response_bytes)))
             self.end_headers()
             self.wfile.write(response_bytes)
+            return
         if self.path == '/api/v1/github/fetch':
             content_length = int(self.headers.get('Content-Length', 0))
             raw_body = self.rfile.read(content_length) if content_length > 0 else b""
@@ -341,10 +343,27 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_error(404)
 
 
+class DualStackServer(ThreadingHTTPServer):
+    def server_bind(self):
+        try:
+            self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        except (AttributeError, OSError):
+            pass
+        super().server_bind()
+
+
 if __name__ == '__main__':
     os.chdir(Path(__file__).parent)
-    ThreadingHTTPServer.allow_reuse_address = True
-    print("Starting server at http://127.0.0.1:8766 ...")
-    ThreadingHTTPServer(('127.0.0.1', 8766), Handler).serve_forever()
+    DualStackServer.allow_reuse_address = True
+    port = int(os.environ.get("PORT", 8766))
+    try:
+        class IPv6Server(DualStackServer):
+            address_family = socket.AF_INET6
+        httpd = IPv6Server(("", port), Handler)
+    except Exception:
+        httpd = DualStackServer(("0.0.0.0", port), Handler)
+
+    print(f"Starting server at http://127.0.0.1:{port} and http://localhost:{port} ...")
+    httpd.serve_forever()
 
 

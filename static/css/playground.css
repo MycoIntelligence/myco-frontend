@@ -1,4 +1,16 @@
 /* Interactive playground: code intelligence surface with light-only architectural styling. */
+/* Playground section hidden per user request: ensures zero visible space or placeholders */
+#playground,
+.playground-section {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
+}
+
 .playground-section {
   position: relative;
   border-top: 1px solid var(--border);

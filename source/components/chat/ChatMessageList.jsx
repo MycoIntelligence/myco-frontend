@@ -27,7 +27,7 @@ export default function ChatMessageList({
       aria-live="polite"
     >
       <div className="myco-chat-welcome">
-        <span className="myco-chat-welcome__badge">Myco Assistant · AI Assistant</span>
+        <span className="myco-chat-welcome__badge">Myco Assistant</span>
         <p><strong>Hi there! 👋 I'm Myco Assistant. How can I help you today?</strong></p>
         <SuggestedQuestions onSelect={onSelectQuestion} />
       </div>

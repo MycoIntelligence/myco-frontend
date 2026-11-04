@@ -891,6 +891,17 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
+  /* Secure Error Sanitizer: never expose internal ports, localhost, urlopen, or socket errors */
+  const sanitizeErrorText = (str, fallbackCode = "ERR_BACKEND_FALLBACK") => {
+    if (!str || typeof str !== "string") {
+      return `Unable to process; sorry for the inconvenience. (Error Code: ${fallbackCode})`;
+    }
+    if (/localhost|127\.0\.0\.1|0\.0\.0\.0|:\d{4,5}|urlopen|Errno|ECONNREFUSED|ENOTFOUND|Traceback|Exception|Internal Server Error|HTTP Error|api\/review/i.test(str)) {
+      return `Unable to process; sorry for the inconvenience. (Error Code: ${fallbackCode})`;
+    }
+    return str;
+  };
+
   /* Regex syntax colorizer */
   const colorizeCode = (code, activeLine, type) => {
     const lines = (code || "").split("\n");
@@ -3517,7 +3528,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       clearLoopGapTimer();
       loopGapTimer = setTimeout(() => {
         clearLoopGapTimer();
-        if (isLoopActive && isDemoMode && !isCustomMode && !isAnalyzing) {
+        if (isLoopActive && isDemoMode && !isCustomMode && !isAnalyzing && !document.hidden) {
           const nextIdx = (currentDemoIndex + 1) % DEMO_EXAMPLES.length;
           startDemoMode(nextIdx);
           runAnalysis();
@@ -3537,6 +3548,21 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       return;
     }
   };
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      clearLoopGapTimer();
+    } else if (isLoopActive && isDemoMode && !isCustomMode && !isAnalyzing) {
+      clearLoopGapTimer();
+      loopGapTimer = setTimeout(() => {
+        if (!document.hidden && isLoopActive && isDemoMode && !isCustomMode && !isAnalyzing) {
+          const nextIdx = (currentDemoIndex + 1) % DEMO_EXAMPLES.length;
+          startDemoMode(nextIdx);
+          runAnalysis();
+        }
+      }, 1000);
+    }
+  });
 
   const nextDemoExample = () => {
     clearLoopGapTimer();
@@ -3668,23 +3694,25 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
     if (!container) return;
 
     if (metadata.isBackendRouted) {
+      const errCode = metadata.errorCode || "ERR_BACKEND_FALLBACK";
+      const cleanExp = sanitizeErrorText(metadata.backendExplanation, errCode);
       container.innerHTML = `
         <div class="finding-card is-backend-card">
           <div class="finding-card__header">
             <div class="finding-card__badges">
-              <span class="report-badge is-backend-badge">MYCO ENTERPRISE CANDIDATE</span>
-              <span class="report-file mono">${escapeHtml(metadata.fileName || "External Workload")}</span>
+              <span class="report-badge is-backend-badge">NOTICE</span>
+              <span class="report-file mono">${escapeHtml(metadata.fileName || "user_code.ts")}</span>
             </div>
-            <span class="report-verified mono">GATEWAY: EXTERNAL_MYCO</span>
+            <span class="report-verified mono">STATUS: ${escapeHtml(errCode)}</span>
           </div>
-          <h3 class="finding-title display">Routed to Future Myco Backend Pipeline</h3>
+          <h3 class="finding-title display">Unable to process; sorry for the inconvenience.</h3>
           <p class="finding-clean-desc">
-            ${escapeHtml(metadata.backendExplanation || "This code input requires cross-repository dependency graphs, full-repository indexing, and deep symbolic taint tracking that exceed lightweight in-browser / single-file AST capabilities.")}
+            ${escapeHtml(cleanExp)}
           </p>
           <div class="backend-routing-box mono">
-            <div><strong>Request Classification:</strong> Candidate for full-repo indexing and multi-repository reasoning</div>
-            <div><strong>Adapter Status:</strong> Candidate notice 200 returned via FutureMycoAdapter</div>
-            <div><strong>Architecture:</strong> Central API gateway verified request and prepared backend dispatch envelope</div>
+            <div><strong>Status:</strong> Unable to process request</div>
+            <div><strong>Error Code:</strong> ${escapeHtml(errCode)}</div>
+            <div><strong>Action:</strong> Please retry shortly or request enterprise access for repository indexing</div>
           </div>
           <div class="backend-pilot-cta">
             <p>Looking to analyze full repositories, cross-repo dependency trees, and enterprise PRs with Myco?</p>
@@ -4212,59 +4240,70 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       ? { path: (activeSample && activeSample.prd ? `${activeSample.prd.id}.md` : "PRD.md"), content: prdInput.value.trim() } 
       : (activeSample ? (activeSample.prd || null) : null);
 
+    let coreRes = null;
     if (window.MycoIntelligenceCore && window.MycoIntelligenceCore.analyze) {
       try {
-        const preCheck = window.MycoIntelligenceCore.analyze({
+        coreRes = window.MycoIntelligenceCore.analyze({
           primaryFile: { path: activeFilename, content: inputCode },
           contextFiles: activeContextFiles,
           prd: activePrd
         });
-        if (preCheck && preCheck.primaryFinding && preCheck.primaryFinding.sourceRange) {
-          targetLine = preCheck.primaryFinding.sourceRange.startLine || 6;
+        if (coreRes && coreRes.primaryFinding && coreRes.primaryFinding.sourceRange) {
+          targetLine = coreRes.primaryFinding.sourceRange.startLine || 6;
         }
-      } catch (_) {}
+      } catch (err) {
+        console.error("MycoCore analysis error:", err);
+      }
     }
 
-    // Start backend pipeline fetch concurrently with step 1-4 UI animations
+    // Two-Tier Routing:
+    // If Little Myco detects coding errors, it provides the solution immediately.
+    // If it fails to find an error or solution, it then sends a request to Myco_backend.
+    const littleMyHasErrors = Boolean(coreRes && !coreRes.isClean && coreRes.findings && coreRes.findings.length > 0);
+
+    // Start backend pipeline fetch only when Little Myco did not find a solution/error
     const sessionId = getOrCreateDemoSessionId();
     let backendPromise = null;
-    try {
-      backendPromise = fetch("/api/v1/demo/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Demo-Session-ID": sessionId
-        },
-        body: JSON.stringify({
-          code: inputCode,
-          fileName: activeFilename,
-          contextFiles: activeContextFiles,
-          prdText: (activePrd && activePrd.content) ? activePrd.content : (typeof activePrd === "string" ? activePrd : ""),
-          isDemo: isDemoMode,
-          isCustomCode: !isDemoMode,
-          enforceWordLimit: !isDemoMode
+    if (!isDemoMode && !littleMyHasErrors) {
+      try {
+        backendPromise = fetch("/api/v1/demo/analyze", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Demo-Session-ID": sessionId
+          },
+          body: JSON.stringify({
+            code: inputCode,
+            fileName: activeFilename,
+            contextFiles: activeContextFiles,
+            prdText: (activePrd && activePrd.content) ? activePrd.content : (typeof activePrd === "string" ? activePrd : ""),
+            isDemo: false,
+            isCustomCode: true,
+            enforceWordLimit: true
+          })
         })
-      })
-        .then(async res => {
-          const data = await res.json().catch(() => null);
-          if (!res.ok) {
-            return {
-              statusCode: res.status,
-              success: false,
-              routeExecuted: (data && data.routeExecuted) || "REJECTED",
-              message: (data && data.message) || ("Server validation failed: HTTP " + res.status),
-              summary: data ? data.summary : {},
-              errors: (data && data.errors) || [(data && data.message) || "Validation failed"],
-              quota: data ? data.quota : null
-            };
-          }
-          return data;
-        })
-        .catch(err => {
-          console.warn("Backend pipeline unavailable, relying on in-browser engine:", err);
-          return null;
-        });
-    } catch (_) {}
+          .then(async res => {
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+              const errCode = "ERR_SRV_" + res.status;
+              return {
+                statusCode: res.status,
+                success: false,
+                routeExecuted: (data && data.routeExecuted) || "REJECTED",
+                message: "Unable to process; sorry for the inconvenience. (Error Code: " + errCode + ")",
+                summary: { errorCode: errCode },
+                errors: [errCode],
+                quota: data ? data.quota : null
+              };
+            }
+            return data;
+          })
+          .catch(() => {
+            console.warn("Backend pipeline unavailable, relying on in-browser engine.");
+            return null;
+          });
+      } catch (_) {}
+    }
 
     // Step 1: Ingest (Take in change, codebase and relevant signals)
     setProgress(15, 1);
@@ -4347,19 +4386,22 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
         const hasBackendFindings = Boolean(apiRes && apiRes.findings && apiRes.findings.length > 0);
         const hasBackendClean = Boolean(apiRes && apiRes.summary && (apiRes.summary.cleanVerified || apiRes.summary.isClean));
 
-        if (apiRes && apiRes.routeExecuted === "EXTERNAL_MYCO" && !hasBackendFindings && !hasBackendClean) {
+        if (!littleMyHasErrors && apiRes && apiRes.routeExecuted === "EXTERNAL_MYCO" && !hasBackendFindings && !hasBackendClean) {
           isBackendRouted = true;
+          const errCode = (apiRes.summary && apiRes.summary.errorCode) || (apiRes.errors && apiRes.errors[0]) || "ERR_BACKEND_FALLBACK";
+          const rawExplanation = (apiRes.summary && apiRes.summary.explanation) || apiRes.message || "";
           backendMeta = {
-            message: apiRes.message,
-            explanation: (apiRes.summary && apiRes.summary.explanation) || apiRes.message,
+            errorCode: errCode,
+            message: "Unable to process; sorry for the inconvenience.",
+            explanation: sanitizeErrorText(rawExplanation, errCode),
             nextAction: (apiRes.summary && apiRes.summary.nextAction) || "request_pilot"
           };
-        } else if (!isBackendRouted && coreRes && coreRes.findings && coreRes.findings.some(f => f.requiresBackendRoute) && !hasBackendFindings) {
+        } else if (!littleMyHasErrors && !isBackendRouted && coreRes && coreRes.findings && coreRes.findings.some(f => f.requiresBackendRoute) && !hasBackendFindings) {
           isBackendRouted = true;
-          const rf = coreRes.findings.find(f => f.requiresBackendRoute);
           backendMeta = {
-            message: rf.title,
-            explanation: rf.explanation,
+            errorCode: "ERR_REPO_SCOPE",
+            message: "Unable to process; sorry for the inconvenience.",
+            explanation: "Unable to process in lightweight browser environment. Full repository scope required. (Error Code: ERR_REPO_SCOPE)",
             nextAction: "request_pilot"
           };
         }
@@ -4394,9 +4436,39 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       if (isQuotaExhausted) {
         isClean = false;
         findingsToRender = [];
+      } else if (coreRes && !coreRes.isClean && coreRes.findings && coreRes.findings.length > 0) {
+        // Priority 1: Little Myco detected coding errors -> immediately provide the appropriate solution!
+        isClean = false;
+        isMergeBlocking = coreRes.isMergeBlocking;
+        findingsToRender = coreRes.findings.map(f => ({
+          id: f.id,
+          engineCode: 1,
+          title: f.title,
+          description: f.explanation,
+          severity: f.severity,
+          category: f.category || "Syntax & Logic",
+          filePath: f.filePath || activeFilename,
+          lineStart: f.sourceRange ? f.sourceRange.startLine : 1,
+          lineEnd: f.sourceRange ? f.sourceRange.endLine : 1,
+          evidence: f.evidenceSnippet || "",
+          evidenceRule: f.evidenceRule || "POLICY INVARIANT",
+          explanation: f.explanation,
+          impact: f.impact || "Evaluated dynamically by Little Myco embedded AST engine.",
+          suggestedFix: f.suggestedAction || "Review the flagged code and apply remediation.",
+          suggestedPatch: f.suggestedPatch || null,
+          fixedCode: f.fixedCode || null,
+          confidence: f.confidence || "98%",
+          mergeBlocking: f.isMergeBlocking || false,
+          mergeReason: f.isMergeBlocking ? "Merge Blocker: Critical syntax or safety issue must be resolved prior to merge." : "Non-blocking warning.",
+          dispatchDetails: {
+            jira: { id: "LITTLE-MY-01", status: "Detected Locally" },
+            slack: { channel: "#code-health" },
+            webhook: { latency: "Little Myco (Instant In-Browser)" }
+          }
+        }));
       } else if (apiRes && apiRes.success && apiRes.findings && apiRes.findings.length > 0) {
-        // Live findings from Myco Backend or Internal Engine
-        const resEngineCode = (apiRes.summary && apiRes.summary.engineCode) || (apiRes.routeExecuted === "EXTERNAL_MYCO" ? 2 : 1);
+        // Priority 2: Live findings from Myco Backend
+        const resEngineCode = (apiRes.summary && apiRes.summary.engineCode) || 2;
         isClean = false;
         isMergeBlocking = Boolean(apiRes.summary && apiRes.summary.isMergeBlocking);
         findingsToRender = apiRes.findings.map(f => ({
@@ -4414,8 +4486,8 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
           explanation: f.explanation || f.title,
           impact: f.impact || "Evaluated by Myco Backend engine.",
           suggestedFix: f.suggestedAction || "Review the flagged code and apply remediation.",
-          suggestedPatch: f.suggestedPatch || (coreRes && coreRes.findings && coreRes.findings[0] && coreRes.findings[0].suggestedPatch) || (activeSample && activeSample.finding ? activeSample.finding.suggestedPatch : null),
-          fixedCode: (coreRes && coreRes.findings && coreRes.findings[0] && coreRes.findings[0].fixedCode) || (activeSample && activeSample.finding ? activeSample.finding.fixedCode : null),
+          suggestedPatch: f.suggestedPatch || (activeSample && activeSample.finding ? activeSample.finding.suggestedPatch : null),
+          fixedCode: (activeSample && activeSample.finding ? activeSample.finding.fixedCode : null),
           confidence: f.confidence || "98%",
           mergeBlocking: f.isMergeBlocking || false,
           mergeReason: f.isMergeBlocking ? "Merge Blocker: Critical security or policy issue." : "Non-blocking warning.",
@@ -4426,7 +4498,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
           } : {
             jira: { id: `MYCO-ENG-${resEngineCode}`, status: "Analyzed" },
             slack: { channel: "#code-review" },
-            webhook: { latency: `${apiRes.summary?.provider || (resEngineCode === 2 ? "Myco Backend" : "Little Myco")}` }
+            webhook: { latency: `${apiRes.summary?.provider || "Myco Backend"}` }
           }
         }));
       } else if (apiRes && apiRes.success && apiRes.summary && (apiRes.summary.cleanVerified || apiRes.summary.isClean)) {
@@ -4435,36 +4507,6 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       } else if (isBackendRouted) {
         isClean = false;
         findingsToRender = [];
-      } else if (coreRes && !coreRes.isClean && coreRes.findings && coreRes.findings.length > 0) {
-        // In-browser engine findings (Little Myco)
-        isClean = false;
-        isMergeBlocking = coreRes.isMergeBlocking;
-        findingsToRender = coreRes.findings.map(f => ({
-          id: f.id,
-          engineCode: 1,
-          title: f.title,
-          description: f.explanation,
-          severity: f.severity,
-          category: f.category || "Security",
-          filePath: f.filePath || activeFilename,
-          lineStart: f.sourceRange ? f.sourceRange.startLine : 1,
-          lineEnd: f.sourceRange ? f.sourceRange.endLine : 1,
-          evidence: f.evidenceSnippet || "",
-          evidenceRule: f.evidenceRule || "POLICY INVARIANT",
-          explanation: f.explanation,
-          impact: f.impact || "Evaluated dynamically by Myco Intelligence Core AST engine.",
-          suggestedFix: f.suggestedAction || "Review the flagged code and apply remediation.",
-          suggestedPatch: f.suggestedPatch || null,
-          fixedCode: f.fixedCode || null,
-          confidence: f.confidence || "95%",
-          mergeBlocking: f.isMergeBlocking || false,
-          mergeReason: f.isMergeBlocking ? "Merge Blocker: Critical security or compatibility issue must be resolved prior to merge." : "Non-blocking warning.",
-          dispatchDetails: f.dispatchDetails || (activeSample ? {
-            jira: activeSample.jiraTicket,
-            slack: activeSample.slackAlert,
-            webhook: activeSample.customApp
-          } : undefined)
-        }));
       } else if (isDemoMode && activeSample && activeSample.finding) {
         // Guaranteed fallback for sample scenarios (Little Myco)
         isClean = false;
@@ -4487,6 +4529,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
         fileName: activeFilename,
         engineCode: activeEngineCode,
         isBackendRouted: isBackendRouted,
+        errorCode: backendMeta ? backendMeta.errorCode : null,
         backendExplanation: backendMeta ? backendMeta.explanation : null,
         isQuotaExhausted: isQuotaExhausted,
         dispatchDetails: activeSample ? {
@@ -4511,11 +4554,12 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       }));
 
       if (isBackendRouted) {
+        const routeCode = backendMeta ? backendMeta.errorCode : "ERR_BACKEND_FALLBACK";
         if (petEngine) {
-          petEngine.setPhoneScreenState("GATEWAY", "ROUTED TO BACKEND");
+          petEngine.setPhoneScreenState("GATEWAY", "SERVICE NOTICE");
           petEngine.setPetState("EXAMINE_FILE");
         }
-        setAgentBubble("Pipeline route executed: Workload routed to future Myco Enterprise backend queue.");
+        setAgentBubble("Unable to process; sorry for the inconvenience. (Error Code: " + routeCode + ")");
         addTimer(() => {
           isAnalyzing = false;
           if (petEngine) {
@@ -4830,13 +4874,47 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
   window.closeDemoPolicyModal = closeDemoPolicyModal;
   window.openRequestPilotModal = openRequestPilotModal;
 
+  const getProofSection = () => {
+    const proofWrap = document.querySelector(".workflow-proof-wrap") ||
+                      document.querySelector(".workflow-proof")?.closest(".wrap");
+    if (proofWrap) return proofWrap;
+
+    const proofGrid = document.querySelector(".proof-grid")?.closest(".wrap");
+    if (proofGrid) return proofGrid;
+
+    const appChildren = document.querySelectorAll(".App > *");
+    for (const el of appChildren) {
+      if (el.id === "playground") continue;
+      const text = el.textContent || "";
+      if (text.includes("PROOF IN WORKFLOW") || text.includes("The bug isn’t always in the changed line.") || text.includes("The bug isn't always in the changed line.")) {
+        return el;
+      }
+    }
+    return null;
+  };
+
   /* Mounting playground section */
   const mountPlayground = () => {
-    if (document.getElementById("playground")) return true;
+    // Playground section is hidden for now per user request.
+    const existingSection = document.getElementById("playground");
+    if (existingSection) {
+      existingSection.remove();
+    }
+    document.querySelectorAll('a[href="#playground"]').forEach(a => a.remove());
+    return true;
+  };
 
-    const contextSection = document.querySelector(".context-section");
-    const targetParent = contextSection?.parentElement || document.querySelector(".App");
-    if (!targetParent) return false;
+  const _disabledMountPlaygroundOriginal = () => {
+    const proofSection = getProofSection();
+    if (!proofSection) return false;
+
+    const existingSection = document.getElementById("playground");
+    if (existingSection) {
+      if (existingSection.previousElementSibling !== proofSection) {
+        proofSection.insertAdjacentElement("afterend", existingSection);
+      }
+      return true;
+    }
 
     const section = document.createElement("section");
     section.id = "playground";
@@ -5077,11 +5155,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
     </section>
   `;
 
-    if (contextSection) {
-      contextSection.insertAdjacentElement("afterend", section);
-    } else {
-      targetParent.appendChild(section);
-    }
+    proofSection.insertAdjacentElement("afterend", section);
 
     const syncNavLinks = () => {
       const navLinks = document.querySelector(".nav-links");
@@ -5309,8 +5383,14 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
   let initTimer = null;
   initTimer = setInterval(() => {
     attempts += 1;
-    if (mountPlayground() || attempts > 30) {
+    if (mountPlayground() || attempts > 50) {
       if (initTimer) clearInterval(initTimer);
     }
   }, 100);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => mountPlayground());
+  } else {
+    mountPlayground();
+  }
 })();

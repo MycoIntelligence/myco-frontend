@@ -806,6 +806,32 @@
       });
     }
 
+    // Python bare except & mutable default rules
+    if (context.primary.format === FORMATS.PYTHON || /\.py$/i.test(context.primary.path) || /^\s*(?:def|import|from|class)\b/m.test(content)) {
+      const bareExceptIdx = lines.findIndex((l) => /^\s*except\s*:\s*(?:#.*)?$/.test(l));
+      if (bareExceptIdx !== -1) {
+        const lineNum = bareExceptIdx + 1;
+        findings.push({
+          id: `REL-PY-BARE-EXCEPT-L${lineNum}`,
+          category: "reliability",
+          severity: "HIGH",
+          confidence: "CONFIRMED",
+          validationStatus: "VALIDATED",
+          title: "Bare Except Handler (Catches BaseException)",
+          explanation: "Using 'except:' without specifying an exception class catches system interrupts (KeyboardInterrupt, SystemExit) and hides critical failures.",
+          impact: "Hangs background workers and masks crash diagnostics.",
+          filePath: context.primary.path,
+          sourceRange: { startLine: lineNum, endLine: lineNum },
+          evidenceSnippet: lines[bareExceptIdx].trim(),
+          evidenceRule: "REL-02 · EXPLICIT_EXCEPTION_HANDLING",
+          suggestedAction: "Catch explicit exceptions, e.g. 'except Exception as err:'.",
+          suggestedPatch: "except Exception as err:",
+          fixedCode: content.replace(/^\s*except\s*:/m, "except Exception as err:"),
+          isMergeBlocking: true
+        });
+      }
+    }
+
     return findings;
   }
 

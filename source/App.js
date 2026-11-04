@@ -24,11 +24,11 @@ function App() {
           <Hero />
           <Stats />
           <ContextEngine />
-          <Playground />
           <DiffSection />
           <ProofSection />
+          {/* <Playground /> */}
           <Integration />
-          <Pricing />
+          {/* <Pricing /> */}
           <Security />
           <Footer />
           <ChatWidget />

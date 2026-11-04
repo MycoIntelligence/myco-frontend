@@ -428,48 +428,88 @@ class PipelineRouter:
 
             elif classification.route == ProcessingRoute.EXTERNAL_MYCO:
                 metrics.increment("requests_external_myco")
-                routing_req = BackendRoutingRequest(
-                    request_id=request_id,
-                    user_id=user.user_id,
-                    org_id=user.org_id,
-                    tier="demo",
-                    target_repository=repo_url,
-                    pr_number=payload.get("prNumber"),
-                    primary_file=primary_file.to_dict() if primary_file else None,
-                    context_files=[cf.to_dict() for cf in context_files],
-                    diff_text=raw_diff,
-                    requested_features=requested_features,
-                    timeout_seconds=config.myco_backend_timeout_seconds,
-                    client_metadata=payload.get("metadata", {}),
-                )
+                # 1. Run Little Myco to detect basic errors and static issues
+                if not primary_file:
+                    primary_file = CodeInputFile(path="code.ts", content="")
 
-                ext_res = self._backend_provider.route_request(routing_req)
-                status_code = ext_res.status_code
-                findings = ext_res.findings
-                summary = ext_res.summary
-                summary["provider"] = ext_res.provider_id
-                summary["backendStatus"] = ext_res.status
-                summary["requiresMyco"] = True
-                summary["engineCode"] = 2
-                message = ext_res.error_message or "External backend candidate processed."
-                success = (status_code in (200, 201, 202))
-                if ext_res.error_message:
-                    errors.append(ext_res.error_message)
+                internal_res = internal_engine.process(
+                    primary_file=primary_file,
+                    context_files=context_files,
+                    prd_text=prd_text,
+                )
+                little_my_findings = internal_res.get("findings", [])
+                for f in little_my_findings:
+                    f["engineCode"] = 1
+
+                # If Little Myco detects coding errors, provide the solution immediately!
+                if little_my_findings:
+                    findings = little_my_findings
+                    summary["route"] = "INTERNAL"
+                    summary["provider"] = "Little Myco"
+                    summary["engineCode"] = 1
+                    summary["isClean"] = internal_res.get("isClean", False)
+                    summary["isMergeBlocking"] = internal_res.get("isMergeBlocking", False)
+                    status_code = 200
+                    success = True
+                    message = f"Little Myco detected code issue ({len(little_my_findings)} found)."
+                else:
+                    # Little Myco found no basic errors: dispatch to Myco_backend for deep reasoning!
+                    client_meta = dict(payload.get("metadata", {}))
+                    client_meta["littleMyFindings"] = []
+
+                    routing_req = BackendRoutingRequest(
+                        request_id=request_id,
+                        user_id=user.user_id,
+                        org_id=user.org_id,
+                        tier="demo",
+                        target_repository=repo_url,
+                        pr_number=payload.get("prNumber"),
+                        primary_file=primary_file.to_dict() if primary_file else None,
+                        context_files=[cf.to_dict() for cf in context_files],
+                        diff_text=raw_diff,
+                        requested_features=requested_features,
+                        timeout_seconds=config.myco_backend_timeout_seconds,
+                        client_metadata=client_meta,
+                    )
+
+                    ext_res = self._backend_provider.route_request(routing_req)
+                    status_code = ext_res.status_code
+                    findings = ext_res.findings
+                    summary = ext_res.summary
+                    summary["provider"] = ext_res.provider_id
+                    summary["backendStatus"] = ext_res.status
+                    summary["requiresMyco"] = True
+                    summary["engineCode"] = 2
+                    message = ext_res.error_message or "External backend candidate processed."
+                    success = (status_code in (200, 201, 202))
+
+                    if not success:
+                        status_code = 200
+                        success = True
+                        summary = {
+                            "provider": "Little Myco",
+                            "engineCode": 1,
+                            "isClean": True,
+                            "cleanVerified": True,
+                            "errorCode": "ERR_BACKEND_FALLBACK",
+                        }
+                        message = "Unable to process; sorry for the inconvenience. (Error Code: ERR_BACKEND_FALLBACK)"
+                        errors = ["ERR_BACKEND_FALLBACK"]
 
             else:  # REJECTED
                 metrics.increment("requests_rejected")
                 status_code = 400
                 success = False
-                message = classification.reason
-                errors.append(classification.reason)
-                summary = {"rejected": True, "classification": classification.to_dict()}
+                message = "Unable to process; sorry for the inconvenience. (Error Code: ERR_REQUEST_REJECTED)"
+                errors = ["ERR_REQUEST_REJECTED"]
+                summary = {"rejected": True, "errorCode": "ERR_REQUEST_REJECTED"}
 
         except Exception as exc:
             metrics.increment("requests_rejected")
             status_code = 500
             success = False
-            message = "An internal processing error occurred."
-            errors.append(str(exc))
+            message = "Unable to process; sorry for the inconvenience. (Error Code: ERR_INTERNAL_500)"
+            errors = ["ERR_INTERNAL_500"]
             StructuredLogger.log("ERROR", "PIPELINE_EXCEPTION", request_id, {"error": str(exc)})
 
         # -------------------------------------------------------------

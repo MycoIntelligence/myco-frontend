@@ -31,7 +31,8 @@ By understanding system invariants before reasoning over the diff, Myco catches 
   - Suggested remediation patches ready for 1-click review.
 - **Pre-Merge Quality Gate**: Can be configured as a required status check in GitHub branch protection rules to prevent high-severity architectural regressions from merging.
 
-## 4. Evaluation Pilot & Enterprise Pricing
-- **30-Day Collaborative Pilot**: Prospective enterprise teams evaluate Myco on real production pull requests within a dedicated sandbox. The Myco engineering team assists with architectural onboarding and baseline calibration.
-- **Enterprise Pricing Structure**: Custom pricing tailored to active developer seats, repository volume, and deployment architecture (cloud-managed SaaS or dedicated self-hosted VPC).
-- **How to Request a Pilot**: Engineering leaders can request a pilot via the "Request a pilot" button on the website, or by leaving their contact details directly with Myco Assistant.
+## 4. Evaluation Pilot & Pricing Plans
+- **Team Plan**: $20 per developer per month, or $16 per developer per month billed annually ($192/year, 20% savings). Includes full review pipeline, unlimited reviews and repositories, dashboard and analytics, email/community support, and a 30-day free trial with no credit card required. LLM usage is paid separately via customer API key.
+- **Enterprise Plan**: Custom pricing tailored to active developer seats, repository volume, and deployment architecture (cloud-managed SaaS or dedicated self-hosted VPC). Includes SSO/SAML, audit logs, custom connectors, advanced self-learning, and dedicated CSM.
+- **30-Day Collaborative Trial & Pilot**: Teams can evaluate Myco on production pull requests. Paid seats are admin-approved; only developers whose PRs are reviewed need a seat.
+- **How to Request a Pilot**: Engineering leaders can request a pilot via the "Request a pilot" button on the website, or by leaving their contact details directly with Myco Assistance.

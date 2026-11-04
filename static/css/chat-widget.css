@@ -364,14 +364,7 @@
 }
 
 .myco-chat-header__status-dot {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #2E8B57;
-  border: 2px solid var(--bg-soft, #EDF2F0);
+  display: none !important;
 }
 
 .myco-chat-header__details h3 {

@@ -103,6 +103,8 @@ class InternalProcessingEngine:
                         evidence_rule="SYNTAX-01 · GRAMMAR & REFERENCE INTEGRITY",
                         suggested_action=f"Declare '{bare_token}' with a declaration keyword (e.g., 'const {bare_token} = ...;') or provide a valid statement or query.",
                         is_merge_blocking=True,
+                        suggested_patch=f'const {bare_token} = "sample_value";',
+                        fixed_code=f'const {bare_token} = "sample_value";\n',
                     )
                 )
 
@@ -235,6 +237,8 @@ class InternalProcessingEngine:
                         evidence_rule="SQL-01 · UNBOUNDED_TABLE_MODIFICATION",
                         suggested_action="Specify a bounded WHERE clause (e.g. 'WHERE id = :id').",
                         is_merge_blocking=True,
+                        suggested_patch=f"{mod_match.group(0)} WHERE id = :id;",
+                        fixed_code=re.sub(r";?\s*$", " WHERE id = :id;\n", code.strip()),
                     )
                 )
             select_match = re.search(r"\bSELECT\s+\*\s+FROM\s+([a-zA-Z0-9_.]+)", code, re.IGNORECASE)
@@ -296,6 +300,8 @@ class InternalProcessingEngine:
                     evidence_rule="LOGIC-01 · ACCIDENTAL_ASSIGNMENT",
                     suggested_action=f"Replace assignment '=' with strict equality '==='.",
                     is_merge_blocking=True,
+                    suggested_patch=f"if ({assign_if.group(1)} === {assign_if.group(2)})",
+                    fixed_code=code.replace(assign_if.group(0), f"if ({assign_if.group(1)} === {assign_if.group(2)})"),
                 )
             )
 
@@ -307,15 +313,17 @@ class InternalProcessingEngine:
                     id=f"LOGIC-NAN-EQUALITY-L{line_no}",
                     category="logic",
                     severity=FindingSeverity.HIGH,
-                    title="Logic Defect: Invalid Direct Equality Comparison Against NaN",
-                    explanation="In IEEE 754 floating-point standard, NaN !== NaN is always true. Direct comparison with NaN will never match.",
-                    impact="Conditional check will never match, causing unreachable code paths.",
+                    title="Logic Defect: Direct Comparison with NaN (Always Evaluates to False)",
+                    explanation="NaN does not equal anything, including NaN. Direct equality checks with NaN always produce unexpected boolean results.",
+                    impact="Flawed conditional branching; branch may become unreachable dead code.",
                     file_path=file_path,
                     source_range=SourceRange(start_line=line_no, end_line=line_no),
                     evidence_snippet=lines[line_no - 1] if line_no <= len(lines) else nan_match.group(0),
-                    evidence_rule="LOGIC-02 · IEEE754_NAN_EQUALITY",
-                    suggested_action="Use 'Number.isNaN(value)' instead of direct equality comparison.",
-                    is_merge_blocking=False,
+                    evidence_rule="LOGIC-02 · NAN_COMPARISON",
+                    suggested_action="Use Number.isNaN(val) instead of direct equality comparison with NaN.",
+                    is_merge_blocking=True,
+                    suggested_patch="Number.isNaN(val)",
+                    fixed_code=re.sub(r"[a-zA-Z_$][a-zA-Z0-9_$]*\s*(?:===|==)\s*NaN|NaN\s*(?:===|==)\s*([a-zA-Z_$][a-zA-Z0-9_$]*)", r"Number.isNaN(\1)", code),
                 )
             )
 

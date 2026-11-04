@@ -74,7 +74,7 @@
     try {
       var keys = config.storageKeys || {};
       sessionStorage.setItem(keys.activeSeconds, String(this.elapsedActiveSeconds));
-    } catch (e) {}
+    } catch (e) { }
   };
 
   ChatWidget.prototype.isSessionDismissedOrOpened = function () {
@@ -93,7 +93,7 @@
     try {
       var keys = config.storageKeys || {};
       sessionStorage.setItem(keys.opened, 'true');
-    } catch (e) {}
+    } catch (e) { }
     this.stopAutoPopupTimer();
   };
 
@@ -101,7 +101,7 @@
     try {
       var keys = config.storageKeys || {};
       sessionStorage.setItem(keys.dismissed, 'true');
-    } catch (e) {}
+    } catch (e) { }
     this.stopAutoPopupTimer();
   };
 
@@ -248,8 +248,8 @@
     ].join('');
 
     // Typewriter Callout Speech Bubble
-    var avatarUrl = config.assistantAvatar || 'assets/myco-icon.svg';
-    var fallbackAvatarUrl = config.assistantAvatarFallback || 'assets/myco-icon.png';
+    var avatarUrl = config.assistantAvatar || '/assets/myco-icon.svg';
+    var fallbackAvatarUrl = config.assistantAvatarFallback || '/assets/myco-icon.svg';
     var callout = document.createElement('div');
     callout.id = 'myco-chat-callout';
     callout.className = 'myco-chat-callout';
@@ -264,7 +264,6 @@
       '<div class="myco-chat-callout__content">',
       '  <div class="myco-chat-callout__header">',
       '    <span class="myco-chat-callout__name">' + (config.assistantName || 'Myco Assistant') + '</span>',
-      '    <span style="font-size:10px;color:var(--muted)">· AI Assistant</span>',
       '  </div>',
       '  <div class="myco-chat-callout__text-line">',
       '    <span class="myco-typewriter-text" id="myco-typewriter-text"></span>',
@@ -279,7 +278,7 @@
     panel.id = 'myco-chat-panel';
     panel.className = 'myco-chat-panel';
     panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-label', (config.assistantName || 'Myco Assistant') + ' — AI Assistant');
+    panel.setAttribute('aria-label', config.assistantName || 'Myco Assistant');
     panel.setAttribute('aria-hidden', 'true');
 
     panel.innerHTML = [
@@ -287,7 +286,6 @@
       '  <div class="myco-chat-header__info">',
       '    <div class="myco-chat-header__avatar">',
       '      <img src="' + avatarUrl + '" onerror="this.src=\'' + fallbackAvatarUrl + '\'" alt="' + (config.assistantName || 'Myco Assistant') + ' Avatar" />',
-      '      <span class="myco-chat-header__status-dot" aria-label="Online"></span>',
       '    </div>',
       '    <div class="myco-chat-header__details">',
       '      <h3>' + (config.assistantName || 'Myco Assistant') + '</h3>',
@@ -629,7 +627,7 @@
     var greeting = config.messages && config.messages.greeting ? config.messages.greeting : "Hi there! 👋 I'm **Myco Assistant**. How can I help you today?";
 
     welcomeDiv.innerHTML = [
-      '<span class="myco-chat-welcome__badge">' + (config.assistantName || 'Myco Assistant') + ' · AI Assistant</span>',
+      '<span class="myco-chat-welcome__badge">' + (config.assistantName || 'Myco Assistant') + '</span>',
       '<div class="myco-chat-welcome__text">' + this.renderMarkdown(greeting) + '</div>',
       '<div class="myco-chat-suggestions">',
       '  <span class="myco-chat-suggestions__label">Suggested questions:</span>',

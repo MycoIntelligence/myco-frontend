@@ -54,14 +54,13 @@ export default function ChatPanel({ isOpen, onClose, messages, setMessages }) {
       id="myco-chat-panel"
       className={`myco-chat-panel ${isOpen ? "is-open" : ""}`}
       role="dialog"
-      aria-label="Myco Assistant — AI Assistant"
+      aria-label="Myco Assistant"
       aria-hidden={!isOpen}
     >
       <header className="myco-chat-header">
         <div className="myco-chat-header__info">
           <div className="myco-chat-header__avatar">
-            <img src="assets/myco-icon.svg" onError={(e) => { e.currentTarget.src = "assets/myco-icon.png"; }} alt="Myco Assistant Avatar" />
-            <span className="myco-chat-header__status-dot" aria-label="Online"></span>
+            <img src="assets/myco-icon.svg" alt="Myco Assistant Avatar" />
           </div>
           <div className="myco-chat-header__details">
             <h3>Myco Assistant</h3>

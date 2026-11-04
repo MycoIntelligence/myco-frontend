@@ -76,12 +76,11 @@ export default function ChatLauncher({ isOpen, hasUnread, onToggle }) {
           title="Click to chat with Myco Assistant"
         >
           <span className="myco-chat-callout__avatar" aria-hidden="true">
-            <img src="assets/myco-icon.svg" onError={(e) => { e.currentTarget.src = "assets/myco-icon.png"; }} alt="Myco Assistant avatar" />
+            <img src="assets/myco-icon.svg" alt="Myco Assistant avatar" />
           </span>
           <div className="myco-chat-callout__content">
             <div className="myco-chat-callout__header">
               <span className="myco-chat-callout__name">Myco Assistant</span>
-              <span style={{ fontSize: "10px", color: "var(--muted)" }}>· AI Assistant</span>
             </div>
             <div className="myco-chat-callout__text-line">
               <span className="myco-typewriter-text">{typedText}</span>
