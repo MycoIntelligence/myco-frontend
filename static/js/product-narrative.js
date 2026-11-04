@@ -4,9 +4,9 @@
     const engine = document.querySelector('.context-section[data-page-composed]');
     const hero = document.querySelector('#overview');
     const diff = document.querySelector('.diff-system-wrap');
-    const how = document.querySelector('#how');
+    const integration = document.querySelector('#integrate');
     const closing = document.querySelector('.page-closing');
-    if (!engine || !hero?.querySelector('h1') || !diff || !how || !closing) return false;
+    if (!engine || !hero?.querySelector('h1') || !diff || !integration || !closing) return false;
     if (hero.dataset.productNarrative) return true;
     hero.dataset.productNarrative = 'true';
     const set = (root, selector, text) => {
@@ -47,8 +47,6 @@
       set(proof, '.workflow-proof__eyebrow', 'AN ILLUSTRATIVE REVIEW');
       set(proof, '.workflow-proof__intro p', 'Myco traces relevant code paths and compares them with product requirements to identify issues that a diff alone can miss. This example shows how an agent retry can bypass an approval requirement.');
     }
-    set(how, '.how-journey__eyebrow', 'HOW PR REVIEW WORKS TODAY');
-    set(how, '.how-journey__headline p', 'Myco builds a scoped view of the change, relevant code and intended behavior. It reviews potential issues, validates findings and ranks what deserves attention. This review does not execute your tests.');
 
     const expansion = document.createElement('div');
     expansion.className = 'wrap quality-expansion-wrap';
@@ -60,7 +58,7 @@
         <li><span class="mono">03 / FAILURE EVIDENCE</span><h3>Run and investigate.</h3><p>Myco will execute relevant tests in supported, authorized environments and investigate failures, explaining likely causes with evidence and visible uncertainty.</p></li>
       </ol><p class="quality-expansion__outcome">The goal: less time from implementation complete to production, without compromising release quality. Engineers and QA teams stay in control.</p>
     </section>`;
-    how.after(expansion);
+    integration.before(expansion);
     set(closing, '.eyebrow', 'EXPLORE MYCO WITH YOUR TEAM');
     set(closing, 'h2', 'Bring quality feedback closer to the code.');
     set(closing, 'p', 'Explore today’s PR review with your team and discuss the quality workflows we are building next.');
