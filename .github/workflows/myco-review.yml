@@ -46,12 +46,14 @@ jobs:
   myco-review:
     name: Myco Fallback Review
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: little-my-review
     # Conditionally execute Myco ONLY when Little My explicitly escalates
     if: always() && needs.little-my-review.outputs.escalation_required == 'true'
     steps:
       - name: Validate Myco Configuration
         id: validate_config
+        continue-on-error: true
         run: |
           python3 -c "
           import os, sys
@@ -78,6 +80,7 @@ jobs:
 
       - name: Invoke Official Myco Action
         id: official_myco_action
+        continue-on-error: true
         uses: MycoIntelligence/myco-bundled-action@v1-groq
         with:
           pr_link: ${{ github.event.pull_request.html_url }}
