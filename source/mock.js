@@ -14,10 +14,10 @@ export const nav = {
 };
 
 export const hero = {
-  eyebrow: "AGENTIC INTELLIGENCE FOR ENGINEERING",
+  eyebrow: "Bringing Quality Assurance in a development workflow",
   titleLines: ["AI writes the code.", "Myco understands it."],
   body:
-    "Myco builds context across your engineering system, reasons over every relevant change, and surfaces the signals that deserve attention.",
+    "Myco reviews pull requests against product requirements, codebase context and dependencies, helping engineers catch bugs while the change is still fresh.",
   primary: { label: "See how it works", href: "#how" },
   secondary: { label: "Request a pilot", href: LINKEDIN_URL },
   graphLabel: "LIVE CONTEXT GRAPH \u00B7 1,284 ARTIFACTS",
