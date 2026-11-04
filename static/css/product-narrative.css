@@ -19,6 +19,13 @@
 @media(max-width:1100px){.quality-expansion{padding:48px 24px}.quality-expansion__header{grid-template-columns:1fr;gap:22px}.quality-expansion__header>div:last-child{padding-top:0;max-width:650px}.quality-expansion__steps{gap:0}.quality-expansion__steps li{padding-right:18px}.quality-expansion__steps li+li{padding-left:18px}}
 @media(max-width:600px){#overview.product-hero h1{font-size:clamp(32px,8vw,42px)!important}.quality-expansion{padding:44px 22px}.quality-expansion p{font-size:15px}.quality-expansion__steps{grid-template-columns:1fr}.quality-expansion__steps li,.quality-expansion__steps li+li{padding:22px 0;border-left:0;border-bottom:1px solid var(--border)}.quality-expansion .quality-expansion__outcome{border-top:0}.quality-expansion .quality-expansion__status{font-size:13px}.quality-expansion .quality-expansion__outcome{font-size:14px}}
 
-#overview .hero-grid .eyebrow { text-transform: none; }
+#overview .hero-grid > div:first-child .eyebrow {
+  text-transform: none;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: .012em !important;
+  text-wrap: balance;
+}
 #overview.product-hero .hero-grid .eyebrow,
 #overview.product-hero .hero-grid p { font-family: var(--font-body) !important; }
