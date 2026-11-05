@@ -446,9 +446,15 @@
 
     this.markOpened();
 
+    if (document.body) {
+      document.body.classList.add('myco-chat-open');
+    }
+
     var self = this;
     setTimeout(function () {
-      self.input.focus();
+      if (window.innerWidth > 640) {
+        self.input.focus();
+      }
       self.scrollToBottom();
     }, 150);
   };
@@ -459,6 +465,10 @@
     this.panel.setAttribute('aria-hidden', 'true');
     this.launcher.setAttribute('aria-expanded', 'false');
     this.launcher.setAttribute('aria-label', 'Open ' + (config.assistantName || 'Myco Assistant'));
+
+    if (document.body) {
+      document.body.classList.remove('myco-chat-open');
+    }
 
     if (explicitDismissal) {
       this.markDismissed();
@@ -471,7 +481,9 @@
     this.renderInitialGreeting();
     this.input.value = '';
     this.sendBtn.disabled = true;
-    this.input.focus();
+    if (window.innerWidth > 640) {
+      this.input.focus();
+    }
   };
 
   ChatWidget.prototype.scrollToBottom = function () {

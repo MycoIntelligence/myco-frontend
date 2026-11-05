@@ -2,6 +2,7 @@
 #overview.product-hero h1{font-size:clamp(36px,4.5vw,64px)!important;line-height:1.1!important;letter-spacing:-.045em!important;max-width:1060px!important;margin-inline:auto!important}
 #overview.product-hero h1 span{display:block}
 #overview.product-hero .hero-grid p{max-width:720px!important;margin-inline:auto!important}
+.quality-expansion-wrap{position:relative;z-index:2}
 .quality-expansion{padding:64px 34px}
 .quality-expansion__header{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr);gap:64px;align-items:start}
 .quality-expansion .eyebrow{font-size:10px;letter-spacing:.18em;margin:0 0 24px;color:var(--accent-dark)}
