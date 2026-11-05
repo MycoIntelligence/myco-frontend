@@ -6,6 +6,7 @@ export const LINKEDIN_URL = "https://www.linkedin.com/in/abhishika-agarwal/";
 export const nav = {
   links: [
     { label: "Overview", href: "#overview" },
+    { label: "How it works", href: "#how" },
     { label: "Integrate", href: "#integrate" },
     { label: "Pricing", href: "/pricing/" },
     { label: "Security", href: "#security" },

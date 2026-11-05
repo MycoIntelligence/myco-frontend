@@ -24,11 +24,8 @@
  #how::before{width:200px;right:-110px;top:-65px}
  #integrate::after{width:180px;left:-125px;top:-40px}
 }
-@media(max-width:900px){
- .context-section::before,
- #how::before,
- #integrate::after {
-  content:none !important;
-  display:none !important;
- }
+@media(max-width:700px){
+ .context-section::before{content:none}
+ #how::before{width:155px;right:-45px;top:-65px;opacity:.85}
+ #integrate::after{width:130px;left:-48px;top:-24px;opacity:.85}
 }
