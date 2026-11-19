@@ -1,0 +1,261 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-serif: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
+  --font-brand: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
+  --font-doto: var(--font-doto), "Doto", monospace;
+
+  --color-ink: #16181c;
+  --color-ink-2: #1e2229;
+  --color-deep: #0e1116;
+  --color-teal-900: #121a17;
+  --color-teal-850: #17231f;
+  --color-panel: #1b2622;
+  --color-slate-500: #5f6d68;
+  --color-slate-400: #71747b;
+  --color-mint-300: #a2c2b8;
+  --color-mint-200: #e4ece8;
+  --color-mint-100: #eef4f1;
+  --color-card-light: #e4e5e2;
+  --color-gray-050: #efeeea;
+  --color-gray-400: #71747b;
+  --color-muted-ink: #33363c;
+  --color-rail: #d5d5cf;
+  --color-rail-active: #0e946e;
+  --color-stat-card: #5c6e68;
+  --color-future-band: #b8dad0;
+  --color-ok: #4fa36b;
+  --color-warn: #c9983c;
+  --color-crit: #c0553c;
+  --color-accent: #0e946e;
+  --color-accent-dark: #0a7c5c;
+  --color-border: #d5d5cf;
+}
+
+:root {
+  --bg: #efeeea;
+  --bg-soft: #e9e9e5;
+  --panel: #e4e5e2;
+  --panel-cool: #dbdfe1;
+  --ink: #16181c;
+  --ink-2: #1e2229;
+  --ink-soft: #33363c;
+  --muted: #71747b;
+  --accent: #0e946e;
+  --accent-dark: #0a7c5c;
+  --verify: #4fa36b;
+  --border: #d5d5cf;
+  --border-strong: #c4c4bd;
+  --wire: #a9ada8;
+
+  --deep: #0e1116;
+  --teal-900: #121a17;
+  --teal-850: #17231f;
+  --slate-500: #5f6d68;
+  --slate-400: #71747b;
+  --mint-300: #a2c2b8;
+  --mint-200: #efeeea;
+  --mint-100: #eef4f1;
+  --card-light: #e4e5e2;
+  --gray-050: #efeeea;
+  --gray-400: #71747b;
+  --muted-ink: #33363c;
+  --rail: #d5d5cf;
+  --rail-active: #0e946e;
+  --stat-card: #5c6e68;
+  --future-band: #b8dad0;
+  --ok: #4fa36b;
+  --warn: #c9983c;
+  --crit: #c0553c;
+  --line-dark: rgba(203, 225, 227, 0.22);
+  --line-dark-hover: rgba(203, 225, 227, 0.75);
+  --line-light: rgba(22, 24, 28, 0.12);
+  --glass-light: rgba(255, 255, 255, 0.14);
+  --glass-light-border: rgba(255, 255, 255, 0.38);
+  --pill-on-dark: rgba(255, 255, 255, 0.1);
+  --pill-on-light: rgba(22, 24, 28, 0.08);
+  --black: #000000;
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur-med: 420ms;
+  --dur-slow: 900ms;
+
+  --seam: 64px;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+code,
+kbd,
+samp,
+pre,
+.font-mono {
+  font-feature-settings: "zero" 1;
+}
+
+::selection {
+  background: #0e946e;
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid #0e946e;
+  outline-offset: 3px;
+  border-radius: inherit;
+}
+
+/* Myco Typography Utilities */
+.eyebrow {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.display {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  line-height: 0.98;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.logo {
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.logo .y {
+  color: var(--accent);
+}
+
+/* Custom slim scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #2f3f3f;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2f3f3f transparent;
+}
+
+/* Film grain utility */
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+  mix-blend-mode: overlay;
+  opacity: var(--grain-opacity, 0.12);
+  z-index: 2;
+}
+
+/* Dash row reveal */
+.dash-row {
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 600ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 40ms);
+}
+
+[data-in="true"] .dash-row,
+.stagger-in .dash-row {
+  transform: scaleX(1);
+}
+
+/* Character blur text */
+.bt-char {
+  display: inline-block;
+  white-space: pre;
+  opacity: 0;
+  transform: translateY(0.18em);
+  filter: blur(14px);
+  animation:
+    bt-in 900ms var(--ease-out) forwards,
+    bt-drift 7s ease-in-out infinite;
+  animation-delay: calc(200ms + var(--i) * 28ms), calc(1800ms + var(--i) * 90ms);
+}
+
+@keyframes bt-in {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes bt-drift {
+  0%,
+  62%,
+  100% {
+    filter: blur(0);
+  }
+  78% {
+    filter: blur(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-char {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+
+  .dash-row {
+    transform: scaleX(1) !important;
+    transition: none !important;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

@@ -1,0 +1,30 @@
+:root {
+  --bg-deep: #101614;
+  --bg-deep-2: #16221e;
+  --bg-pale: #efeeea;
+  --bg-paper: #f4f4f2;
+  --ink-on-dark: #dce8e4;
+  --ink-muted-on-dark: rgba(220, 232, 228, 0.55);
+  --ink-on-light: #16181c;
+  --ink-muted-on-light: rgba(22, 24, 28, 0.55);
+  --accent: #0e946e;
+  --accent-hover: #0a7c5c;
+  --verify: #4fa36b;
+  --crit: #c0553c;
+  --line-dark: rgba(220, 232, 228, 0.14);
+  --line-light: rgba(22, 24, 28, 0.14);
+  --btn-solid: #16181c;
+  --btn-ink: #16181c;
+
+  --r-pill: 999px;
+  --r-card: 28px;
+  --r-inner: 16px;
+  --r-chip: 6px;
+
+  --font-display: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-body: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  --font-doto: var(--font-doto), "Doto", monospace;
+  --font-serif: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
+}
+
