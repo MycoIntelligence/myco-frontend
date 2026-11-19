@@ -1,0 +1,12 @@
+/* Atmospheric layers sit behind the interface and never obscure content. */
+.myco-atmosphere { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+.myco-atmosphere__haze { position:absolute; inset:0; background:linear-gradient(180deg,transparent 28%,rgba(175,207,180,.08) 52%,rgba(175,207,180,.17) 70%,transparent 90%); }
+.myco-atmosphere__wisp { position:absolute; left:-20%; width:140%; height:750px; background:url('/assets/myco-smoke.svg') center / 100% 100% no-repeat; opacity:.72; will-change:transform; }
+.myco-atmosphere__wisp--one { top:-4%; opacity:.9; animation:myco-wisp-one 23s ease-in-out infinite alternate; }
+.myco-atmosphere__wisp--two { top:16%; opacity:.72; transform:scaleX(-1); animation:myco-wisp-two 30s ease-in-out infinite alternate; }
+@keyframes myco-wisp-one { from{transform:translate3d(-4%,0,0) scale(1)} to{transform:translate3d(5%,-26px,0) scale(1.1)} }
+@keyframes myco-wisp-two { from{transform:translate3d(4%,18px,0) scaleX(-1)} to{transform:translate3d(-4%,-20px,0) scaleX(-1.12)} }
+.md-hero { isolation:isolate; }
+.md-hero > .md-wrap { position:relative; z-index:1; }
+@media(max-width:760px) { .myco-atmosphere__wisp { left:-65%; width:230%; height:600px; } .myco-atmosphere__wisp--one { top:0; } .myco-atmosphere__wisp--two { top:16%; } }
+@media(prefers-reduced-motion:reduce) { .myco-atmosphere__wisp { animation:none; will-change:auto; } }

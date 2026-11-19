@@ -1,219 +1,92 @@
-# Myco Website & Myco Assistant (RAG-Powered AI Chatbot)
+# VELDT Marketing Platform
 
-Current website version: light-only, graphite/teal palette, approved horizontal Myco logo, and text-led hero with an integrated production-ready **Myco Assistant** Retrieval-Augmented Generation (RAG) chatbot.
+VELDT is a production-grade, single-page marketing website and release reliability platform built with Next.js 15, React 19, TypeScript, Tailwind CSS v4, and motion.
 
----
+## Getting Started
 
-## 1. Quick Start: Local Preview
+### Prerequisites
 
-To launch the local preview server with the full RAG pipeline and escalation endpoints:
+- Node.js 20.x or later
+- npm 10.x or later
 
-```bash
-python3 serve.py
-```
-
-Then open `http://127.0.0.1:8766` in your browser.
-
-To run the automated RAG pipeline test suite:
+### Installation
 
 ```bash
-python3 -m unittest test_rag_pipeline.py -v
+npm install
 ```
 
----
+### Environment Variables
 
-## 2. Myco Assistant: Architecture & RAG Pipeline
-
-Myco Assistant is a production-ready, grounded conversational assistant designed to answer visitor questions about Myco's product capabilities, context-first engineering intelligence, security posture, and competitor comparisons without hallucinating or leaking confidential implementation details.
-
-### System Architecture
-
-```text
-Frontend (Browser)
-  └── Myco Assistant Widget (Vanilla JS, floating widget, safe Markdown rendering)
-        └── POST /api/chat/ask
-              │
-              ├── Rate Limiting & Input Sanitization
-              │     └── Length limits, character encoding, IP-based sliding window
-              │
-              ├── Security & Confidentiality Guard
-              │     ├── Prompt injection rejection (direct / developer mode / DAN)
-              │     └── Policy checks for internal architecture, private AST heuristics, secrets
-              │
-              ├── Hybrid Retrieval Engine (Vector Semantic + Lexical BM25)
-              │     ├── Deterministic subword n-gram hash vector projection
-              │     ├── BM25 term frequency / inverse document frequency ranking
-              │     └── Access-Control Filter (strictly excludes 'restricted' sources)
-              │
-              ├── Evidence Sufficiency & Keyword Coverage Evaluator
-              │     ├── Top score thresholding (RAG_SIMILARITY_THRESHOLD = 0.35)
-              │     ├── Multi-term query keyword coverage validation (>= 40% coverage)
-              │     └── Honest Refusal if evidence is insufficient (UNKNOWN status)
-              │
-              ├── Context Assembly & Boundary Isolation
-              │     └── Preserves document names, section titles, and citation metadata
-              │
-              ├── Groq LLM Inference Service (Centralized Client)
-              │     ├── Model: llama-3.3-70b-versatile (or llama-3.1-8b-instant)
-              │     ├── Exponential backoff retries, timeouts, and quota handling
-              │     └── Local grounded fallback synthesizer for offline preview
-              │
-              ├── Output Validation & Secret Scrubber
-              │     └── Inspects generated text and redacts internal tokens/heuristics
-              │
-              └── Formatted Delivery with Citations
-                    └── Structured Markdown tables, lists, and [Source: Doc > Sec] pills
-```
-
----
-
-## 3. Knowledge Base & Document Ingestion
-
-Approved documentation resides in `pipeline/rag/documents/`:
-
-| Document | Access Level | Description |
-|---|---|---|
-| `myco_core.md` | `public` | Context-first architectural philosophy, P0/P1 invariants, pilot workflow, pricing, and integrations |
-| `competitor_matrix.md` | `public` | Structured comparison matrix and qualitative analysis for Myco vs **CodeRabbit**, **Graptile**, and **CodeAnt** |
-| `security_privacy.md` | `public` | Zero model training guarantee, tenant isolation, dedicated VPC options, secret redaction, SOC 2 Type II |
-| `restricted_internal.md` | `restricted` | Private AST heuristics, internal detector tokens, and internal architecture (strictly access-controlled) |
-
-### Adding, Updating, or Removing Documents
-
-1. **Add or Edit Documents**: Add `.md` files to `pipeline/rag/documents/` with standard YAML frontmatter:
-   ```markdown
-   ---
-   title: "Document Title"
-   access: "public"  # Use "public" for assistant visibility or "restricted" for confidential
-   version: "1.0"
-   ---
-   ## Section Heading
-   Document content here...
-   ```
-2. **Re-index Knowledge Base**: Run the re-indexing command to regenerate the deterministic vector index and BM25 tables:
-   ```bash
-   python3 -c "from pipeline.rag.pipeline import rag_pipeline; rag_pipeline.initialize(force_reload=True)"
-   ```
-   This updates `pipeline/rag/index_cache.json`.
-3. **Delete Documents**: Remove the markdown file from `pipeline/rag/documents/` and run the re-indexing command above.
-
----
-
-## 4. Groq LLM Integration & Configuration
-
-Groq is integrated via a centralized server-side service (`pipeline/rag/groq_client.py` and `api/chat/ask.js`). Credentials are read exclusively from environment variables and never exposed to the client.
-
-### Environment Variables (`.env`)
-
-```ini
-# Groq API Key (https://console.groq.com/keys)
-GROQ_API_KEY=gsk_...
-
-# Groq Model Selection
-# - llama-3.3-70b-versatile (Default / recommended for deep reasoning)
-# - llama-3.1-8b-instant    (Low-latency high-speed alternative)
-GROQ_MODEL=llama-3.3-70b-versatile
-GROQ_BASE_URL=https://api.groq.com/openai/v1
-GROQ_TIMEOUT_SECONDS=15.0
-GROQ_MAX_RETRIES=2
-GROQ_TEMPERATURE=0.1
-GROQ_MAX_TOKENS=800
-
-# Retrieval & Answerability Thresholds
-RAG_SIMILARITY_THRESHOLD=0.35
-RAG_ANSWERABILITY_THRESHOLD=0.42
-RAG_HYBRID_VECTOR_WEIGHT=0.65
-RAG_HYBRID_LEXICAL_WEIGHT=0.35
-
-# Resend Notification Provider (for Escalations)
-RESEND_API_KEY=re_...
-PILOT_EMAIL_FROM=onboarding@resend.dev
-PILOT_EMAIL_TO=team@mycointelligence.com
-CHAT_ESCALATION_EMAIL_TO=pilot@mycointelligence.com
-```
-
-### Offline & Resilience Fallback
-
-If `GROQ_API_KEY` is not configured or Groq experiences an upstream outage, the system automatically engages its local grounded fallback synthesizer (`model: "local-grounded-fallback"`), delivering verified facts directly from indexed documents without hallucinating.
-
----
-
-## 5. Security & Product Confidentiality Safeguards
-
-Myco Assistant enforces a strict multi-layer defense-in-depth model:
-
-1. **Access-Controlled Retrieval**: The vector store filters by `access_filter="public"`. Documents tagged with `access: "restricted"` are excluded at search time and never enter the prompt context.
-2. **Pre-Retrieval Policy Filter**: Queries targeting internal system prompts, internal AST heuristics (`InternalProcessingEngine`), private algorithms, or backend workflows immediately trigger the standard refusal:
-   > *"I can help explain Myco’s publicly documented features and capabilities, but I can’t share confidential implementation details or internal system architecture."*
-3. **Prompt Injection Resistance**: Instruction overrides ("ignore previous instructions", "you are now in developer mode", "DAN") are detected and neutralized.
-4. **Output Secret Scrubbing**: All LLM completions pass through `security_guard.validate_and_scrub_output()`, checking for accidental leaks of tokens, salts, or confidential classifications.
-5. **Strict Grounding & Evidence Calibration**: Multi-term questions require >= 40% keyword coverage in retrieved documentation. Queries without verified answers trigger honest refusal:
-   > *"I’m sorry, but I don’t have enough verified information to answer that question accurately. Please contact the Myco team for further assistance."*
-
----
-
-## 6. Competitor Comparisons: CodeRabbit, Graptile, and CodeAnt
-
-Legacy comparisons with SonarQube and GitHub Copilot have been deprecated. Myco Assistant objectively compares Myco against contemporary code intelligence tools:
-
-- **CodeRabbit**: High-level PR walkthrough summaries, sequence diagrams, and line-by-line developer comments. Myco acts as the architectural invariant enforcement layer blocking P0 regressions.
-- **Graptile (Greptile)**: Graph indexing connecting codebase insights to autonomous coding agents (Cursor, Devin). (Note: Specific benchmark metrics for Graptile remain unverified and are explicitly labeled as such).
-- **CodeAnt (CodeAnt AI)**: Agentic security posture, compliance frameworks (SOC 2, HIPAA), and pre-commit CLI linting (`codeant review`). Myco provides whole-system context reasoning across polyglot microservice boundaries before merge.
-
----
-
-## 7. Human Escalation for Unanswered Questions
-
-When an inquiry is unanswerable (`status: "UNKNOWN"`) or targets restricted enterprise details (`status: "RESTRICTED"`), the assistant offers a human escalation path:
-
-- Endpoint: `POST /api/chat/escalations`
-- Collects: Visitor Name, Work Email, Original Question, Optional Company/Phone, and Conversation Context.
-- Protections: Rate limiting (5 requests / 5 minutes per IP), anti-spam honeypot detection, CRLF header injection defense, input length limits.
-- Delivery: Sends structured notification via Resend with visitor email set as `Reply-To`.
-
----
-
-## 8. Frontend Branding & Visual Assets
-
-- **Assistant Name**: Rebranded throughout to **Myco Assistant**.
-- **Official Logo**: Uses the official vector icon `assets/myco-icon.svg` across all assistant surfaces without any screenshot artifact or status indicator dot.
-- **Typewriter Effect**: Proactive typewriter callout on landing highlighting capabilities and competitor comparisons.
-- **Markdown Rendering**: Safe client-side parser rendering tables, bold text, lists, and discrete verified source badges (`[Source: Document > Section]`).
-
----
-
-## 9. Automated Testing
-
-Run the test suites:
+Copy `.env.example` to `.env.local`:
 
 ```bash
-# 1. RAG Pipeline, Grounding, Security, Competitors & GitHub Integration (26 tests)
-python3 -m unittest test_rag_pipeline.py -v
-
-# 2. Chat Escalation, Lead Capture, & Notification Integrity (20 tests)
-python3 -m unittest test_chat_assistant.py -v
+cp .env.example .env.local
 ```
 
----
+Variables:
+- `NEXT_PUBLIC_APP_URL`: The destination URL for "Sign in" buttons (default: `https://app.veldt.dev`).
+- `NEXT_PUBLIC_SITE_URL`: The canonical URL for SEO metadata, Open Graph tags, and sitemaps (default: `https://veldt.dev`).
 
-## 10. Dual-Mode Architecture: GitHub Data Fetching vs .env Testing Mode
+### Development Server
 
-The API is architected to operate seamlessly in two complementary modes:
+```bash
+npm run dev
+```
 
-### A. Live GitHub Remote Fetching
-The platform dynamically fetches data from GitHub for both code analysis and RAG documentation ingestion:
-- **Pull Request Diffs**: Fetches metadata, unified diffs, and modified file trees using the GitHub v3 API (`/repos/{owner}/{repo}/pulls/{number}`).
-- **File Blobs**: Fetches and decodes source files at any branch, tag, or SHA commit.
-- **Repository Documentation Trees**: Recursively fetches Markdown documents for dynamic indexing into the RAG vector store.
-- **SSRF & Security Safeguards**: Strictly whitelists `github.com` and `raw.githubusercontent.com`. Private IP addresses (`127.0.0.1`, RFC 1918), internal hostnames, and cloud metadata services (`169.254.169.254`) are systematically rejected with HTTP 400.
-- **API Endpoints**:
-  - `POST /api/v1/github/fetch`: Fetches PR, file, or tree by URL or owner/repo/number.
-  - `GET /api/v1/github/fetch?url=...`: URL-queryable preview endpoint.
-  - `POST /api/v1/analyze`: When `repoUrl` is supplied, fetches the PR diff directly from GitHub and analyzes it for architectural invariant violations.
-  - `POST /api/chat/ingest/github`: Dynamically indexes documentation from any remote GitHub repository into the live knowledge base.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-### B. Hermetic Offline Testing via `.env`
-For fast, deterministic unit tests and offline development without GitHub API rate limits or network dependencies:
-- Setting `TEST_GITHUB_PR_DIFF` in `.env` or the test runner immediately serves mock PR diffs.
-- Setting `TEST_GITHUB_FILE_CONTENT` in `.env` provides hermetic file fixtures.
-- Local Markdown files in `pipeline/rag/documents/` serve as the base approved knowledge source when remote repositories are not configured.
+### Production Build
+
+```bash
+npm run build
+npm start
+```
+
+### Quality Gates and Testing
+
+```bash
+# Check for emojis (strict zero-emoji policy)
+node scripts/check-no-emoji.mjs
+
+# Check for forbidden reference phrases
+node scripts/check-no-reference-copy.mjs
+
+# Run Vitest unit tests
+npm test
+
+# Run TypeScript type check
+npm run typecheck
+```
+
+## Content Configuration
+
+All site copy, customer claims, partner marks, and pricing details live in a single centralized configuration file:
+
+`lib/content.ts`
+
+To rebrand or update copy:
+1. Open `lib/content.ts`.
+2. Update the brand name, taglines, section headlines, statements, and FAQ answers.
+3. Replace placeholder figures with verified, audited customer data before launch.
+4. Components automatically consume these values without requiring JSX edits.
+
+## Connecting pilot requests
+
+The pilot form sends validated requests to a server-side HTTPS webhook. Set `LEAD_WEBHOOK_URL` in the deployment environment to an endpoint you control that accepts JSON POST requests and returns a 2xx response only after accepting the request. Optionally set `LEAD_WEBHOOK_TOKEN` for a bearer authorization header. These values must remain server-side; do not use a `NEXT_PUBLIC_` prefix.
+
+The payload contains `id`, `timestamp`, `fullName`, `workEmail`, `company`, `industry`, `teamSize`, and `message`. The endpoint must handle and store this personal information appropriately. The form reports failure if delivery is unconfigured, times out after ten seconds, redirects, or returns a non-2xx response. A timeout can be ambiguous if the receiver accepted the request before the connection failed; the receiver should deduplicate using `id` where possible. Configure monitoring and test a real submission end to end before launch. The existing in-memory rate limit is per server instance and is not a distributed abuse control.
+
+## Image Pipeline and Fallbacks
+
+1. The site includes zero-asset procedural SVG fallbacks (`components/ui/PhotoFallback.tsx`) that generate motion-blurred and sharp duotone graphics directly from code.
+2. To use custom photography, place source images into `public/images/` as specified in section 16 of the prompt (`industry-01.webp` through `industry-06.webp`, sharp variants, and blog images).
+3. The sharp image pipeline can be run via `scripts/make-variants.mjs` using the Sharp image processor.
+
+## Architecture Highlights
+
+- Fixed two-layer header with a dynamic clip-path seam cutting through logos and pills at section boundaries.
+- Continuous pinned timeline state machine driven by scroll progress.
+- Procedural streak texture canvas generator running entirely in memory with parallax translation.
+- Bitmapped dash-glyph rendering engine for numerals and custom pictograms.
+- Full screen reader accessibility landmarks, accessible names, skip links, and reduced-motion fallbacks.
+
