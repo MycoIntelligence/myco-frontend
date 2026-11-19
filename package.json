@@ -10,6 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
+  "allowScripts": {
+    "esbuild": true,
+    "sharp": true
+  },
   "dependencies": {
     "clsx": "^2.1.1",
     "gsap": "^3.15.1",
