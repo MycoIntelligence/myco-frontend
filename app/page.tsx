@@ -7,8 +7,6 @@ import { ScrollExperience } from "@/src/components/ScrollExperience";
 import { CinematicStory } from "@/src/components/CinematicStory";
 import { ConnectedWorkflow } from "@/src/components/ConnectedWorkflow";
 import { Playground } from "@/src/components/Playground";
-import { AtmosphericSmoke } from "@/src/components/AtmosphericSmoke";
-import { HeroParticles } from "@/src/components/HeroParticles";
 
 const questions = [
   ["What can we evaluate today?", "Contextual pull request review in GitHub is the live foundation. Connected sources, repository scope and supported review actions are confirmed for your configuration."],
@@ -19,10 +17,8 @@ const questions = [
 
 export default function HomePage() {
   return <><Nav /><ScrollExperience /><main id="main" className="md-site">
-    <section className="md-hero" id="overview" data-theme="dark">
-      <AtmosphericSmoke />
-      <HeroParticles />
-      <div className="md-forest-scene" aria-hidden="true" /><div className="md-wrap">
+    <section className="md-hero" id="overview" data-theme="light">
+      <div className="md-sculptural-scene" aria-hidden="true" /><div className="md-wrap">
         <div className="md-kicker"><span className="md-dot" /> CONTEXTUAL PULL REQUEST REVIEW</div>
         <div className="md-hero-grid">
           <div>

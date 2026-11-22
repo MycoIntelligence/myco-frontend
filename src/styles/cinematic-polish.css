@@ -1,5 +1,5 @@
 /* A quieter editorial rhythm for Myco's original visual language. */
-.md-site { background: #f2f4ec; }
+.md-site { background: #f7f9f8; }
 .md-site .md-section-head h2,.md-site .md-problem h2,.md-site .md-evaluate h2,.md-site .md-faq h2 { letter-spacing: -.055em; font-weight: 500; }
 .md-site .md-kicker { letter-spacing: .14em; }
 .md-site .md-process { background: #e2eadc; border-block: 1px solid #cad8c6; }

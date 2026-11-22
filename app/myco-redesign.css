@@ -35,3 +35,18 @@
 @media(prefers-reduced-motion:reduce){.md-forest-scene{transform:none!important}}
 .md-workspace-sidebar>strong{color:#21432f!important}
 .hero-particles{position:absolute;inset:0 0 auto;width:100%;z-index:0;pointer-events:none}
+
+/* Match the live Myco site's light sculptural background. */
+.md-site{background:#f7f9f8}
+.md-hero{background:#f7f9f8;color:#122024}
+.md-sculptural-scene{position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,transparent 65%,#f7f9f8 100%),#fff url('/assets/sculptural-layers.jpg') center top/100% auto no-repeat}
+.md-hero::after{content:none}
+.md-hero>.md-wrap>.md-kicker{background:#ffffffb3;border-color:#d5ddda;color:#52645f}
+.md-hero .md-dot{background:#4f776e;box-shadow:none}
+.md-hero h1{color:#122024}.md-hero h1>span{color:#47685e}
+.md-hero .md-lead,.md-hero-copy{color:#4d5c58}
+.md-hero .md-light{background:#152125;color:#fff}.md-hero .md-light:hover{background:#2c4440}
+.md-hero .md-text-link{background:#ffffffb3;border-color:#aebbb6;color:#122024}.md-hero .md-text-link:hover{background:#e8eeeb}
+.md-hero-note{color:#52645f}
+.md-hero-bottom{background:transparent;color:#52645f;border-color:#d5ddda;text-shadow:none}
+@media(max-width:760px){.md-sculptural-scene{background-size:auto,auto 720px;background-position:center,center top}}
