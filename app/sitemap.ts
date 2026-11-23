@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { siteContent } from "@/lib/content";
 import { articles } from "@/lib/articles";
+import { features } from "@/src/marketing/feature-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = siteContent.brand.siteUrl;
@@ -11,7 +12,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/workflow",
     "/pricing",
     "/faq",
-    "/blog",
+    "/blog/myco-vs-coderabbit",
+    "/security",
+    "/contact",
+    ...features.map(({ slug }) => `/features/${slug}`),
     "/book-demo",
     "/terms",
     "/privacy",

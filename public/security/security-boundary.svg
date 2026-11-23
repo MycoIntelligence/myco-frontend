@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144"><defs><linearGradient id="glass" x2=".7" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#416c96" stop-opacity=".24" /><stop offset="1" stop-color="#749ec7" stop-opacity=".04" /></linearGradient><linearGradient id="sheet" x2=".8" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#2d4d6a" /><stop offset="1" stop-color="#17283c" /></linearGradient></defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 89 72 116 126 89 72 62Z" fill="#111c2b" stroke="#42617a" stroke-width="1.15" />
+  <path d="M18 89v7l54 27 54-27v-7l-54 27Z" fill="#152437" stroke="#42617a" stroke-width="1.15" />
+  <path d="M27 46 72 23 117 46 72 69Z" fill="#71b2e4" fill-opacity=".07" stroke="#7ca9ca" stroke-width="1.25" />
+  <path d="M27 46v40l45 23V69Z" fill="url(#glass)" stroke="#7299b7" stroke-width="1.25" />
+  <path d="M117 46v40l-45 23V69Z" fill="#477cb3" fill-opacity=".13" stroke="#7299b7" stroke-width="1.25" />
+  <path d="M72 23v40M27 86l45-23 45 23" fill="none" stroke="#6685a0" stroke-width="1" stroke-dasharray="2.6 3.3" opacity=".65" />
+  <path d="M44 69 72 55l28 14-28 14Z" fill="#223d57" stroke="#8db7d8" stroke-width="1.15" />
+  <path d="M64 66l-7 3.5 7 3.5m16-7 7 3.5-7 3.5m-5-8-5 9" stroke="#c3e5ff" stroke-width="1.35" fill="none" />
+  <circle cx="27" cy="46" r="2" fill="#b3d6ef" />
+  <circle cx="117" cy="46" r="2" fill="#b3d6ef" />
+  <path d="M110 77c5 3 9 4.5 14 5v10c0 8-6.5 14-14 17-7.5-3-14-9-14-17V82c5-.5 9-2 14-5Z" fill="#192d42" stroke="#a1c9e8" stroke-width="1.35" />
+  <path d="m104.5 92 4 4 7-8" fill="none" stroke="#c7e5ff" stroke-width="1.55" />
+</g></svg>
