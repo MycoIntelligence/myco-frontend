@@ -1,8 +1,8 @@
 export const features = [
   {
-    slug:'pr-review', label:'PR Review',
-    title:['See what your PR','could break before merge.'],
-    explanation:'What you get in a pull request review',
+    slug:'pr-review', label:'PR Review', beta:false,
+    title:['See what your PR','could break before you merge'],
+    explanation:'Check the change against requirements and see what could break in this repo or another',
     summary:'Myco checks pull requests against product requirements and traces what could break downstream. Each bug, regression, or potential security finding includes the exact line, supporting evidence, and likely impact.',
     indexCopy:'Catch changes that break the spec or downstream behavior.',
     sections:[
@@ -13,23 +13,23 @@ export const features = [
     example:'Checkout correctly charges $85 after a discount, but the receipt still shows $100. Myco connects the discrepancy to the requirement that the receipt must match the charge and points to the line that uses the original subtotal.',
   },
   {
-    slug:'testing', label:'Testing & Test Generation',
-    title:['Turn requirements','into tests that can fail.'],
-    explanation:'From requirement to test result',
-    summary:'We’re building Myco to find what your tests miss, generate tests from your requirements, and show what happened when they ran. Engineers can review the proposed coverage and use the results to decide what’s ready to merge.',
-    indexCopy:'Turn a coverage gap into a test case.',
+    slug:'testing', label:'Testing & Test Generation', beta:false,
+    title:['Turn requirements into a test plan','and identify test coverage gaps'],
+    explanation:'Find missing coverage, generate test cases, and see which checks fail',
+    summary:'Test coverage analysis and test plan generation are live. Myco checks what your existing tests cover against the requirements for the change and posts the gaps in an inline GitHub comment.',
+    indexCopy:'Find coverage gaps and get a test plan in GitHub.',
     sections:[
-      ['Find gaps and generate reviewable tests','Myco will compare your requirements with what existing tests actually assert, then propose cases for missing behavior. Each case will show the setup, test data, steps, and expected result so engineers can check it before adding it to the suite.'],
-      ['Test the behavior at the right level','Cover pricing rules with unit tests, UI behavior with component tests, and service handoffs with integration or API contract tests. For a complete user journey, Myco will exercise the flow in a browser against an authorized test environment.'],
-      ['Run affected tests and explain failures','Myco will run the checks relevant to the change and show the failing step or assertion, the expected and actual results, and supporting evidence from the run. Engineers can rerun the case to see whether the failure reproduces.'],
-      ['Reuse tests when related code changes','Keep approved tests in your regression suite so the same behavior can be checked on later changes. The requirement and run evidence give developers and QA a shared starting point, reducing the work of recreating failures before sign-off.'],
+      ['See what your tests miss','The PR comment calls out how many cases are missing and which behaviours need a check. Reviewers can see what still needs coverage before they approve the change.'],
+      ['Open the test plan from the PR','The same comment links to an Excel sheet. It groups numbered test cases by scenario and shows the expected result and coverage status for each case.'],
+      ['Use the plan to add the right tests','Engineers use the proposed cases and expected results to write the checks that matter for the change.'],
+      ['Test failure analysis','Myco pinpoints why a test failed and recommends a fix that addresses the underlying cause.',true],
     ],
-    example:'A payment test already confirms the customer is charged $85. Myco proposes a second check for the receipt returned by checkout. If checkout returns a $100 receipt total, the failing assertion shows the expected and actual amounts.',
+    example:'In checkout PR #214, the existing test covers a receipt with no discount. Myco flags two gaps: the receipt should show $85 after a $15 discount on a $100 order, and an explicit $0 discount should skip the default. The inline comment links to an Excel test plan with the expected results, so the author knows which checks to add before merging.',
   },
   {
-    slug:'pre-prod-validation', label:'Pre-Prod Validation',
-    title:['Test the exact release','in a production-like environment.'],
-    explanation:'From staging checks to release sign-off',
+    slug:'pre-prod-validation', label:'Pre-Prod Validation', beta:true,
+    title:['Know if the release candidate','is ready to ship'],
+    explanation:'Validate customer workflows, integrations, and performance in a production-like environment',
     summary:'We’re building Myco to validate features in staging and test the exact release candidate in isolated, production-like infrastructure. Release owners get evidence on customer workflows, integrations, and performance.',
     indexCopy:'Check the release candidate in staging.',
     sections:[
@@ -42,9 +42,9 @@ export const features = [
     example:'The checkout candidate passes the receipt and billing checks. At 100 checkouts per minute, p95 latency rises from 245 ms on the current release to 420 ms on the candidate, above the 350 ms limit. Myco’s illustrative report recommends holding the release, inspecting the slow checkout traces, and rerunning the load check after a fix.',
   },
   {
-    slug:'production-monitoring', label:'Production Monitoring',
-    title:['Trace unexpected behavior','back to the release.'],
-    explanation:'What happens after an alert',
+    slug:'production-monitoring', label:'Production Monitoring', beta:true,
+    title:['See what changed','after you shipped'],
+    explanation:'Link unexpected behaviour to the rollout and give on-call engineers a place to start',
     summary:'We’re building Myco to monitor how changed workflows behave under real traffic. When a signal moves outside expectations, Myco will use what the team intended to ship and what actually went out to help the on-call engineer decide where to look.',
     indexCopy:'Trace unexpected behavior back to a release.',
     sections:[

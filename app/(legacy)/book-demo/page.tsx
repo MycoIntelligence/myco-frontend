@@ -141,7 +141,7 @@ function BookDemoContent() {
           </div>
 
           <h1 className="font-sans text-[clamp(36px,4.8vw,76px)] font-normal leading-[0.97] tracking-[-0.03em] uppercase text-[#071a1b] max-w-[14ch] [text-wrap:balance]">
-            SEE MYCO IN YOUR WORKFLOW.
+            SEE MYCO IN YOUR WORKFLOW
           </h1>
 
           <p className="mt-6 text-[20px] leading-[1.4] text-[#44595a] max-w-[520px] [text-wrap:pretty]">

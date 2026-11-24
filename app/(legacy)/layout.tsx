@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, JetBrains_Mono, Doto } from "next/font/google";
 import { SmoothScrollProvider } from "@/src/components/SmoothScrollProvider";
 import { MycoAssistant } from "@/src/components/MycoAssistant";
 import { siteContent } from "@/src/lib/content";
@@ -12,27 +11,6 @@ import "@/src/styles/journey.css";
 import "@/src/styles/playground.css";
 import "@/src/styles/connected-workflow.css";
 import "@/src/styles/cinematic-polish.css";
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-plus-jakarta",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
-
-const doto = Doto({
-  subsets: ["latin"],
-  weight: ["700"],
-  variable: "--font-doto",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: siteContent.meta.title,
@@ -91,10 +69,7 @@ export default function RootLayout({
   };
 
   return (
-    <html
-      lang="en"
-      className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} ${doto.variable}`}
-    >
+    <html lang="en">
       <head>
         <script
           dangerouslySetInnerHTML={{

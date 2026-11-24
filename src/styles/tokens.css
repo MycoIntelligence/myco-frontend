@@ -21,10 +21,9 @@
   --r-inner: 16px;
   --r-chip: 6px;
 
-  --font-display: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --font-body: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
-  --font-doto: var(--font-doto), "Doto", monospace;
-  --font-serif: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
+  --font-display: var(--site-sans);
+  --font-body: var(--site-sans);
+  --font-mono: var(--site-mono);
+  --font-serif: var(--site-sans);
 }
 

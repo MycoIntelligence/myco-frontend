@@ -4,6 +4,7 @@ import Link from "next/link"
 import {useReducedMotion} from 'motion/react'
 import {SiteHeader, SiteFooter} from './home-sections'
 import {SmoothCursor} from './smooth-cursor'
+import {DitherFlow} from './dither-flow'
 
 const comparedProducts = [
   {
@@ -19,7 +20,7 @@ const comparedProducts = [
   {
     name: 'Myco',
     logo: '/marketing/myco-mark.png',
-    description: 'Feature QA that starts in your pull request.',
+    description: 'Review code based on intended feature behavior.',
     capabilities: [
       'Checks whether the code matches the available product requirements',
       'Traces what could break across authorized repositories',
@@ -53,14 +54,15 @@ function ComparisonCards() {
 function Comparison() {
   return <main className="blog-main comparison-main">
     <article className="blog-article">
-      <header className="blog-heading">
-        <span className="blog-kicker">Tool comparison</span>
-        <h1>Myco vs CodeRabbit</h1>
-        <p>CodeRabbit and Myco both review pull requests in GitHub. Myco checks whether the change meets your product requirements, follows what could break across repositories, and shows the exact line behind each finding.</p>
-        <div className="blog-hero-actions">
-          <Link href="/#pilot">Request your 14-day free trial <span aria-hidden="true">&#8599;</span></Link>
-        </div>
-      </header>
+      <DitherFlow className="blog-dither-flow">
+        <header className="blog-heading">
+          <h1>Myco vs CodeRabbit</h1>
+          <p>CodeRabbit and Myco both review pull requests in GitHub. Myco checks whether the change meets your product requirements, follows what could break across repositories, and shows the exact line behind each finding.</p>
+          <div className="blog-hero-actions">
+            <Link href="/#pilot">Request your 14-day free trial <span aria-hidden="true">&#8599;</span></Link>
+          </div>
+        </header>
+      </DitherFlow>
       <ComparisonCards />
       <div className="blog-reading-layout">
       <nav className="blog-contents" aria-label="On this page">

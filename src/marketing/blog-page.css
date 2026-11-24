@@ -16,6 +16,13 @@
   --article-border: #292f3a;
   --article-panel: #101318;
 }
+.blog-dither-flow {
+  background: transparent;
+}
+.blog-dither-flow .flow-dither {
+  height: 100%;
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+}
 .blog-heading {
   display: grid;
   justify-items: center;
@@ -25,16 +32,7 @@
   background: transparent;
   text-align: center;
 }
-.blog-kicker {
-  padding: 5px 12px;
-  border: 1px solid #3a506a;
-  border-radius: 999px;
-  color: #b7dbfc;
-  font-size: 13px;
-  font-weight: 550;
-}
 .blog-heading h1 {
-  margin-top: 22px;
   font-size: clamp(33px, 5vw, 60px);
   text-wrap: balance;
 }

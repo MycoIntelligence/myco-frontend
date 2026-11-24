@@ -126,7 +126,7 @@ type Renderer = {
   setRamp: (ramp: Rgba[]) => void
   setIntensity: (intensity: number) => void
   setMedia: (media: Media | null) => void
-  draw: (time: number, pointer: [number, number, number]) => void
+  draw: (time: number, pointer: [number, number, number], motion: [number, number]) => void
   dispose: () => void
 }
 
@@ -200,6 +200,7 @@ uniform vec4 uMid;
 uniform vec4 uHigh;
 uniform float uIntensity;
 uniform vec3 uPointer;
+uniform vec2 uPointerMotion;
 uniform float uDot;
 out vec4 outColor;
 
@@ -219,7 +220,12 @@ float threshold(vec2 cell) {
 }
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / uView;
+  vec2 away = gl_FragCoord.xy * uDot - uPointer.xy;
+  float falloff = exp(-dot(away, away) / 28000.0);
+  // Move the field and its dot thresholds together so the dots stay crisp.
+  vec2 displacement = (away * 0.40 - uPointerMotion * 0.70) * falloff * uPointer.z;
+  vec2 samplePixel = gl_FragCoord.xy + displacement / uDot;
+  vec2 uv = samplePixel / uView;
   float base = texture(uField, uv).r;
   float halo = textureLod(uField, uv, 1.0).r * 0.45
     + textureLod(uField, uv, 2.2).r * 0.35
@@ -229,12 +235,11 @@ void main() {
   v = min(v, 0.85) + over / (1.0 + 4.0 * over);
   v = clamp(v * uIntensity, 0.0, 1.0);
   // The pointer glow comes after intensity, so it shows on quiet fields too.
-  vec2 away = gl_FragCoord.xy * uDot - uPointer.xy;
-  v = min(v + uPointer.z * exp(-dot(away, away) / 28000.0) * (0.35 + 0.5 * v), 1.0);
+  v = min(v + uPointer.z * falloff * (0.35 + 0.5 * v), 1.0);
   // Drop the faintest light, so empty areas stay empty instead of showing
   // a sparse, even grid.
   v = max(v - 0.02, 0.0) / 0.98;
-  float on = step(threshold(gl_FragCoord.xy), v);
+  float on = step(threshold(samplePixel), v);
   vec4 c = v < 0.5 ? mix(uLow, uMid, v * 2.0) : mix(uMid, uHigh, v * 2.0 - 1.0);
   outColor = vec4(c.rgb * c.a, c.a) * on;
 }`
@@ -359,7 +364,7 @@ function createRenderer(
       media = next
       mediaStale = true
     },
-    draw(time, pointer) {
+    draw(time, pointer, motion) {
       gl.useProgram(field)
       if (media) {
         const source = media
@@ -397,6 +402,7 @@ function createRenderer(
       gl.uniform2f(at(dither, "uView"), view[0], view[1])
       gl.uniform1f(at(dither, "uDot"), css[0] / view[0])
       gl.uniform3f(at(dither, "uPointer"), ...pointer)
+      gl.uniform2f(at(dither, "uPointerMotion"), ...motion)
       gl.viewport(0, 0, view[0], view[1])
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     },
@@ -555,6 +561,7 @@ export function DitherField({
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
     const pointer = { x: 0, y: 0, clientX: 0, clientY: 0, on: false, hover: 0 }
+    let motion: [number, number] = [0, 0]
     let previous = 0
     let frame = 0
     let cssHeight = 0
@@ -564,7 +571,7 @@ export function DitherField({
 
     const draw = () => {
       if (!ready || !cssHeight || lost) return
-      renderer.draw(time.current, [pointer.x, pointer.y, pointer.hover])
+      renderer.draw(time.current, [pointer.x, pointer.y, pointer.hover], motion)
       canvas.dataset.ready = ""
       shown.current = true
     }
@@ -640,13 +647,15 @@ export function DitherField({
         pointer.clientX <= box.right &&
         pointer.clientY >= box.top &&
         pointer.clientY <= box.bottom
-      pointer.x = ease(pointer.x, pointer.clientX - left, POINTER_EASE, dt)
-      pointer.y = ease(
-        pointer.y,
-        top + cssHeight - pointer.clientY,
-        POINTER_EASE,
-        dt
-      )
+      const targetX = pointer.clientX - left
+      const targetY = top + cssHeight - pointer.clientY
+      pointer.x = ease(pointer.x, targetX, POINTER_EASE, dt)
+      pointer.y = ease(pointer.y, targetY, POINTER_EASE, dt)
+      const maxTrail = 56
+      motion = [
+        ease(motion[0], inside ? Math.max(-maxTrail, Math.min(maxTrail, targetX - pointer.x)) : 0, 9, dt),
+        ease(motion[1], inside ? Math.max(-maxTrail, Math.min(maxTrail, targetY - pointer.y)) : 0, 9, dt),
+      ]
       pointer.hover = ease(pointer.hover, inside ? Math.min(1, Math.max(0, live.current.pointerIntensity)) : 0, 4, dt)
       draw()
     }

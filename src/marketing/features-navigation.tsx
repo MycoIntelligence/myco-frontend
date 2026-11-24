@@ -1,12 +1,7 @@
 import Link from "next/link"
 import {useEffect, useRef, useState} from 'react'
 
-export const featureLinks = [
-  {slug:'pr-review',name:'PR Review'},
-  {slug:'testing',name:'Testing & Test Generation'},
-  {slug:'pre-prod-validation',name:'Pre-Prod Validation'},
-  {slug:'production-monitoring',name:'Production Monitoring'},
-] as const
+import {features,href} from './feature-data'
 
 export function FeaturesNavigation({active=false}: {active?:boolean}) {
   const [mode,setMode] = useState<'hover'|'explicit'|null>(null)
@@ -50,7 +45,12 @@ export function FeaturesNavigation({active=false}: {active?:boolean}) {
     </button>
     <div className="features-menu-flyout" data-open={open} inert={!open}>
       <ul className="features-menu-panel" id="header-feature-links">
-        {featureLinks.map(feature=><li key={feature.slug}><Link href={'/features/'+feature.slug+'/'}>{feature.name}</Link></li>)}
+        {features.map(({slug,label,beta})=><li key={slug}>
+          <Link href={href(slug)}>
+            <span>{label}</span>
+            {beta && <span className="feature-beta">Beta</span>}
+          </Link>
+        </li>)}
       </ul>
     </div>
   </div>

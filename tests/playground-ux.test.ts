@@ -33,19 +33,14 @@ describe("Playground UX & Design System Alignment", () => {
     expect(css).toContain("#dbe4d5");
   });
 
-  it("verifies typography tokens: Plus Jakarta Sans & JetBrains Mono", () => {
+  it("uses Geist for headings, body copy, and code", () => {
     const css = fs.readFileSync(cssPath, "utf-8");
+    const globals = fs.readFileSync(path.resolve(process.cwd(), "app/(legacy)/globals.css"), "utf-8");
 
-    // Headings & body: Plus Jakarta Sans
-    expect(css).toContain("--font-plus-jakarta");
-    expect(css).toContain("Plus Jakarta Sans");
-
-    // Code & tags: JetBrains Mono
-    expect(css).toContain("--font-jetbrains-mono");
-    expect(css).toContain("JetBrains Mono");
-
-    // No legacy Geist font remaining
-    expect(css).not.toContain("'Geist'");
+    expect(css).toContain("font-family: var(--site-sans)");
+    expect(css).toContain("font-family: var(--site-mono)");
+    expect(globals).toContain('--site-sans: Geist, system-ui, sans-serif;');
+    expect(globals).toContain("--site-mono: var(--site-sans);");
   });
 
   it("verifies frosted window bar shell is mounted in playground.js DOM", () => {

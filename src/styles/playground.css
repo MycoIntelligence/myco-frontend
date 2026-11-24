@@ -10,7 +10,7 @@
   --muted: #6e8474;
   --accent: #173e2b;
   --accent-hover: #24583f;
-  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-family: var(--site-sans);
   position: relative;
   border-top: 1px solid var(--border);
   background: var(--bg);
@@ -157,7 +157,7 @@
   background: var(--ide-titlebar-bg);
   color: var(--ide-titlebar-text);
   border-bottom: 1px solid var(--ide-border);
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   user-select: none;
   box-sizing: border-box;
@@ -260,7 +260,7 @@
 .theme-option-btn {
   background: transparent;
   border: none;
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   font-weight: 500;
   color: var(--ide-titlebar-text);
@@ -373,7 +373,7 @@
   color: var(--ide-tab-text);
   border: none;
   border-top: 2px solid transparent;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -421,7 +421,7 @@
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--ide-border);
   color: var(--ide-tab-active-text);
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 500;
   padding: 4px 10px;
@@ -476,7 +476,7 @@
   background: var(--ide-breadcrumbs-bg);
   color: var(--ide-breadcrumbs-text);
   border-bottom: 1px solid var(--ide-border-subtle);
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   user-select: none;
   box-sizing: border-box;
@@ -525,7 +525,7 @@
   padding: 0 12px !important;
   background: var(--ide-statusbar-bg) !important;
   color: var(--ide-statusbar-text) !important;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace !important;
+  font-family: var(--site-mono) !important;
   font-size: 11px !important;
   flex-shrink: 0 !important;
   z-index: 10 !important;
@@ -601,7 +601,7 @@
   border-radius: 3px !important;
   font-size: 11px !important;
   font-weight: 500 !important;
-  font-family: var(--font-jetbrains-mono), monospace !important;
+  font-family: var(--site-mono) !important;
   cursor: pointer !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
@@ -648,7 +648,7 @@
   margin: 0 !important;
   font-size: 11.5px !important;
   font-weight: 700 !important;
-  font-family: var(--font-jetbrains-mono), monospace !important;
+  font-family: var(--site-mono) !important;
   border-radius: 5px !important;
   cursor: pointer !important;
   white-space: nowrap !important;
@@ -702,7 +702,7 @@
   gap: 16px;
   padding: 6px 8px 14px;
   color: #39523d;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   letter-spacing: 0.05em;
   user-select: none;
@@ -821,7 +821,7 @@
 .playground-demo-tag {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -837,7 +837,7 @@
 }
 
 .playground-header__headline h2 {
-  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-family: var(--site-sans);
   font-size: clamp(32px, 4.2vw, 50px);
   line-height: 1.08;
   letter-spacing: -0.03em;
@@ -847,7 +847,7 @@
 }
 
 .playground-header__headline p {
-  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-family: var(--site-sans);
   font-size: 16px;
   line-height: 1.6;
   color: var(--ink-soft);
@@ -899,7 +899,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-family: var(--site-sans);
   font-size: 12px;
   font-weight: 500;
   color: var(--ink-soft);
@@ -949,7 +949,7 @@
 .project-pill.is-active .project-dot.is-custom { box-shadow: 0 0 5px rgba(13, 148, 136, 0.5); }
 
 .project-pill__name {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
 }
 
@@ -994,7 +994,7 @@
 }
 
 .project-repo-badge {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 600;
   color: #1b3832;
@@ -1014,7 +1014,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 500;
   color: var(--muted);
@@ -1047,7 +1047,7 @@
 .code-limit-warning-banner {
   margin-top: 8px;
   padding: 8px 12px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
   line-height: 1.45;
   color: #991b1b;
@@ -1138,7 +1138,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 600;
   color: var(--muted);
@@ -1215,7 +1215,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   color: var(--accent);
   background: rgba(57, 117, 109, 0.08);
@@ -1461,7 +1461,7 @@
   align-items: center;
   gap: 6px;
   padding: 5px 9px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
   color: var(--muted);
   background: transparent;
@@ -1563,7 +1563,7 @@
   border-right: 1px solid #eef2f0;
   padding: 14px 0;
   user-select: none;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 12px;
   line-height: 22px;
   color: #94a3b8;
@@ -1621,7 +1621,7 @@
   height: 100%;
   padding: 14px 16px;
   margin: 0;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: var(--site-mono);
   font-size: 12.5px;
   line-height: 22px;
   white-space: pre;
@@ -1695,7 +1695,7 @@
   background: var(--ide-panel-bg, #f8fafc) !important;
   color: var(--ide-card-text, #475569) !important;
   border-top: 1px solid var(--ide-border-subtle, #e2e8f0);
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -1809,7 +1809,7 @@
   pointer-events: auto;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   animation: dispatchCardSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
+  font-family: var(--site-sans);
 }
 
 @keyframes dispatchCardSlideIn {
@@ -1956,7 +1956,7 @@
   position: absolute;
   bottom: 10px;
   left: 12px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   line-height: 1.4;
   color: #cbd5e1;
@@ -2140,7 +2140,7 @@
 }
 
 .pstep {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   color: #94a3b8;
   transition: color 0.2s ease;
@@ -2183,7 +2183,7 @@
 }
 
 .report-badge {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10px;
   font-weight: 700;
   padding: 3px 8px;
@@ -2254,7 +2254,7 @@
 .report-evidence-code {
   padding: 10px 12px;
   margin: 0;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 12px;
   color: #f8fafc;
   background: transparent;
@@ -2328,7 +2328,7 @@
   background: #ffffff;
   border: 1px solid #dcfce7;
   border-radius: 4px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
   color: #14532d;
   white-space: pre-wrap;
@@ -2484,7 +2484,7 @@
 }
 
 .popup-item__val {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   color: var(--accent);
   font-weight: 600;
 }
@@ -2610,7 +2610,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 5px;
   padding: 8px 10px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
   color: #334155;
   white-space: pre-wrap;
@@ -2893,7 +2893,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-family: var(--site-sans);
   font-size: 11.5px;
   font-weight: 500;
   color: var(--ink-soft);
@@ -2940,7 +2940,7 @@
 .demo-pill.is-active .demo-dot.is-custom { box-shadow: 0 0 5px rgba(13, 148, 136, 0.5); }
 
 .demo-pill__name {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
 }
 
@@ -2961,7 +2961,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 500;
   padding: 4px 10px;
@@ -3088,7 +3088,7 @@
 }
 
 .summary-sev {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 9.5px;
   font-weight: 700;
   padding: 1.5px 6px;
@@ -3387,7 +3387,7 @@
    Dropdown Report & Collapsible Detail Sections
    ========================================================================== */
 .report-empty__badge {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -3455,7 +3455,7 @@
   border: 1px solid var(--ide-card-border, var(--border));
   border-radius: 4px;
   padding: 4px 26px 4px 8px;
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 600;
   color: var(--ide-card-text, var(--ink));
@@ -3494,7 +3494,7 @@
 .report-toggle-all-btn {
   font-size: 10.5px;
   font-weight: 600;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   color: var(--ide-card-text, var(--muted));
   background: var(--ide-card-bg, #ffffff);
   border: 1px solid var(--ide-card-border, var(--border));
@@ -3678,7 +3678,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   font-weight: 700;
   color: var(--ink);
@@ -3703,7 +3703,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   font-weight: 600;
   color: var(--muted);
@@ -3725,7 +3725,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 10px;
   font-weight: 600;
   color: #92400e;
@@ -3756,7 +3756,7 @@
   justify-content: center;
   padding: 8px 12px;
   border-radius: 6px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 600;
   color: #92400e;
@@ -3870,7 +3870,7 @@
   background: #f0fdf4;
   border: 1px solid #86efac;
   color: #15803d;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -4166,7 +4166,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 12px 14px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 12.5px;
   line-height: 1.6;
   color: var(--ink);
@@ -4187,7 +4187,7 @@
 
 /* Live Word Counter Badge in Editor Header */
 .editor-word-count-badge {
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 600;
   padding: 3px 9px;
@@ -4289,7 +4289,7 @@
   right: 14px;
   bottom: 12px;
   z-index: 15;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 11.5px;
   font-weight: 500;
   color: var(--muted);
@@ -4331,7 +4331,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+  font-family: var(--site-mono);
   font-size: 12px;
   font-weight: 500;
   color: var(--muted);
@@ -4832,7 +4832,7 @@
 .custom-code-modal-textarea {
   width: 100%;
   height: 220px;
-  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--site-mono);
   font-size: 12.5px;
   line-height: 20px;
   padding: 12px 14px;
@@ -4992,7 +4992,7 @@
 }
 
 .ide-workspace-badge {
-  font-family: var(--font-plus-jakarta), sans-serif !important;
+  font-family: var(--site-sans) !important;
   font-size: 13.5px !important;
   font-weight: 700 !important;
   color: #f0fdf4 !important;
@@ -5316,7 +5316,7 @@
   border: 1px solid #1a382c;
   border-radius: 6px;
   color: #8fa398;
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--site-mono);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
@@ -5387,12 +5387,12 @@
   font-size: 14.5px;
   font-weight: 600;
   color: #f0fdf4;
-  font-family: var(--font-plus-jakarta), sans-serif;
+  font-family: var(--site-sans);
   letter-spacing: -0.01em;
 }
 
 .issue-severity-pill {
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   font-weight: 700;
   padding: 2px 8px;
@@ -5460,7 +5460,7 @@
   line-height: 1.55;
   color: #c2d9cc;
   margin: 0 0 14px 0;
-  font-family: var(--font-plus-jakarta), sans-serif;
+  font-family: var(--site-sans);
 }
 
 /* Suggested Fix Box */
@@ -5490,7 +5490,7 @@
   font-size: 12px;
   font-weight: 600;
   color: #ffffff;
-  font-family: var(--font-plus-jakarta), sans-serif;
+  font-family: var(--site-sans);
 }
 
 .fix-copy-action-btn {
@@ -5502,7 +5502,7 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 4px;
   color: #e2e8f0;
-  font-family: var(--font-jetbrains-mono), monospace;
+  font-family: var(--site-mono);
   font-size: 10.5px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -5519,7 +5519,7 @@
   line-height: 1.55;
   color: #f1f5f9;
   margin: 0;
-  font-family: var(--font-plus-jakarta), sans-serif;
+  font-family: var(--site-sans);
 }
 
 /* Issues Tab List */
@@ -5735,7 +5735,7 @@
 .report-evidence-code,
 .report-evidence-code code {
   color: #f8fafc !important; /* crisp, high-contrast pure white code text */
-  font-family: var(--font-jetbrains-mono), monospace !important;
+  font-family: var(--site-mono) !important;
   font-size: 12.5px !important;
   line-height: 1.5 !important;
   background: transparent !important;
@@ -5775,13 +5775,13 @@
 /* Syntax Highlighting High Contrast Tokens */
 .editor-syntax-view {
   color: #e2e8f0 !important;
-  font-family: var(--font-jetbrains-mono), monospace !important;
+  font-family: var(--site-mono) !important;
   font-size: 12.5px !important;
   line-height: 22px !important;
 }
 
 .editor-textarea {
-  font-family: var(--font-jetbrains-mono), monospace !important;
+  font-family: var(--site-mono) !important;
   font-size: 12.5px !important;
   line-height: 22px !important;
   tab-size: 2 !important;
@@ -6083,7 +6083,7 @@
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  font-family: var(--font-jetbrains-mono), monospace !important;
+  font-family: var(--site-mono) !important;
 }
 
 /* Remove Manual Scenario Arrows & Theme Options Picker */

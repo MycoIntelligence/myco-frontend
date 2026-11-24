@@ -1,6 +1,5 @@
 import Link from "next/link"
 import {features,href} from './feature-data'
-import {Terminal} from './terminal'
 
 export function Arrow() {
   return <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -49,11 +48,13 @@ function BentoDemo({index}: {index:number}) {
     </div>
   </div>
 
-  if (index===1) return <div className="bento-demo bento-test-demo">
-    <Terminal title="receipt.test.ts" label="Receipt test">
-      <pre className="demo-terminal-code"><code>{'expect(receipt.total).toBe(8500)'}</code></pre>
-      <div className="bento-result bento-failure">Failed · received 10000</div>
-    </Terminal>
+  if (index===1) return <div className="bento-demo bento-review-demo">
+    <div className="bento-demo-header"><span>GitHub · PR #214</span><span>Test coverage</span></div>
+    <div className="bento-review-finding">
+      <strong>2 missing tests</strong>
+      <p>Discounted receipt · Explicit zero discount</p>
+      <span className="bento-result">Test plan · checkout-test-plan.xlsx</span>
+    </div>
   </div>
 
   if (index===2) return <div className="bento-demo bento-release-demo">
@@ -89,7 +90,9 @@ function BentoFeature({index}: {index:number}) {
     aria-labelledby={titleId}
   >
     <div className="feature-card-top">
-      <h3 id={titleId} className="feature-card-title">{feature.label}</h3>
+      <h3 id={titleId} className="feature-card-title">
+        {feature.label}{feature.beta && <span className="feature-beta">Beta</span>}
+      </h3>
       <span className="bento-arrow"><Arrow/></span>
     </div>
     <p>{feature.indexCopy}</p>
@@ -100,8 +103,8 @@ function BentoFeature({index}: {index:number}) {
 export function FeatureBento() {
   return <section id="features" className="feature-main home-feature-bento" aria-labelledby="home-features-title">
     <div className="feature-intro">
-      <h2 id="home-features-title" className="feature-intro-title">Know what to check<br/> before you ship.</h2>
-      <p>GitHub PR review is live, with testing, release validation, and monitoring on the roadmap.</p>
+      <h2 id="home-features-title" className="feature-intro-title">agentic Quality Assurance<br/> <em>From PRD to Production</em></h2>
+      <p>Define what a change should do, then check that it does as you build, test, and ship</p>
     </div>
     <div className="feature-grid">
       {features.map((feature,index)=><BentoFeature key={feature.slug} index={index}/>)}

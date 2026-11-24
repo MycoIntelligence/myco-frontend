@@ -15,7 +15,7 @@ export default function ContactPage(){
     <DitherFlow>
       <main className="contact-detail">
         <span className="eyebrow">Contact</span>
-        <h1>Talk to <em>Myco.</em></h1>
+        <h1>Talk to <em>Myco</em></h1>
         <p>Have a question about Myco or want to discuss a pilot? Email us.</p>
         <a className="contact-email-card" href={'mailto:'+contactEmail}>
           <span className="contact-email-icon">

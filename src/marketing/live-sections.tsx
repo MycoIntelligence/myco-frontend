@@ -3,6 +3,10 @@ import {liveStyles, liveSections} from './live-section-data'
 import {connectSmoothCursor} from './cursor-frame'
 
 const darkFrame = `
+@font-face{font-family:Geist;src:url(/marketing/Geist.woff2) format("woff2");font-weight:100 900;font-display:swap}
+:root{--font-body:Geist,sans-serif;--font-display:var(--font-body);--font-serif:var(--font-body);--editorial-font:var(--font-body);--font-mono:var(--font-body)}
+html,body,.App,code,pre,kbd,samp{font-family:var(--font-body)}
+.integration-workflow .eyebrow,.security-editorial .eyebrow,.security-editorial__row h3,.integration-workflow .diagram-card :is(strong,p,small),.integration-workflow .diagram-engine strong{font-family:var(--font-body)!important}
 :root{color-scheme:dark;--bg:#090a0c;--bg-soft:#11151b;--panel:#141c27;--panel-cool:#142132;--ink:#f4f7fc;--ink-soft:#bdc8d6;--muted:#a8b7c9;--border:#263342;--border-strong:#436383;--wire:#5887b2;--accent:#9bcfff;--accent-dark:#9bcfff;--verify:#9bcfff}
 html,body,.App{background:#090a0c!important;color:#f4f7fc!important}
 #integrate::after{content:none!important}
@@ -10,10 +14,36 @@ html,body,.App{background:#090a0c!important;color:#f4f7fc!important}
 .integration-workflow__header h2,.security-editorial h2,.security-editorial h3,.integration-workflow__tool strong,.integration-workflow__repository strong{color:var(--ink)!important}
 .integration-workflow__header p,.security-editorial p,.integration-workflow__tool>span,.vertical-diagram p{color:var(--ink-soft)!important}
 .integration-workflow .eyebrow,.security-editorial .eyebrow,.diagram-card small{color:var(--accent)!important}
+.integration-workflow__header h2,
+.security-editorial__intro h2 {
+  font-family: var(--font-body) !important;
+  font-size: clamp(36px, 5.5vw, 64px) !important;
+  font-weight: 700 !important;
+  line-height: 1.03 !important;
+  letter-spacing: -.064em !important;
+  color: #f6f8fc !important;
+  margin: 0 !important;
+  text-wrap: balance;
+}
+.integration-workflow__header h2 span:last-child,
+.security-editorial__intro h2 span:last-child { color: var(--accent); }
+.integration-workflow__header p,
+.security-editorial__intro > p,
+.security-editorial__row p {
+  font-size: 17px !important;
+  line-height: 1.5 !important;
+  color: #a6adb7 !important;
+}
+.security-editorial__intro > p { margin: 18px 0 0; }
+.security-editorial__row h3 {
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -.047em;
+}
 .integration-workflow__repository,.integration-workflow__logo,.integration-workflow__tool{background:#090a0c!important}
 .integration-workflow__wires path,.vertical-diagram path{stroke:#5887b2!important}
 .integration-workflow__logo img{mix-blend-mode:normal;filter:none}
-.integration-workflow__repository img,.integration-workflow__tool:first-child img,.integration-workflow__tool.is-custom img,.vertical-diagram>.diagram-card img,.vertical-diagram .diagram-grid>.diagram-card:first-child img,.vertical-diagram .diagram-grid>.diagram-card:last-child img,.diagram-engine img{filter:brightness(0) saturate(100%) invert(81%) sepia(20%) saturate(1043%) hue-rotate(180deg)}
+.integration-workflow__repository img,.integration-workflow__tool.is-custom img,.vertical-diagram>.diagram-card img,.vertical-diagram .diagram-grid>.diagram-card:last-child img,.diagram-engine img{filter:brightness(0) saturate(100%) invert(81%) sepia(20%) saturate(1043%) hue-rotate(180deg)}
 .vertical-diagram{color:var(--ink)!important}
 .vertical-diagram .diagram-card,.diagram-engine img{background:#131c29!important;border-color:#344964!important}
 .diagram-engine img{filter:none;background:#1b2e42!important;object-fit:contain}

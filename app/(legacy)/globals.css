@@ -1,12 +1,22 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: Geist;
+  src: url("/marketing/Geist.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root {
+  --site-sans: Geist, system-ui, sans-serif;
+  --site-mono: var(--site-sans);
+}
+
 @theme {
-  --font-sans: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-serif: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
-  --font-brand: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
-  --font-doto: var(--font-doto), "Doto", monospace;
+  --font-sans: var(--site-sans);
+  --font-display: var(--site-sans);
+  --font-mono: var(--site-mono);
+  --font-serif: var(--site-sans);
+  --font-brand: var(--site-sans);
 
   --color-ink: #16181c;
   --color-ink-2: #1e2229;

@@ -28,20 +28,29 @@ function FeatureDetail({index}: {index:number}) {
     <nav className="feature-layout-nav" aria-label="Features">
       {features.map(({slug,label},i)=><Link key={slug}
         href={href(slug)}
-        aria-current={i===index?'page':undefined}>{label}</Link>)}
+        aria-current={i===index?'page':undefined}>
+          <span className="feature-nav-pill">{label}</span></Link>)}
     </nav>
     <section className="feature-layout-intro" aria-labelledby="feature-title">
-      <div className="eyebrow feature-detail-label">{feature.label}</div>
+      <div className="feature-detail-heading">
+        <span className="eyebrow feature-detail-label">{feature.label}</span>
+        {feature.beta && <span className="feature-beta">Beta</span>}
+      </div>
       <h1 id="feature-title">
         <span>{title}</span><br className="feature-layout-break"/> <em>{emphasis}</em>
       </h1>
-      <p>{feature.summary}</p>
+      <h2 id="feature-explanation">{feature.explanation}</h2>
     </section>
     <div className="feature-layout-visual"><Sample index={index}/></div>
     <p className="feature-layout-example"><strong>In practice.</strong> {feature.example}</p>
     <section className="feature-layout-explanation" aria-labelledby="feature-explanation">
-      <h2 id="feature-explanation">{feature.explanation}</h2>
-      <dl>{feature.sections.map(([label,copy])=><div key={label}><dt>{label}</dt><dd>{copy}</dd></div>)}</dl>
+      <p className="feature-layout-summary">{feature.summary}</p>
+      <dl>
+        {feature.sections.map(([label,copy,beta])=><div key={label}>
+          <dt>{label}{beta && <span className="feature-beta">Beta</span>}</dt>
+          <dd>{copy}</dd>
+        </div>)}
+      </dl>
       <div className="feature-layout-actions">
         <Link className="eyebrow feature-layout-next" href={href(next.slug)}>
           {next.label} <Arrow/>

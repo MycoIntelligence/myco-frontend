@@ -9,7 +9,7 @@ const questions = [
   ["How is customer data handled?", "Data handling, model routing, deployment and security terms should be confirmed for your environment during evaluation."],
 ];
 export default function FaqPage() {
-  return <PageShell eyebrow="FAQ" title="Questions, answered." lead="The essentials about Myco’s pull request review and evaluation.">
+  return <PageShell eyebrow="FAQ" title="Questions, answered" lead="The essentials about Myco’s pull request review and evaluation.">
     <div className="max-w-[860px] divide-y divide-[#071a1b]/15 border-y border-[#071a1b]/15">{questions.map(([q,a]) => <details key={q} className="group py-5"><summary className="cursor-pointer text-xl font-medium text-[#071a1b]">{q}</summary><p className="mt-4 max-w-[700px] leading-relaxed text-[#44595a]">{a}</p></details>)}</div>
   </PageShell>;
 }

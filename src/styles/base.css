@@ -60,7 +60,7 @@ body {
 }
 
 .font-doto-scanline {
-  font-family: var(--font-doto);
+  font-family: var(--site-mono);
   font-weight: 700;
   line-height: 1;
   -webkit-mask-image: repeating-linear-gradient(to bottom, #000 0 3px, transparent 3px 5px);

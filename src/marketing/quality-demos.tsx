@@ -1,7 +1,7 @@
+import {useReducedMotion} from 'motion/react'
 import {FeatureWalkthrough} from './feature-walkthrough'
 import {Terminal} from './terminal'
 
-const testingSteps=['Requirement','Generate test','Run checks','Review evidence']
 const preProdSteps=['Deploy candidate','Acceptance checks','Load test','Release decision']
 
 function FindingHeading({title}:{title:string}){
@@ -12,44 +12,15 @@ function FindingHeading({title}:{title:string}){
 }
 
 export function TestingDemo(){
-  return <FeatureWalkthrough label="Illustrative Myco testing walkthrough" context="Pull request #214 / Checkout API" title="Test generation and execution" steps={testingSteps}>
-    {step=><div className="monitor-body quality-body">
-      <div className="monitor-release">
-        <span><strong>checkout/discounted-receipts</strong></span>
-        <span className={step>=2?'monitor-alert':''}>{['Coverage gap found','Test proposed','1 check failed','Engineer review pending'][step]}</span>
-      </div>
-      <div className="monitor-metrics">
-        <section className="monitor-card quality-card">
-          <div className="monitor-card-heading"><h3>PRD · CHECKOUT-17</h3></div>
-          <strong>Receipt total must match the amount charged.</strong>
-          <p>A $100 order with a $15 discount should produce an $85 receipt.</p>
-          <div className="monitor-evidence"><code>Acceptance criterion AC-03</code></div>
-        </section>
-        <div className="quality-terminal-stage" data-visible={step>=1} inert={step<1}>
-          <Terminal title="receipt.test.ts" label="Proposed test" status="Proposed">
-            <pre className="demo-terminal-code"><code><span className="terminal-function">test</span>{'('}<span className="terminal-string">&quot;returns the amount charged&quot;</span>{',\n  '}<span className="terminal-keyword">async</span>{' () => {\n    '}<span className="terminal-keyword">const</span>{' receipt = '}<span className="terminal-keyword">await</span>{' checkout({\n      subtotal: 10000, discount: 1500,\n    });\n    '}<span className="terminal-function">expect</span>{'(receipt.total).toBe(8500);\n  }\n);'}</code></pre>
-          </Terminal>
-        </div>
-      </div>
-      <div className="monitor-handoff">
-        <div className="quality-terminal-stage" data-visible={step>=2} inert={step<2}>
-          <Terminal title="Test run" label="Receipt test output" status="Failed" failed>
-            <div className="demo-terminal-output">
-              <div className="quality-fail"><span aria-hidden="true">× </span>returns the amount charged</div>
-              <div><span>Expected</span> $85.00</div>
-              <div><span>Received</span> <strong className="quality-fail">$100.00</strong></div>
-            </div>
-          </Terminal>
-        </div>
-        <section className="monitor-card monitor-finding quality-card" data-visible={step>=3} inert={step<3}>
-          <FindingHeading title="Myco finding"/>
-          <strong>The receipt uses the subtotal before discount.</strong>
-          <p>Check the returned value at receipt.ts:40 before signing off.</p>
-          <div className="monitor-evidence"><code>receipt.ts:40</code></div>
-        </section>
-      </div>
-    </div>}
-  </FeatureWalkthrough>
+  const reduced=useReducedMotion()
+  return <div className="feature-sample sample-pr">
+    <img
+      src={'/animations/testing-coverage-plan.'+(reduced?'png':'gif')}
+      width={1200}
+      height={660}
+      alt="Illustrative GitHub inline review flags two missing checkout tests and links to a spreadsheet test plan. The plan groups numbered cases by scenario and lists their expected results and current coverage."
+    />
+  </div>
 }
 
 const releaseChecks=[

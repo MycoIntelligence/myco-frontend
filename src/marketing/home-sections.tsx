@@ -1,7 +1,7 @@
 import Link from "next/link"
 import {FolderGit2, GitPullRequest, ListChecks} from 'lucide-react'
 import {BorderBeam} from './border-beam-local'
-import {contactEmail,trialEmail} from './contact-email'
+import {contactEmail} from './contact-email'
 import {FeaturesNavigation} from './features-navigation'
 
 function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'}) {
@@ -16,11 +16,11 @@ function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'
   return <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round"><path d={paths[name]}/></svg>
 }
 
-const trialRequestHref = 'mailto:'+trialEmail+'?subject='+encodeURIComponent('Myco 14-day trial request')
+const trialSignupHref = 'https://app.mycointelligence.com'
 
 export function PilotLink({footer=false}: {footer?:boolean}) {
-  return <a className="pilot" href={footer ? trialRequestHref : '#pilot'}>
-    <img src="/marketing/github.png" alt="" />{footer ? 'Request your free trial' : 'Request a free trial'} <span aria-hidden="true">&#8599;</span>
+  return <a className="pilot" href={footer ? trialSignupHref : '#pilot'}>
+    <img src="/marketing/github.png" alt="" />{footer ? 'Sign up with GitHub' : 'Request a free trial'} <span aria-hidden="true">&#8599;</span>
     <BorderBeam size={57} duration={5} initialOffset={15} colorFrom="#5aa9f2" colorTo="#c9e8ff" borderWidth={1.5} />
   </a>
 }
@@ -29,7 +29,7 @@ export function WorkflowSection() {
   return <section className="home-section workflow" id="integration" aria-labelledby="integration-title">
     <div className="home-section-heading">
       <p className="home-label">Integrations</p>
-      <h2 id="integration-title">Connect to the workflow.</h2>
+      <h2 id="integration-title">Connect to the workflow</h2>
       <p>Give Myco the context behind a change. Get the finding and its evidence right on the pull request.</p>
     </div>
     <div className="workflow-layout">
@@ -55,7 +55,7 @@ export function SecuritySection() {
     <div className="home-section">
       <div className="home-section-heading">
         <p className="home-label">Security</p>
-        <h2 id="security-title">You decide what Myco can access.</h2>
+        <h2 id="security-title">You decide what Myco can access</h2>
         <p>Scope the review to the repositories and sources you authorize.</p>
       </div>
       <div className="security-grid">
@@ -71,19 +71,18 @@ export function HomeFooter() {
   return <>
     <section className="pilot-close" id="pilot" aria-labelledby="pilot-title">
       <div className="pilot-close-inner">
-        <img className="pilot-close-mark" src="/marketing/myco-mark.png" alt="" width="44" height="46" />
         <h2 id="pilot-title">14 days of free code review</h2>
-        <p className="pilot-close-intro">Email us to request access. Once we approve your request, you can connect GitHub and try Myco on a pull request from your own repo.</p>
+        <p className="pilot-close-intro">Sign up with GitHub to start 14 days of free code review. GitHub will guide you through installing the Myco app on the repositories you choose.</p>
         <ol className="pilot-close-steps" aria-label="How to get started">
           <li>
             <span className="pilot-step-icon"><img src="/marketing/github.png" alt="" width="20" height="20" /></span>
-            <h3>Connect GitHub</h3>
+            <h3>Sign up with GitHub</h3>
             <p>Sign in with the GitHub account you use for code review.</p>
           </li>
           <li>
             <span className="pilot-step-icon"><FolderGit2 size={21} aria-hidden="true" /></span>
-            <h3>Choose a repository</h3>
-            <p>Pick one repo you’d like Myco to review.</p>
+            <h3>Install the Myco app</h3>
+            <p>Choose which repositories Myco can review.</p>
           </li>
           <li>
             <span className="pilot-step-icon"><GitPullRequest size={21} aria-hidden="true" /></span>
