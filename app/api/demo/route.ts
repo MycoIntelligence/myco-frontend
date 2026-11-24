@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { demoFormSchema, trialRequestSchema } from "@/lib/schema";
+import { demoFormSchema, trialGitHubUsernameError, trialRequestSchema } from "@/lib/schema";
 import { deliverLead } from "@/lib/leads";
 import { allowRequest, readJsonLimited, RequestTooLarge } from "@/lib/request-security";
 
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         if (account?.type !== "User" || account.login?.toLowerCase() !== username.toLowerCase()) {
           return NextResponse.json({
             ok: false,
-            errors: { githubUsername: "Please enter the correct GitHub username." },
+            errors: { githubUsername: trialGitHubUsernameError },
           }, { status: 400 });
         }
       } catch {

@@ -67,10 +67,26 @@ describe("Free trial requests", () => {
     expect(payload).not.toHaveProperty("message");
   });
 
-  it("rejects a URL in the GitHub username field", async () => {
-    const response = await POST(request({ ...trial, githubUsername: "https://github.com/alex-jones" }));
+  it.each([
+    "https://github.com/Alex-Jones/",
+    "github.com/alex-jones?tab=repositories",
+    "Alex Jones",
+  ])("checks the normalized GitHub username from %s", async (githubUsername) => {
+    const response = await POST(request({ ...trial, githubUsername }));
+    expect(response.status).toBe(200);
+    expect(lookup).toHaveBeenCalledWith("https://api.github.com/users/alex-jones", expect.any(Object));
+    expect(deliverLead).toHaveBeenCalledWith(expect.objectContaining({ githubUsername: "alex-jones" }));
+  });
+
+  it.each([
+    "https://github.com/alex-jones/repo",
+    "https://example.com/alex-jones",
+    "https://github.com@example.com/alex-jones",
+  ])("rejects %s without looking it up", async (githubUsername) => {
+    const response = await POST(request({ ...trial, githubUsername }));
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({ errors: { githubUsername: expect.any(String) } });
+    expect(lookup).not.toHaveBeenCalled();
     expect(deliverLead).not.toHaveBeenCalled();
   });
 
@@ -85,9 +101,9 @@ describe("Free trial requests", () => {
     expect(deliverLead).not.toHaveBeenCalled();
   });
 
-  it("rejects a GitHub username that does not exist", async () => {
+  it.each(["alex-jones", "Alex Jones", "https://github.com/alex-jones"])("rejects %s when the account does not exist", async (githubUsername) => {
     lookup.mockResolvedValueOnce(new Response(null, { status: 404 }));
-    const response = await POST(request(trial));
+    const response = await POST(request({ ...trial, githubUsername }));
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({
       errors: { githubUsername: "Please enter the correct GitHub username." },

@@ -138,8 +138,8 @@ export function TrialRequestDialog() {
           <input id="free-trial-email" {...fieldAttributes("workEmail")} type="email" autoComplete="email" placeholder="alex@acme.com" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={254} />
           {fieldFeedback("workEmail")}
 
-          <label htmlFor="free-trial-github">GitHub username<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-          <input id="free-trial-github" {...fieldAttributes("githubUsername")} autoCapitalize="off" spellCheck={false} placeholder="alex-jones" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={39} />
+          <label htmlFor="free-trial-github">GitHub username or profile URL<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+          <input id="free-trial-github" {...fieldAttributes("githubUsername")} autoCapitalize="off" spellCheck={false} placeholder="alex-jones or github.com/alex-jones" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={256} />
           {fieldFeedback("githubUsername")}
 
           <div className="trial-dialog-trap" aria-hidden="true">

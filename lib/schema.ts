@@ -18,9 +18,17 @@ export const trialEmailSchema = workEmailSchema
     message: "Please enter your company email address.",
   });
 
+export const trialGitHubUsernameError = "Please enter the correct GitHub username.";
+const githubProfilePattern = /^(?:https?:\/\/)?(?:www\.)?github\.com\/([a-z0-9-]+)\/?(?:[?#]\S*)?$/i;
+
 export const trialGitHubUsernameSchema = z.string().trim()
-  .max(39, "Please enter the correct GitHub username.")
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/i, "Please enter the correct GitHub username.");
+  .max(256, trialGitHubUsernameError)
+  .transform((value) => {
+    const profile = githubProfilePattern.exec(value);
+    return (profile?.[1] ?? value.replace(/\s+/g, "-")).toLowerCase();
+  })
+  .pipe(z.string().max(39, trialGitHubUsernameError)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, trialGitHubUsernameError));
 
 const leadFields = z.object({
   fullName: z.string().trim().min(1, "Full name is required.").max(120),
