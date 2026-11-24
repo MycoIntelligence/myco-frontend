@@ -1,5 +1,4 @@
 import Link from "next/link"
-import {LayoutDashboard} from 'lucide-react'
 import {features,href} from './feature-data'
 import {Terminal} from './terminal'
 
@@ -101,10 +100,6 @@ function BentoFeature({index}: {index:number}) {
 export function FeatureBento() {
   return <section id="features" className="feature-main home-feature-bento" aria-labelledby="home-features-title">
     <div className="feature-intro">
-      <div className="eyebrow home-features-eyebrow">
-        <LayoutDashboard size={16} aria-hidden="true"/>
-        Features
-      </div>
       <h2 id="home-features-title" className="feature-intro-title">Know what to check<br/> before you ship.</h2>
       <p>GitHub PR review is live, with testing, release validation, and monitoring on the roadmap.</p>
     </div>

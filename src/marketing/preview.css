@@ -168,8 +168,7 @@ body[style*="cursor: none"] a{cursor:none}
 
 .review-story{border-top:1px solid #e5ebe7;background:#fff;color:#17211b;font-family:Review Geist,Inter,sans-serif}
 .story-heading{text-align:center;margin:auto;padding:84px 20px 68px;max-width:690px}
-.story-heading>span{display:inline-block;padding:5px 11px;border:1px solid #dfe8e2;border-radius:100px;background:#f6faf7;font-size:13px;color:#315e48}
-.story-heading h2{margin:20px 0 14px;font-size:clamp(42px,6vw,72px);line-height:1.01;letter-spacing:-.066em;font-weight:600}
+.story-heading h2{margin:0 0 14px;font-size:clamp(42px,6vw,72px);line-height:1.01;letter-spacing:-.066em;font-weight:600}
 .story-heading em{font-style:normal;color:#3d765b}
 .story-heading p{font-size:16px;line-height:1.5;margin:18px auto 0;max-width:380px}
 .story-chapters{list-style:none;margin:0 auto;padding:0;max-width:1110px;border-inline:1px solid #e3ebe5}
@@ -338,7 +337,7 @@ nav a:hover,.footer-inner nav a:hover,.footer-social:hover{color:var(--blue)}
 .hero-review-flow{background:radial-gradient(ellipse 710px 330px at 50% calc(var(--flow-hero-height) - 112px),#12263c99,transparent 98%),var(--page)}
 .hero-review-flow .hero,.hero-review-flow .review-story{background:transparent}
 .hero-review-flow .review-story .story-chapters,.review-story{background:var(--page);color:var(--text)}
-.story-heading>span,.pricing-label,.plan-trial{background:#142132;border-color:#29415a;color:var(--blue)}
+.pricing-label,.plan-trial{background:#142132;border-color:#29415a;color:var(--blue)}
 .story-chapters,.story-chapter,.story-chapter:last-child,.story-visual{border-color:var(--line)}
 .story-visual{background:var(--page)}
 .review-animation img{border:1px solid #28374a;box-shadow:0 20px 46px #0005}
@@ -480,7 +479,6 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   color: #f4f5f7;
 }
 .home-feature-bento .feature-intro { background: none; }
-.home-features-eyebrow { margin-bottom: 15px; font-size: 13px; }
 .home-feature-bento .feature-intro-title { font-size: clamp(36px, 5.5vw, 64px); }
 .home-feature-bento .feature-intro>p:last-child { max-width: 48ch; color: var(--bento-muted); }
 .bento-grid-with-background { position: relative; isolation: isolate; }
@@ -834,3 +832,70 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   background: #162333;
 }
 .comparison-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+.review-example-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.review-example-options button {
+  padding: 6px 10px;
+  border: 1px solid #303840;
+  border-radius: 7px;
+  background: #14171b;
+  color: var(--subtle);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.review-example-options button:hover,
+.review-example-options button[aria-pressed="true"] {
+  border-color: #617b96;
+  background: #19222d;
+  color: var(--text);
+}
+.review-example-options button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.review-example-demo {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #303840;
+  border-radius: 10px;
+  background: #0d1117;
+  color: #f0f3f7;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.review-example-demo figcaption {
+  display: grid;
+  gap: 3px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #303840;
+  background: #151a20;
+}
+.review-example-demo figcaption span { color: #aeb9c6; font-size: 11px; }
+.review-example-demo figcaption strong { font-size: 15px; }
+.review-example-demo-body { padding: 12px 16px 16px; }
+.review-example-demo code { color: #aeb9c6; overflow-wrap: anywhere; }
+.review-example-demo dl { margin: 10px 0; }
+.review-example-demo dl div { padding-block: 6px; }
+.review-example-demo dt { font-weight: 650; }
+.review-example-demo dd { margin: 2px 0 0; color: #d0d7df; }
+.review-example-demo-finding {
+  padding: 9px 12px;
+  border-left: 2px solid #d77c7c;
+  background: #21181b;
+}
+.review-example-demo-finding p { margin: 2px 0 0; color: #e1dce0; }
+@media (prefers-reduced-motion: no-preference) {
+  .review-example-demo[data-in-view="true"] .review-example-demo-finding {
+    animation: review-finding-highlight 5s ease-in-out infinite;
+  }
+}
+@keyframes review-finding-highlight {
+  0%, 18%, 100% { background-color: #21181b; }
+  35%, 72% { background-color: #352124; }
+}

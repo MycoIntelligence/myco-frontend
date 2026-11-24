@@ -1,7 +1,7 @@
 import Link from "next/link"
 import {FolderGit2, GitPullRequest, ListChecks} from 'lucide-react'
 import {BorderBeam} from './border-beam-local'
-import {contactEmail} from './contact-email'
+import {contactEmail,trialEmail} from './contact-email'
 import {FeaturesNavigation} from './features-navigation'
 
 function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'}) {
@@ -16,7 +16,7 @@ function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'
   return <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round"><path d={paths[name]}/></svg>
 }
 
-const trialRequestHref = 'mailto:'+contactEmail+'?subject='+encodeURIComponent('Myco 14-day trial request')
+const trialRequestHref = 'mailto:'+trialEmail+'?subject='+encodeURIComponent('Myco 14-day trial request')
 
 export function PilotLink({footer=false}: {footer?:boolean}) {
   return <a className="pilot" href={footer ? trialRequestHref : '#pilot'}>
