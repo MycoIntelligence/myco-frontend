@@ -10,7 +10,6 @@ const trial = {
   firstName: "Alex",
   lastName: "Jones",
   workEmail: "alex@acme.com",
-  company: "Acme",
   githubUsername: "alex-jones",
 };
 
@@ -51,10 +50,12 @@ describe("Free trial requests", () => {
     expect(deliverLead).not.toHaveBeenCalled();
   });
 
-  it.each([undefined, ""])("accepts a trial request with company %j", async (company) => {
-    const response = await POST(request({ ...trial, company }));
+  it("drops company and notes submitted by older versions of the form", async () => {
+    const response = await POST(request({ ...trial, company: "Acme", message: "Old trial notes" }));
     expect(response.status).toBe(200);
-    expect(deliverLead).toHaveBeenCalledWith(expect.objectContaining({ fullName: "Alex Jones" }));
+    const [payload] = vi.mocked(deliverLead).mock.calls[0];
+    expect(payload).not.toHaveProperty("company");
+    expect(payload).not.toHaveProperty("message");
   });
 
   it("rejects a URL in the GitHub username field", async () => {

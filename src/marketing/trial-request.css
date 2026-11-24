@@ -77,8 +77,6 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
   font-weight: 600;
 }
 
-.trial-dialog label span { color: var(--subtle); font-size: 12px; font-weight: 400; }
-
 .trial-dialog input {
   display: block;
   width: 100%;

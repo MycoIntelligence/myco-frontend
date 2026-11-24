@@ -22,11 +22,10 @@ const leadFields = z.object({
 
 const companySchema = z.string({ required_error: "Company name is required." }).trim().min(1, "Company name is required.").max(200);
 
-export const trialRequestSchema = leadFields.omit({ fullName: true }).extend({
+export const trialRequestSchema = leadFields.omit({ fullName: true, message: true }).extend({
   kind: z.literal("trial"),
   firstName: z.string({ required_error: "First name is required." }).trim().min(1, "First name is required.").max(60),
   lastName: z.string({ required_error: "Last name is required." }).trim().min(1, "Last name is required.").max(60),
-  company: z.string().trim().max(200).optional(),
   githubUsername: z.string({ required_error: "GitHub username is required." }).trim()
     .max(39, "GitHub username must be 39 characters or fewer.")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/i, "Enter a GitHub username, such as alex-jones."),
