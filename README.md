@@ -27,6 +27,14 @@ Variables:
 - `NEXT_PUBLIC_APP_URL`: The destination URL for "Sign in" buttons (default: `https://app.veldt.dev`).
 - `NEXT_PUBLIC_SITE_URL`: The canonical URL for SEO metadata, Open Graph tags, and sitemaps (default: `https://veldt.dev`).
 
+### Free trial emails
+
+1. Verify a sending domain in [Resend](https://resend.com/docs/dashboard/domains/introduction) and create an API key with Sending access.
+2. Add `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (a sender on the verified domain), and `TRIAL_REQUEST_TO` (the Myco team inbox) as server-only variables in the deployment environment.
+3. Redeploy, submit a trial request using a work inbox you control, and check both inboxes and the Resend email activity log.
+
+A valid trial request sends the team the application details and sends the applicant a receipt. The team reviews the request and sends the onboarding guide. When a Resend key is configured, trial requests use Resend. The existing lead webhook handles demo requests and handles trial requests when the Resend key is unset.
+
 ### Development Server
 
 ```bash
