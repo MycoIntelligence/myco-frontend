@@ -9,6 +9,7 @@ import {TestingDemo,PreProdDemo} from './quality-demos'
 import {ProductionDemo} from './production-demo'
 import {DitherFlow} from './dither-flow'
 import {SmoothCursor} from './smooth-cursor'
+import {PRReviewContext} from './pr-review-context'
 
 function Sample({index}: {index:number}) {
   const reduced=useReducedMotion()
@@ -43,6 +44,7 @@ function FeatureDetail({index}: {index:number}) {
     </section>
     <div className="feature-layout-visual"><Sample index={index}/></div>
     <p className="feature-layout-example"><strong>In practice.</strong> {feature.example}</p>
+    {feature.slug === 'pr-review' && <PRReviewContext/>}
     <section className="feature-layout-explanation" aria-labelledby="feature-explanation">
       <p className="feature-layout-summary">{feature.summary}</p>
       <dl>

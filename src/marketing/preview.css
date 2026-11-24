@@ -864,3 +864,36 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   outline-offset: 2px;
 }
 .story-chapter[data-text-only="true"] { grid-template-columns: minmax(0, 1fr); }
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-self: end;
+}
+
+.nav-login {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.nav-login:hover {
+  color: var(--blue);
+}
+
+@media (761px <= width <= 940px) {
+  html { scroll-padding-top: 88px; }
+  .nav { grid-template-columns: 1fr auto; gap: 10px; padding-block: 12px; }
+  .nav nav { grid-row: 2; grid-column: 1 / -1; justify-content: space-between; }
+}
+
+@media (max-width: 420px) {
+  .nav { margin-inline: 12px; }
+  .nav-actions { gap: 10px; }
+  .nav-actions .nav-pilot { padding-inline: 9px; font-size: 13px; }
+}

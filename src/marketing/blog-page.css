@@ -47,7 +47,7 @@
   justify-content: center;
   margin-top: 26px;
 }
-.blog-main .blog-hero-actions a {
+.blog-main .blog-hero-actions .blog-trial-button {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -62,8 +62,8 @@
   font-weight: 650;
   text-decoration: none;
 }
-.blog-main .blog-hero-actions a:hover { background: #d3eaff; }
-.blog-hero-actions a:focus-visible { outline: 2px solid #b7dbfc; outline-offset: 3px; }
+.blog-main .blog-hero-actions .blog-trial-button:hover { background: #d3eaff; }
+.blog-hero-actions .blog-trial-button:focus-visible { outline: 2px solid #b7dbfc; outline-offset: 3px; }
 .comparison-overview {
   padding-block: clamp(28px, 5vw, 50px) clamp(32px, 5vw, 52px);
   border-bottom: 1px solid var(--article-border);

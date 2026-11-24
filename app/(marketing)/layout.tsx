@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "@/src/marketing/preview.css";
+import { TrialRequestDialog } from "@/src/marketing/trial-request";
 
 export const metadata: Metadata = {
   title: { default: "Myco | Software Quality Infrastructure", template: "%s | Myco" },
@@ -13,7 +14,10 @@ export const viewport: Viewport = { themeColor: "#0b0c0e" };
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <TrialRequestDialog />
+      </body>
     </html>
   );
 }

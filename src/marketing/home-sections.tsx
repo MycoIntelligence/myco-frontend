@@ -1,8 +1,9 @@
 import Link from "next/link"
-import {FolderGit2, GitPullRequest, ListChecks} from 'lucide-react'
+import {ClipboardList, FolderGit2, GitPullRequest, ListChecks} from 'lucide-react'
 import {BorderBeam} from './border-beam-local'
 import {contactEmail} from './contact-email'
 import {FeaturesNavigation} from './features-navigation'
+import {TrialRequestButton} from './trial-request'
 
 function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'}) {
   const paths={
@@ -16,13 +17,11 @@ function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'
   return <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round"><path d={paths[name]}/></svg>
 }
 
-const trialSignupHref = 'https://app.mycointelligence.com'
-
-export function PilotLink({footer=false}: {footer?:boolean}) {
-  return <a className="pilot" href={footer ? trialSignupHref : '#pilot'}>
-    <img src="/marketing/github.png" alt="" />{footer ? 'Sign up with GitHub' : 'Request a free trial'} <span aria-hidden="true">&#8599;</span>
+export function PilotLink() {
+  return <TrialRequestButton className="pilot">
+    Request a free trial <span aria-hidden="true">→</span>
     <BorderBeam size={57} duration={5} initialOffset={15} colorFrom="#5aa9f2" colorTo="#c9e8ff" borderWidth={1.5} />
-  </a>
+  </TrialRequestButton>
 }
 
 export function WorkflowSection() {
@@ -72,17 +71,17 @@ export function HomeFooter() {
     <section className="pilot-close" id="pilot" aria-labelledby="pilot-title">
       <div className="pilot-close-inner">
         <h2 id="pilot-title">14 days of free code review</h2>
-        <p className="pilot-close-intro">Sign up with GitHub to start 14 days of free code review. GitHub will guide you through installing the Myco app on the repositories you choose.</p>
+        <p className="pilot-close-intro">Request a free trial to try Myco on a pull request. Once we approve your request, we’ll email you with next steps.</p>
         <ol className="pilot-close-steps" aria-label="How to get started">
           <li>
-            <span className="pilot-step-icon"><img src="/marketing/github.png" alt="" width="20" height="20" /></span>
-            <h3>Sign up with GitHub</h3>
-            <p>Sign in with the GitHub account you use for code review.</p>
+            <span className="pilot-step-icon"><ClipboardList size={21} aria-hidden="true" /></span>
+            <h3>Request a free trial</h3>
+            <p>Share your name, work email, and what you’d like to try.</p>
           </li>
           <li>
             <span className="pilot-step-icon"><FolderGit2 size={21} aria-hidden="true" /></span>
-            <h3>Install the Myco app</h3>
-            <p>Choose which repositories Myco can review.</p>
+            <h3>Choose a repository</h3>
+            <p>Once approved, choose where you’d like to start.</p>
           </li>
           <li>
             <span className="pilot-step-icon"><GitPullRequest size={21} aria-hidden="true" /></span>
@@ -95,27 +94,30 @@ export function HomeFooter() {
             <p>Read each finding, the line it points to, and the evidence behind it.</p>
           </li>
         </ol>
-        <PilotLink footer />
+        <PilotLink />
       </div>
     </section>
     <SiteFooter />
   </>
 }
 
-export function SiteHeader({pricing=false,featuresPage=false,securityPage=false,contactPage=false,blogPage=false}: {pricing?:boolean;featuresPage?:boolean;securityPage?:boolean;contactPage?:boolean;blogPage?:boolean}) {
-  const home=pricing || featuresPage || securityPage || contactPage || blogPage ? '/' : ''
+export function SiteHeader({pricing=false,featuresPage=false,securityPage=false,contactPage=false,blogPage=false,accountPage=false}: {pricing?:boolean;featuresPage?:boolean;securityPage?:boolean;contactPage?:boolean;blogPage?:boolean;accountPage?:boolean}) {
+  const home=pricing || featuresPage || securityPage || contactPage || blogPage || accountPage ? '/' : ''
   return <>
   <div id="home" aria-hidden="true"/>
   <header className="site-header">
     <div className="nav">
       <Link className="brand" href={home+'#home'}><img src="/marketing/myco-mark.png" alt="" />myco</Link>
       <nav aria-label="Main navigation">
-        <Link href={home+'#home'} aria-current={pricing || featuresPage || securityPage || contactPage || blogPage ? undefined : 'page'}>Home</Link>
+        <Link href={home+'#home'} aria-current={home ? undefined : 'page'}>Home</Link>
         <FeaturesNavigation active={featuresPage}/>
         <Link href="/security/" aria-current={securityPage ? 'page' : undefined}>Security</Link>
         <Link href="/pricing/" aria-current={pricing ? 'page' : undefined}>Pricing</Link>
       </nav>
-      <Link className="nav-pilot" href={home+'#pilot'}><img src="/marketing/github.png" alt="" />Request a free trial</Link>
+      <div className="nav-actions">
+        <Link className="nav-login" href="/login/">Log in</Link>
+        <TrialRequestButton className="nav-pilot" />
+      </div>
     </div>
   </header>
   </>

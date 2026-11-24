@@ -1,6 +1,6 @@
-import type { DemoFormData } from "./schema";
+import type { DemoFormData, TrialRequestData } from "./schema";
 
-export type Lead = DemoFormData & {
+export type Lead = (DemoFormData | TrialRequestData) & {
   id: string;
   timestamp: string;
 };

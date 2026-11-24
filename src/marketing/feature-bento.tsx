@@ -103,7 +103,7 @@ function BentoFeature({index}: {index:number}) {
 export function FeatureBento() {
   return <section id="features" className="feature-main home-feature-bento" aria-labelledby="home-features-title">
     <div className="feature-intro">
-      <h2 id="home-features-title" className="feature-intro-title">agentic Quality Assurance<br/> <em>From PRD to Production</em></h2>
+      <h2 id="home-features-title" className="feature-intro-title">Agentic Quality Assurance<br/> <em>From PRD to Production</em></h2>
       <p>Define what a change should do, then check that it does as you build, test, and ship</p>
     </div>
     <div className="feature-grid">

@@ -11,21 +11,24 @@ const FORBIDDEN_DOMAINS = [
   "protonmail.com",
 ];
 
-export const demoFormSchema = z.object({
+const workEmailSchema = z.string().trim().email("Please provide a valid email address.").max(254);
+
+const leadFields = z.object({
   fullName: z.string().trim().min(1, "Full name is required.").max(120),
-  workEmail: z
-    .string()
-    .trim()
-    .email("Please provide a valid email address.").max(254)
-    .refine(
-      (email) => {
-        const domain = email.split("@")[1]?.toLowerCase();
-        return !FORBIDDEN_DOMAINS.includes(domain);
-      },
-      {
-        message: "Please use your corporate work email, not a free email provider.",
-      }
-    ),
+  workEmail: workEmailSchema,
+  message: z.string().max(600, "Notes cannot exceed 600 characters.").optional(),
+  website: z.string().optional(),
+});
+
+export const trialRequestSchema = leadFields.extend({
+  kind: z.literal("trial"),
+});
+
+export const demoFormSchema = leadFields.extend({
+  workEmail: workEmailSchema.refine(
+    (email) => !FORBIDDEN_DOMAINS.includes(email.split("@")[1]?.toLowerCase()),
+    { message: "Please use your corporate work email, not a free email provider." }
+  ),
   company: z.string().trim().min(1, "Company name is required.").max(200),
   industry: z.enum(
     [
@@ -47,13 +50,7 @@ export const demoFormSchema = z.object({
       errorMap: () => ({ message: "Please select team size." }),
     }
   ),
-  message: z
-    .string()
-    .max(600, "Notes cannot exceed 600 characters.")
-    .optional()
-    .or(z.literal("")),
-  website: z.string().optional().or(z.literal("")),
 });
 
 export type DemoFormData = z.infer<typeof demoFormSchema>;
-
+export type TrialRequestData = z.infer<typeof trialRequestSchema>;

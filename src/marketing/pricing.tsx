@@ -10,7 +10,7 @@ const trial = '14-day trial'
 const monthly = 20
 const yearlyMonthly = 16
 const faqs = [
-  ['How does the 14-day trial work?', 'Sign up with GitHub to start your 14-day free trial. Install the Myco GitHub App on the repositories you choose and open a pull request to get your first review.'],
+  ['How does the 14-day trial work?', 'Submit a free trial request with your name and work email. Once we approve your request, we’ll email you with next steps for your 14 days of free code review.'],
   ['What is the difference between monthly and annual billing?', 'Team is $20 per developer per month when billed monthly, or $192 per developer when billed annually. That works out to $16 per month.'],
   ['What is included in Enterprise?', 'Enterprise pricing and configuration depend on your organization’s needs. Talk to us about your workflow, configuration, and support requirements.'],
   ['Which capabilities are available?', 'Contextual GitHub pull request review is available today. Ask us about supported integrations, permissions, and access to other capabilities during your evaluation.'],
