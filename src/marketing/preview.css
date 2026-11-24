@@ -332,6 +332,26 @@ nav a:hover,.footer-inner nav a:hover,.footer-social:hover{color:var(--blue)}
 .nav-pilot img{display:block;flex:none;width:16px;height:16px}
 .pilot img,.nav-pilot img{filter:brightness(0) invert(1)}
 .pilot:hover,.nav-pilot:hover{background:#1a2a3d}
+.nav-account-actions{display:flex;align-items:center;justify-self:end;gap:12px}
+.nav-sign-in{display:inline-flex;align-items:center;min-height:38px;padding:6px 10px;color:var(--text);font-size:14px;font-weight:650;white-space:nowrap}
+.nav-sign-in:hover{color:var(--blue)}
+.nav-account-placeholder{width:50px}
+.nav-profile{gap:7px;padding-inline:0}
+.nav-profile-avatar{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:#193651;color:#b9e1ff;font-size:14px}
+.nav-profile-name{max-width:80px;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:480px){
+  .site-header .nav{margin-inline:15px}
+  .nav-account-actions{gap:5px}
+  .nav-sign-in,.nav-account-actions .nav-pilot{font-size:12px;padding-inline:7px}
+  .nav-profile{padding-inline:3px}
+  .nav-profile-name{display:none}
+}
+@media(max-width:380px){
+  .site-header .nav{grid-template-columns:minmax(0,1fr) auto;column-gap:7px}
+  .site-header .brand{gap:7px;font-size:22px}
+  .site-header .brand img{width:24px;height:26px}
+  .nav-account-actions .nav-pilot img{display:none}
+}
 .hero-copy p,.story-heading p,.story-copy p:not(.story-label),.pilot-close p,.pricing-intro>p:last-child{color:var(--subtle)}
 .note{color:#c3d5e4;background:#0c1118e8}
 .hero-review-flow{background:radial-gradient(ellipse 710px 330px at 50% calc(var(--flow-hero-height) - 112px),#12263c99,transparent 98%),var(--page)}

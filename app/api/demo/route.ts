@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { demoFormSchema, trialGitHubUsernameError, trialRequestSchema } from "@/lib/schema";
 import { deliverLead } from "@/lib/leads";
+import { getWebsiteCustomerSession } from "@/lib/supabase/server";
 import { allowRequest, readJsonLimited, RequestTooLarge } from "@/lib/request-security";
 
 export async function POST(req: NextRequest) {
@@ -22,6 +23,13 @@ export async function POST(req: NextRequest) {
     }
 
     const isTrial = body && typeof body === "object" && "kind" in body && body.kind === "trial";
+    if (isTrial && !(await getWebsiteCustomerSession())) {
+      return NextResponse.json({
+        ok: false,
+        message: "Sign in to request a free trial.",
+      }, { status: 401 });
+    }
+
     const result = (isTrial ? trialRequestSchema : demoFormSchema).safeParse(body);
     if (!result.success) {
       const errors: Record<string, string> = {};
