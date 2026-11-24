@@ -5,7 +5,6 @@
 .feature-layout-nav a:hover .feature-nav-pill,.feature-layout-nav a[aria-current=page] .feature-nav-pill{background:#1b2c40;border-color:#527ba3;color:var(--blue)}
 .feature-layout-nav a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .feature-layout-intro{padding:clamp(46px,6.1vw,80px) 0 clamp(27px,4vw,48px);text-align:center}
-.feature-detail-heading{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:21px}
 .feature-layout-intro h1{max-width:900px;margin:0 auto;font-size:clamp(39px,6.2vw,76px);line-height:1.02;letter-spacing:-.062em;text-wrap:balance}
 .feature-layout-intro h1 em{color:var(--blue);font-style:normal}
 .feature-layout-pr-review .feature-layout-intro h1,
@@ -58,6 +57,7 @@
 .feature-layout-explanation dt{font-weight:650}
 .feature-layout-explanation dt .feature-beta{margin-inline-start:7px}
 .feature-layout-explanation dd{max-width:63ch;margin:0;color:#bac8da;font-size:14px;line-height:1.55}
+.feature-layout-requirement-check{margin-top:clamp(26px,4vw,48px)}
 .feature-layout-actions{display:flex;margin-top:20px}
 .feature-layout-next{min-height:44px;font-size:14px;font-weight:600;text-decoration:none}
 .feature-layout-next svg{flex-shrink:0}

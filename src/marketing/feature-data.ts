@@ -2,7 +2,7 @@ export const features = [
   {
     slug:'pr-review', label:'PR Review', beta:false,
     title:['See what your PR','could break before you merge'],
-    explanation:'Check the change against requirements and see what could break in this repo or another',
+    explanation:'Check the change against intended requirements, find potential bugs & regressions across authorised repositories',
     summary:'Myco checks pull requests against product requirements and traces what could break downstream. Each bug, regression, or potential security finding includes the exact line, supporting evidence, and likely impact.',
     indexCopy:'Catch changes that break the spec or downstream behavior.',
     sections:[

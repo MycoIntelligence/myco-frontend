@@ -71,17 +71,17 @@ export function HomeFooter() {
     <section className="pilot-close" id="pilot" aria-labelledby="pilot-title">
       <div className="pilot-close-inner">
         <h2 id="pilot-title">14 days of free code review</h2>
-        <p className="pilot-close-intro">Request a free trial to try Myco on a pull request. Once we approve your request, we’ll email you with next steps.</p>
+        <p className="pilot-close-intro">Try Myco on a pull request. We’ll review your request and email you an onboarding guide.</p>
         <ol className="pilot-close-steps" aria-label="How to get started">
           <li>
             <span className="pilot-step-icon"><ClipboardList size={21} aria-hidden="true" /></span>
             <h3>Request a free trial</h3>
-            <p>Share your name, work email, and what you’d like to try.</p>
+            <p>Share your business email, company, and GitHub username.</p>
           </li>
           <li>
             <span className="pilot-step-icon"><FolderGit2 size={21} aria-hidden="true" /></span>
             <h3>Choose a repository</h3>
-            <p>Once approved, choose where you’d like to start.</p>
+            <p>Follow the onboarding guide to choose where you’d like to start.</p>
           </li>
           <li>
             <span className="pilot-step-icon"><GitPullRequest size={21} aria-hidden="true" /></span>
@@ -114,10 +114,7 @@ export function SiteHeader({pricing=false,featuresPage=false,securityPage=false,
         <Link href="/security/" aria-current={securityPage ? 'page' : undefined}>Security</Link>
         <Link href="/pricing/" aria-current={pricing ? 'page' : undefined}>Pricing</Link>
       </nav>
-      <div className="nav-actions">
-        <Link className="nav-login" href="/login/">Log in</Link>
-        <TrialRequestButton className="nav-pilot" />
-      </div>
+      <TrialRequestButton className="nav-pilot" />
     </div>
   </header>
   </>

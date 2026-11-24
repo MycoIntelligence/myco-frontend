@@ -59,7 +59,7 @@ export function PRReviewContext() {
 
   return (
     <section className="pr-context" aria-labelledby="pr-context-title">
-      <h2 id="pr-context-title">From context to a PR finding</h2>
+      <h2 id="pr-context-title">From context to Bug Detection</h2>
       <p className="mc-intro">See what Myco checks before it leaves a comment.</p>
       <div className="mc-workflow">
         <div className="mc-inputs" role="group" aria-label="Context sources">

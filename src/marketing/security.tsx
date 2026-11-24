@@ -19,7 +19,6 @@ export default function SecurityPage(){
     <main>
       <DitherFlow className="security-hero-flow">
         <section className="security-detail-hero" aria-labelledby="security-title">
-          <span className="eyebrow">Security by Architecture</span>
           <h1 id="security-title">You choose what<br/> <em>Myco can review</em></h1>
           <p>How Myco accesses your repositories, handles source code, and shares its findings.</p>
         </section>

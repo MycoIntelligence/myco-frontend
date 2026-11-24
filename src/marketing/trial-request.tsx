@@ -4,7 +4,7 @@ import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import "./trial-request.css";
 
 const dialogId = "free-trial-request";
-const intro = "Enter your details below. Once we approve your request, you can try Myco free for 14 days.";
+const intro = "Share your details and we’ll review your request. We’ll email you an onboarding guide to get started.";
 
 export function TrialRequestButton({ className, children }: { className: string; children?: ReactNode }) {
   function openForm() {
@@ -72,15 +72,29 @@ export function TrialRequestDialog() {
       <p className="trial-dialog-badge">14 days of free code review</p>
       <h2 id="trial-dialog-title">{sent ? "Request received" : "Request a free trial"}</h2>
       <p id="trial-dialog-intro" role={sent ? "status" : undefined}>
-        {sent ? "We’ll review your request and email you with next steps." : intro}
+        {sent ? "We’ll review your details and email you an onboarding guide." : intro}
       </p>
       {!sent && (
         <form onSubmit={submit} method="post">
-          <label htmlFor="free-trial-name">Full name</label>
-          <input id="free-trial-name" name="fullName" autoComplete="name" placeholder="Alex Jones" required maxLength={120} />
+          <div className="trial-dialog-name-fields">
+            <div>
+              <label htmlFor="free-trial-first-name">First name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+              <input id="free-trial-first-name" name="firstName" autoComplete="given-name" placeholder="Alex" required maxLength={60} />
+            </div>
+            <div>
+              <label htmlFor="free-trial-last-name">Last name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+              <input id="free-trial-last-name" name="lastName" autoComplete="family-name" placeholder="Jones" required maxLength={60} />
+            </div>
+          </div>
 
-          <label htmlFor="free-trial-email">Work email</label>
+          <label htmlFor="free-trial-email">Business email<span className="trial-dialog-required" aria-hidden="true">*</span></label>
           <input id="free-trial-email" name="workEmail" type="email" autoComplete="email" placeholder="alex@acme.com" required maxLength={254} />
+
+          <label htmlFor="free-trial-company">Company<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+          <input id="free-trial-company" name="company" autoComplete="organization" placeholder="Acme" required maxLength={200} />
+
+          <label htmlFor="free-trial-github">GitHub username<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+          <input id="free-trial-github" name="githubUsername" autoCapitalize="off" spellCheck={false} placeholder="alex-jones" required maxLength={39} />
 
           <label htmlFor="free-trial-message">What would you like to try? <span>Optional</span></label>
           <textarea id="free-trial-message" name="message" rows={3} maxLength={600} placeholder="For example, catch regressions in our checkout flow." />

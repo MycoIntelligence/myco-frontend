@@ -5,7 +5,6 @@
   --mc-text: #f6f8fc;
   --mc-muted: #b7c0ce;
   --mc-blue: #9bcfff;
-  margin-top: clamp(34px, 6vw, 64px);
   color: var(--mc-text);
   background: var(--mc-page);
   border: 1px solid #242b34;

@@ -84,7 +84,7 @@ function Comparison() {
       <section id="review-workflows">
         <h2>How Myco and CodeRabbit review a pull request</h2>
         <p>CodeRabbit offers automated code review with PR summaries, inline findings, and suggested fixes. It can also assess linked Jira acceptance criteria and inspect related repositories when those sources are configured. <a href="https://docs.coderabbit.ai/guides/code-review-overview">CodeRabbit review documentation &#8599;</a></p>
-        <p>There’s overlap with CodeRabbit on PR review. We’re building Myco as a QA layer for the feature you’re shipping. Myco checks the PR against the requirements available to the review, whether they’re captured in a ticket, PRD, meeting notes, or a Slack message. It also traces what could break across authorized repositories. When it flags a bug, it shows you the exact line and why it matters.</p>
+        <p>There’s overlap with CodeRabbit on PR review. We’re building Myco as a QA layer for the feature you’re shipping. Myco checks the PR against the requirements available to the review, whether they’re captured in a ticket, PRD, meeting notes, or a Slack thread. It also traces what could break across authorized repositories. When it flags a bug, it shows you the exact line and why it matters.</p>
         <p>We’re building toward using that same context to automate tests and help engineers catch and explain failures in staging and production.</p>
       </section>
 
