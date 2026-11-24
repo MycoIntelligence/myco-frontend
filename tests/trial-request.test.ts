@@ -36,7 +36,7 @@ describe("Free trial requests", () => {
     });
   });
 
-  it("requires both names, business email, company, and GitHub username", async () => {
+  it("requires both names, business email, and GitHub username", async () => {
     const response = await POST(request({ kind: "trial", workEmail: "invalid" }));
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({
@@ -45,11 +45,16 @@ describe("Free trial requests", () => {
         firstName: expect.any(String),
         lastName: expect.any(String),
         workEmail: expect.any(String),
-        company: expect.any(String),
         githubUsername: expect.any(String),
       },
     });
     expect(deliverLead).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, ""])("accepts a trial request with company %j", async (company) => {
+    const response = await POST(request({ ...trial, company }));
+    expect(response.status).toBe(200);
+    expect(deliverLead).toHaveBeenCalledWith(expect.objectContaining({ fullName: "Alex Jones" }));
   });
 
   it("rejects a URL in the GitHub username field", async () => {

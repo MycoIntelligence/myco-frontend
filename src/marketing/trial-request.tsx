@@ -90,14 +90,11 @@ export function TrialRequestDialog() {
           <label htmlFor="free-trial-email">Business email<span className="trial-dialog-required" aria-hidden="true">*</span></label>
           <input id="free-trial-email" name="workEmail" type="email" autoComplete="email" placeholder="alex@acme.com" required maxLength={254} />
 
-          <label htmlFor="free-trial-company">Company<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-          <input id="free-trial-company" name="company" autoComplete="organization" placeholder="Acme" required maxLength={200} />
+          <label htmlFor="free-trial-company">Company <span>Optional</span></label>
+          <input id="free-trial-company" name="company" autoComplete="organization" placeholder="Acme" maxLength={200} />
 
           <label htmlFor="free-trial-github">GitHub username<span className="trial-dialog-required" aria-hidden="true">*</span></label>
           <input id="free-trial-github" name="githubUsername" autoCapitalize="off" spellCheck={false} placeholder="alex-jones" required maxLength={39} />
-
-          <label htmlFor="free-trial-message">What would you like to try? <span>Optional</span></label>
-          <textarea id="free-trial-message" name="message" rows={3} maxLength={600} placeholder="For example, catch regressions in our checkout flow." />
 
           <div className="trial-dialog-trap" aria-hidden="true">
             <label htmlFor="free-trial-website">Website</label>

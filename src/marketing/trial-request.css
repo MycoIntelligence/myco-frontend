@@ -79,7 +79,7 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
 
 .trial-dialog label span { color: var(--subtle); font-size: 12px; font-weight: 400; }
 
-.trial-dialog :is(input, textarea) {
+.trial-dialog input {
   display: block;
   width: 100%;
   min-height: 44px;
@@ -94,9 +94,8 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
 }
 
 .trial-dialog label .trial-dialog-required { color: var(--blue); font-weight: 700; }
-.trial-dialog textarea { resize: vertical; }
-.trial-dialog :is(input, textarea)::placeholder { color: #8794a6; opacity: 1; }
-.trial-dialog :is(input, textarea, button):focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.trial-dialog input::placeholder { color: #8794a6; opacity: 1; }
+.trial-dialog :is(input, button):focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 .trial-dialog .trial-dialog-submit {
   display: flex;
