@@ -53,7 +53,7 @@ export default function PricingPage() {
               <p className="plan-summary">For engineering teams getting started with contextual review.</p>
               <div className="plan-price" aria-live="polite"><div><strong>${annual ? yearlyMonthly : monthly}</strong><span> / developer / month</span></div><p>{annual ? '$192 per developer, billed annually.' : 'Billed monthly.'}</p></div>
               <PlanFeatures features={['Contextual GitHub pull request review','Review against available requirements and authorized code','14-day trial with no credit card required']}/>
-              <Link className="plan-button plan-primary" href="/#pilot">Request your 14-day free trial <Arrow/></Link>
+              <Link className="plan-button plan-primary" href="/#pilot">Upgrade to Pro <Arrow/></Link>
             </article>
             <article className="plan plan-glare">
               <div className="plan-heading"><h2>Enterprise</h2></div>

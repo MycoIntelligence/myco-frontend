@@ -5,6 +5,51 @@ import {useReducedMotion} from 'motion/react'
 import {SiteHeader, SiteFooter} from './home-sections'
 import {SmoothCursor} from './smooth-cursor'
 
+const comparedProducts = [
+  {
+    name: 'CodeRabbit',
+    logo: '/marketing/coderabbit.png',
+    description: 'Automated code review in GitHub.',
+    capabilities: [
+      'PR summaries, inline comments, and suggested fixes',
+      'Acceptance criteria checks for linked Jira issues',
+      'Related repository context when configured',
+    ],
+  },
+  {
+    name: 'Myco',
+    logo: '/marketing/myco-mark.png',
+    description: 'Feature QA that starts in your pull request.',
+    capabilities: [
+      'Checks whether the code matches the available product requirements',
+      'Traces what could break across authorized repositories',
+      'Shows the exact line and evidence behind each finding',
+    ],
+  },
+]
+
+function ComparisonCards() {
+  return <section className="comparison-overview" id="at-a-glance" aria-labelledby="comparison-overview-title">
+    <h2 id="comparison-overview-title">PR review at a glance</h2>
+    <div className="comparison-products">
+      {comparedProducts.map(({name, logo, description, capabilities}) => (
+        <div className="comparison-product" key={name}>
+          <h3><img src={logo} alt="" width={32} height={32} />{name}</h3>
+          <p>{description}</p>
+          <ul role="list">
+            {capabilities.map(capability => <li key={capability}>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {capability}
+            </li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+}
+
 function Comparison() {
   return <main className="blog-main comparison-main">
     <article className="blog-article">
@@ -16,6 +61,7 @@ function Comparison() {
           <Link href="/#pilot">Request your 14-day free trial <span aria-hidden="true">&#8599;</span></Link>
         </div>
       </header>
+      <ComparisonCards />
       <div className="blog-reading-layout">
       <nav className="blog-contents" aria-label="On this page">
         <span>On this page</span>
@@ -38,29 +84,6 @@ function Comparison() {
         <p>CodeRabbit offers automated code review with PR summaries, inline findings, and suggested fixes. It can also assess linked Jira acceptance criteria and inspect related repositories when those sources are configured. <a href="https://docs.coderabbit.ai/guides/code-review-overview">CodeRabbit review documentation &#8599;</a></p>
         <p>There’s overlap with CodeRabbit on PR review. We’re building Myco as a QA layer for the feature you’re shipping. Myco checks the PR against the requirements available to the review, whether they’re captured in a ticket, PRD, meeting notes, or a Slack message. It also traces what could break across authorized repositories. When it flags a bug, it shows you the exact line and why it matters.</p>
         <p>We’re building toward using that same context to automate tests and help engineers catch and explain failures in staging and production.</p>
-        <div className="blog-table" role="region" aria-label="Side-by-side comparison" tabIndex={0}>
-          <table className="blog-comparison">
-            <caption>GitHub PR review, side by side</caption>
-            <thead><tr><th scope="col">What to compare</th><th scope="col">Myco</th><th scope="col">CodeRabbit</th></tr></thead>
-            <tbody>
-              <tr>
-                <th scope="row">Requirements</th>
-                <td>Checks the implementation against the product requirements available to the review and flags where behavior diverges.</td>
-                <td>Assesses changes against acceptance criteria from linked Jira issues.</td>
-              </tr>
-              <tr>
-                <th scope="row">Downstream changes</th>
-                <td>Traces a change into authorized repositories to identify which consumers could break.</td>
-                <td>Uses linked repositories to identify issues such as API mismatches and breaking changes.</td>
-              </tr>
-              <tr>
-                <th scope="row">GitHub feedback</th>
-                <td>Flags requirement mismatches, implementation bugs, regressions, and potential security issues with the relevant line and supporting evidence.</td>
-                <td>Provides PR summaries, inline comments, and suggested fixes.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </section>
 
       <section id="review-gaps">

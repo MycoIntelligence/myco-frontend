@@ -19,7 +19,7 @@
 .blog-heading {
   display: grid;
   justify-items: center;
-  padding: clamp(28px, 4.5vw, 56px) 8px clamp(44px, 7vw, 88px);
+  padding: clamp(28px, 4.5vw, 56px) 8px clamp(32px, 5vw, 54px);
   border: 0;
   border-bottom: 1px solid var(--article-border);
   background: transparent;
@@ -66,6 +66,65 @@
 }
 .blog-main .blog-hero-actions a:hover { background: #d3eaff; }
 .blog-hero-actions a:focus-visible { outline: 2px solid #b7dbfc; outline-offset: 3px; }
+.comparison-overview {
+  padding-block: clamp(28px, 5vw, 50px) clamp(32px, 5vw, 52px);
+  border-bottom: 1px solid var(--article-border);
+}
+.comparison-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.comparison-product {
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--article-border);
+  border-radius: 14px;
+  background: var(--article-panel);
+  --check-color: #aab7c9;
+}
+.comparison-product h3 {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(22px, 3vw, 27px);
+  letter-spacing: -.03em;
+}
+.comparison-product h3 img {
+  display: block;
+  flex: none;
+  border-radius: 7px;
+  object-fit: contain;
+}
+.comparison-product p { margin: 10px 0 0; }
+.comparison-product :is(p, li) { color: var(--text); }
+.comparison-product ul {
+  display: grid;
+  gap: 13px;
+  margin: 20px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--article-border);
+  list-style: none;
+}
+.comparison-product li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.comparison-product li svg {
+  width: 16px;
+  height: 16px;
+  margin-top: .2em;
+  color: var(--check-color);
+}
+@media (max-width: 650px) {
+  .comparison-products { grid-template-columns: minmax(0, 1fr); }
+}
 .blog-review-gaps {
   margin-top: 18px;
   border: 1px solid var(--article-border);
@@ -108,33 +167,6 @@
 .blog-body p { margin: 14px 0 0; }
 .blog-body p a { white-space: normal; }
 .blog-body em, .blog-body strong { color: var(--text); }
-.blog-table {
-  overflow-x: auto;
-  margin-top: 24px;
-  border: 1px solid var(--article-border);
-  border-radius: 13px;
-  background: var(--article-panel);
-}
-.blog-table:focus-visible { outline: 2px solid #a8d0f2; outline-offset: 3px; }
-.blog-comparison { width: 100%; min-width: 540px; border-collapse: collapse; font-size: 14px; line-height: 1.56; }
-.blog-comparison caption {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--article-border);
-  color: #b9c2d0;
-  text-align: left;
-}
-.blog-comparison th, .blog-comparison td {
-  padding: 16px;
-  border-bottom: 1px solid var(--article-border);
-  text-align: left;
-  vertical-align: top;
-}
-.blog-comparison :is(th, td) + :is(th, td) { border-left: 1px solid var(--article-border); }
-.blog-comparison tbody tr:last-child > * { border-bottom: 0; }
-.blog-comparison thead th { background: #171c25; color: var(--text); }
-.blog-comparison thead th:nth-child(2) { color: #b7dbfc; }
-.blog-comparison td { width: 40%; color: #b9c2d0; }
-.blog-comparison td a { display: inline-block; margin-top: 4px; }
 .blog-body ol { margin: 22px 0 0; padding-left: 1.4em; }
 .blog-body ol li { padding-left: 6px; }
 .blog-body ol li + li { margin-top: 12px; }
