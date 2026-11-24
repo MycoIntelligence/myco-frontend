@@ -1,0 +1,188 @@
+@import "./tokens.css";
+
+html {
+  color-scheme: light;
+  scroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--bg-pale);
+  color: var(--ink-on-light);
+  font-family: var(--font-body);
+  overflow-x: clip;
+  margin: 0;
+  padding: 0;
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: inherit;
+}
+
+/* Typographic scale */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.035em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.editorial-headline {
+  font-family: var(--font-display);
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.editorial-title {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.editorial-lead {
+  font-family: var(--font-body);
+  letter-spacing: -0.015em;
+  line-height: 1.55;
+}
+
+.font-doto-scanline {
+  font-family: var(--site-mono);
+  font-weight: 700;
+  line-height: 1;
+  -webkit-mask-image: repeating-linear-gradient(to bottom, #000 0 3px, transparent 3px 5px);
+  mask-image: repeating-linear-gradient(to bottom, #000 0 3px, transparent 3px 5px);
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.two-tone-title {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.two-tone-title .muted {
+  opacity: 0.55;
+}
+
+/* Atmospheric overlays & textures */
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-repeat: repeat;
+  background-size: 160px 160px;
+}
+
+/* Glassmorphism surfaces */
+.glass-card-dark {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(220, 232, 228, 0.12);
+}
+
+.glass-card-dark:hover {
+  border-color: rgba(14, 148, 110, 0.45);
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(22, 24, 28, 0.1);
+}
+
+.glass-card-light:hover {
+  border-color: rgba(14, 148, 110, 0.5);
+}
+
+/* Atmospheric light cones */
+.ambient-glow-emerald {
+  position: absolute;
+  pointer-events: none;
+  width: 480px;
+  height: 480px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(14, 148, 110, 0.18) 0%, transparent 70%);
+  filter: blur(70px);
+}
+
+.ambient-glow-mint {
+  position: absolute;
+  pointer-events: none;
+  width: 440px;
+  height: 440px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(203, 225, 227, 0.16) 0%, transparent 70%);
+  filter: blur(60px);
+}
+
+/* Typewriter terminal cursor */
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.88em;
+  background-color: var(--accent);
+  vertical-align: middle;
+  margin-left: 3px;
+  animation: typewriter-blink 1s steps(2, start) infinite;
+}
+
+@keyframes typewriter-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Focus drift wave */
+.focus-drift-loop {
+  animation: focus-drift-cycle 7s ease-in-out infinite;
+}
+
+@keyframes focus-drift-cycle {
+  0%, 65%, 100% {
+    filter: blur(0px);
+  }
+  80% {
+    filter: blur(2.5px);
+  }
+}
+
+/* Duotone image filter */
+.duotone-engineering {
+  filter: grayscale(100%) contrast(110%);
+  mix-blend-mode: luminosity;
+  transition: filter 300ms ease, transform 300ms ease;
+}
+
+.duotone-engineering:hover {
+  filter: grayscale(20%) contrast(105%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-cursor,
+  .focus-drift-loop {
+    animation: none !important;
+  }
+}

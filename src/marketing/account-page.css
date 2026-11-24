@@ -1,0 +1,41 @@
+.account-page {
+  display: grid;
+  place-items: start center;
+  padding: clamp(56px, 10vw, 128px) 16px 64px;
+}
+
+.account-card {
+  width: min(100%, 29rem);
+  padding: clamp(24px, 5vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  text-align: center;
+}
+
+.account-card h1 {
+  margin: 0 0 12px;
+  font-size: clamp(32px, 5vw, 42px);
+}
+
+.account-card p {
+  margin: 0;
+  color: var(--subtle);
+  font-size: 16px;
+}
+
+.account-card .account-continue {
+  width: 100%;
+  min-height: 46px;
+  margin-block: 28px 20px;
+}
+
+.account-card .account-switch {
+  font-size: 14px;
+}
+
+.account-switch a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

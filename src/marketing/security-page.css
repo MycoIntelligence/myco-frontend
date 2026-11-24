@@ -1,0 +1,29 @@
+.security-detail{max-width:1120px;margin:auto;padding:0 24px 80px}
+.security-hero-flow{background:var(--page)}
+.security-hero-flow .flow-dither{height:100%;mask-image:linear-gradient(to bottom,#000 62%,transparent 100%)}
+.security-detail-hero{text-align:center;max-width:1120px;margin:auto;padding:clamp(50px,7vw,90px) 24px clamp(36px,5.7vw,70px)}
+.security-detail-hero h1{max-width:900px;margin:0 auto;font-size:clamp(38px,7vw,76px);line-height:1.02;letter-spacing:-.064em;text-wrap:balance}
+.security-detail-hero h1 em{font-style:normal;color:var(--blue)}
+.security-detail-hero p{margin:18px auto 0;max-width:48ch;color:var(--subtle);font-size:clamp(15px,2vw,18px);text-wrap:balance}
+.security-detail-principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #30465d;border-radius:18px;overflow:hidden;background:#101722f2}
+.security-detail-principles>section{padding:20px clamp(16px,3vw,32px) 26px}
+.security-detail-principles>section+section{border-left:1px solid #28374a}
+.security-detail-principles img{display:block;margin:-2px 0 5px -9px}
+.security-detail-principles h2{margin:0 0 9px;font-size:20px;letter-spacing:-.035em;line-height:1.2}
+.security-detail-principles p,.security-detail-lead p{margin:0;color:var(--subtle);font-size:14px;line-height:1.6}
+.security-detail-section{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.65fr);gap:18px 36px;margin:clamp(39px,6vw,74px) 0 0}
+.security-detail-lead h2{margin:0 0 9px;font-size:clamp(25px,3.6vw,38px);letter-spacing:-.045em;line-height:1.13}
+.security-detail-permissions,.security-detail-steps{margin:0;color:var(--subtle);font-size:14px;line-height:1.55}
+.security-detail-permissions>div{display:grid;grid-template-columns:minmax(105px,1fr) minmax(0,2fr);gap:12px;border-top:1px solid var(--line);padding:13px 0}
+.security-detail-permissions dt,.security-detail-steps strong{color:var(--text);font-weight:600}
+.security-detail-permissions dd{margin:0}
+.security-detail-steps{padding-left:22px}
+.security-detail-steps li{border-top:1px solid var(--line);padding:13px 0 13px 3px}
+.security-detail-steps li::marker{color:var(--blue);font-weight:600}
+@media(max-width:690px){
+  .security-detail,.security-detail-hero{padding-inline:18px}
+  .security-detail-principles,.security-detail-section{grid-template-columns:1fr}
+  .security-detail-principles>section{padding:17px 20px 22px}
+  .security-detail-principles>section+section{border-left:0;border-top:1px solid #28374a}
+  .security-detail-principles img{width:72px;height:72px}
+}

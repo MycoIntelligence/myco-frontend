@@ -1,0 +1,16 @@
+/* A quieter editorial rhythm for Myco's original visual language. */
+.md-site { background: #f7f9f8; }
+.md-site .md-section-head h2,.md-site .md-problem h2,.md-site .md-evaluate h2,.md-site .md-faq h2 { letter-spacing: -.055em; font-weight: 500; }
+.md-site .md-kicker { letter-spacing: .14em; }
+.md-site .md-process { background: #e2eadc; border-block: 1px solid #cad8c6; }
+.md-site .md-steps article { border-top: 1px solid #8ea48f; border-radius: 0; background: transparent; box-shadow: none; }
+.md-site .md-step-number { color: #476c55; }
+.md-site .md-audience-grid article { border-radius: 4px; border: 1px solid #d2ddcd; background: #f9faf5; box-shadow: none; }
+.md-site .md-audience-caption { border-top: 1px solid #d2ddcd; }
+.md-site .md-trust { background: #142b22; }
+.md-site .md-live,.md-site .md-direction article { border-radius: 4px; }
+.eco-marquee-section { background: #e8eee2; border-block: 1px solid #d5dfd1; }
+.eco-tile { border-radius: 8px; box-shadow: none; border: 1px solid #d4ded0; }
+.eco-globe-badge { border-radius: 8px; box-shadow: none; }
+.eco-title { letter-spacing: -.055em; }
+@media (prefers-reduced-motion: reduce) { .eco-marquee-track { transform: none !important; } .eco-marquee-mask { overflow-x: auto; mask-image: none; -webkit-mask-image: none; } }
