@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { trialEmailSchema, trialGitHubUsernameSchema, trialRequestSchema } from "@/lib/schema";
 import "./trial-request.css";
 
 const dialogId = "free-trial-request";
@@ -26,28 +27,72 @@ export function TrialRequestDialog() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, string>>>({});
+
+  function validateOnBlur(input: HTMLInputElement) {
+    const schema = input.name === "workEmail" ? trialEmailSchema : trialGitHubUsernameSchema;
+    const result = schema.safeParse(input.value);
+    if (!result.success) {
+      setFieldErrors((previous) => ({ ...previous, [input.name]: result.error.issues[0]?.message }));
+    }
+  }
+
+  function fieldFeedback(name: string) {
+    return fieldErrors[name] && (
+      <p id={`trial-error-${name}`} className="trial-dialog-field-error" role="alert">{fieldErrors[name]}</p>
+    );
+  }
+
+  function fieldAttributes(name: string) {
+    return {
+      name,
+      "aria-invalid": fieldErrors[name] ? true : undefined,
+      "aria-describedby": fieldErrors[name] ? `trial-error-${name}` : undefined,
+      onChange: () => setFieldErrors((previous) => (
+        previous[name] ? { ...previous, [name]: undefined } : previous
+      )),
+      readOnly: sending,
+    };
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending.current) return;
-    const fields = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const payload = { ...Object.fromEntries(new FormData(form)), kind: "trial" };
+    const validation = trialRequestSchema.safeParse(payload);
+    setError("");
 
+    function showFieldErrors(errors: Record<string, string>) {
+      setFieldErrors(errors);
+      const firstField = form.elements.namedItem(Object.keys(errors)[0]);
+      if (firstField instanceof HTMLInputElement && dialog.current?.open) firstField.focus();
+    }
+
+    if (!validation.success) {
+      const errors = Object.entries(validation.error.flatten().fieldErrors);
+      showFieldErrors(Object.fromEntries(errors.map(([name, messages]) => [name, messages[0]])));
+      return;
+    }
+
+    setFieldErrors({});
     pending.current = true;
     setSending(true);
-    setError("");
 
     try {
       const response = await fetch("/api/demo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...Object.fromEntries(fields), kind: "trial" }),
+        body: JSON.stringify(payload),
       });
       const result = await response.json();
       if (response.ok && result.ok) {
         if (dialog.current?.open) closeButton.current?.focus();
         setSent(true);
+      } else if (result.errors) {
+        showFieldErrors(result.errors);
       } else {
-        setError(Object.values(result.errors ?? {}).join(" ") || result.message || "We couldn’t send your request. Try again.");
+        setError(result.message || "We couldn’t send your request. Try again.");
       }
     } catch {
       setError("We couldn’t send your request. Try again.");
@@ -75,23 +120,27 @@ export function TrialRequestDialog() {
         {sent ? "We’ll review your details and email you an onboarding guide." : intro}
       </p>
       {!sent && (
-        <form onSubmit={submit} method="post">
+        <form onSubmit={submit} method="post" noValidate>
           <div className="trial-dialog-name-fields">
             <div>
               <label htmlFor="free-trial-first-name">First name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-              <input id="free-trial-first-name" name="firstName" autoComplete="given-name" placeholder="Alex" required maxLength={60} />
+              <input id="free-trial-first-name" {...fieldAttributes("firstName")} autoComplete="given-name" placeholder="Alex" required maxLength={60} />
+              {fieldFeedback("firstName")}
             </div>
             <div>
               <label htmlFor="free-trial-last-name">Last name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-              <input id="free-trial-last-name" name="lastName" autoComplete="family-name" placeholder="Jones" required maxLength={60} />
+              <input id="free-trial-last-name" {...fieldAttributes("lastName")} autoComplete="family-name" placeholder="Jones" required maxLength={60} />
+              {fieldFeedback("lastName")}
             </div>
           </div>
 
-          <label htmlFor="free-trial-email">Business email<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-          <input id="free-trial-email" name="workEmail" type="email" autoComplete="email" placeholder="alex@acme.com" required maxLength={254} />
+          <label htmlFor="free-trial-email">Work email<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+          <input id="free-trial-email" {...fieldAttributes("workEmail")} type="email" autoComplete="email" placeholder="alex@acme.com" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={254} />
+          {fieldFeedback("workEmail")}
 
           <label htmlFor="free-trial-github">GitHub username<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-          <input id="free-trial-github" name="githubUsername" autoCapitalize="off" spellCheck={false} placeholder="alex-jones" required maxLength={39} />
+          <input id="free-trial-github" {...fieldAttributes("githubUsername")} autoCapitalize="off" spellCheck={false} placeholder="alex-jones" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={39} />
+          {fieldFeedback("githubUsername")}
 
           <div className="trial-dialog-trap" aria-hidden="true">
             <label htmlFor="free-trial-website">Website</label>

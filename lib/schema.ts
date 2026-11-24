@@ -11,7 +11,16 @@ const FORBIDDEN_DOMAINS = [
   "protonmail.com",
 ];
 
-const workEmailSchema = z.string().trim().email("Please provide a valid email address.").max(254);
+const workEmailSchema = z.string().trim().email("Please enter a valid email address.").max(254);
+
+export const trialEmailSchema = workEmailSchema
+  .refine((email) => !FORBIDDEN_DOMAINS.includes(email.split("@")[1]?.toLowerCase()), {
+    message: "Please enter your company email address.",
+  });
+
+export const trialGitHubUsernameSchema = z.string().trim()
+  .max(39, "Please enter the correct GitHub username.")
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/i, "Please enter the correct GitHub username.");
 
 const leadFields = z.object({
   fullName: z.string().trim().min(1, "Full name is required.").max(120),
@@ -26,9 +35,8 @@ export const trialRequestSchema = leadFields.omit({ fullName: true, message: tru
   kind: z.literal("trial"),
   firstName: z.string({ required_error: "First name is required." }).trim().min(1, "First name is required.").max(60),
   lastName: z.string({ required_error: "Last name is required." }).trim().min(1, "Last name is required.").max(60),
-  githubUsername: z.string({ required_error: "GitHub username is required." }).trim()
-    .max(39, "GitHub username must be 39 characters or fewer.")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/i, "Enter a GitHub username, such as alex-jones."),
+  workEmail: trialEmailSchema,
+  githubUsername: trialGitHubUsernameSchema,
 }).transform((trial) => ({
   ...trial,
   fullName: `${trial.firstName} ${trial.lastName}`,

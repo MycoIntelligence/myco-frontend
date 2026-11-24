@@ -76,7 +76,7 @@ export function HomeFooter() {
           <li>
             <span className="pilot-step-icon"><ClipboardList size={21} aria-hidden="true" /></span>
             <h3>Request a free trial</h3>
-            <p>Share your name, business email, and GitHub username.</p>
+            <p>Share your name, work email, and GitHub username.</p>
           </li>
           <li>
             <span className="pilot-step-icon"><FolderGit2 size={21} aria-hidden="true" /></span>

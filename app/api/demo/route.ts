@@ -34,6 +34,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, errors }, { status: 400 });
     }
 
+    if ("githubUsername" in result.data) {
+      try {
+        const username = result.data.githubUsername;
+        const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
+          headers: { Accept: "application/vnd.github+json" },
+          cache: "no-store",
+          redirect: "error",
+          signal: AbortSignal.timeout(5000),
+        });
+        if (response.status !== 404 && !response.ok) throw new Error("GitHub lookup failed");
+        const account = response.ok ? await response.json() : null;
+
+        if (account?.type !== "User" || account.login?.toLowerCase() !== username.toLowerCase()) {
+          return NextResponse.json({
+            ok: false,
+            errors: { githubUsername: "Please enter the correct GitHub username." },
+          }, { status: 400 });
+        }
+      } catch {
+        return NextResponse.json({
+          ok: false,
+          message: "We couldn’t verify your GitHub username right now. Please try again.",
+        }, { status: 503 });
+      }
+    }
+
     const leadId = `lead_${Math.random().toString(36).substring(2, 9)}`;
     const timestamp = new Date().toISOString();
 

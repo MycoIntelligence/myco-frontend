@@ -113,6 +113,8 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
 
 .trial-dialog .trial-dialog-submit:hover:enabled { background: #bbe0ff; }
 .trial-dialog .trial-dialog-submit:disabled { opacity: .75; }
+.trial-dialog input[aria-invalid="true"] { border-color: #ffb4aa; margin-bottom: 6px; }
+.trial-dialog .trial-dialog-field-error { margin: 0 0 16px; color: #ffb4aa; font-size: 13px; }
 .trial-dialog .trial-dialog-error { margin: 10px 0 0; color: #ffb4aa; font-size: 14px; }
 .trial-dialog-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .trial-dialog button, .trial-request-button { cursor: pointer; }
