@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { trialLoginHref } from "@/lib/account-paths";
+import { trialLoginHref, trialResumeHref } from "@/lib/account-paths";
 import { useWebsiteSession } from "./website-session";
 import { trialEmailSchema, trialGitHubUsernameSchema, trialRequestSchema } from "@/lib/schema";
 import "./trial-request.css";
@@ -20,12 +20,11 @@ export function TrialRequestButton({ className, children }: { className: string;
       return;
     }
 
-    const dialog = document.getElementById(dialogId);
-    if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
+    window.location.assign(trialResumeHref);
   }
 
   return (
-    <button type="button" className={`trial-request-button ${className}`} aria-haspopup={profile ? "dialog" : undefined} aria-controls={profile ? dialogId : undefined} onClick={openForm}>
+    <button type="button" className={`trial-request-button ${className}`} onClick={openForm}>
       {children ?? "Request a free trial"}
     </button>
   );
