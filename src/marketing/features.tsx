@@ -53,7 +53,16 @@ function FeatureDetail({index}: {index:number}) {
         </div>)}
       </dl>
     </section>
-    {isPRReview && <div className="feature-layout-requirement-check">{example}</div>}
+    {isPRReview && (
+      <section className="feature-layout-requirement-check" aria-labelledby="checkout-example-title">
+        <div className="feature-layout-visual"><Sample index={index}/></div>
+        <div className="feature-layout-checkout-copy">
+          <h2 id="checkout-example-title">An example of reviewing a PR against product requirements</h2>
+          <p>Jira ticket CHECKOUT-17 says the receipt total must match the amount charged. On a $100 order with a $15 discount, the customer pays $85.</p>
+          <p>Myco flags line 40 in <code>receipt.ts</code>. The code returns the original $100 subtotal, so the receipt overstates what the customer paid by $15.</p>
+        </div>
+      </section>
+    )}
     <div className="feature-layout-actions">
       <Link className="eyebrow feature-layout-next" href={href(next.slug)}>
         {next.label} <Arrow/>
