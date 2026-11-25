@@ -59,8 +59,8 @@
 .feature-layout-explanation dd{max-width:63ch;margin:0;color:#bac8da;font-size:14px;line-height:1.55}
 .feature-layout-requirement-check{margin-top:clamp(26px,4vw,48px)}
 .feature-layout-checkout-copy{position:relative;z-index:1;margin:0 0 clamp(18px,3vw,30px);text-align:left}
-.feature-layout-checkout-copy h2{margin:0 0 10px;font-size:clamp(24px,4vw,40px);line-height:1.12;letter-spacing:-.045em}
-.feature-layout-checkout-copy p{margin:0;color:var(--subtle);font-size:clamp(15px,2vw,18px)}
+.feature-layout-checkout-copy h2{width:100%;max-width:none;margin:0 0 10px;font-size:clamp(24px,4vw,40px);line-height:1.12;letter-spacing:-.045em}
+.feature-layout-checkout-copy p{width:100%;max-width:none;margin:0;color:var(--subtle);font-size:clamp(15px,2vw,18px)}
 .feature-layout-actions{display:flex;margin-top:20px}
 .feature-layout-next{min-height:44px;font-size:14px;font-weight:600;text-decoration:none}
 .feature-layout-next svg{flex-shrink:0}
