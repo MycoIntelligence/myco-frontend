@@ -16,7 +16,7 @@ export const features = [
     slug:'testing', label:'Testing & Test Generation', beta:false,
     title:['Turn requirements into a test plan','and identify test coverage gaps'],
     explanation:'See which requirements lack coverage and get a test plan in GitHub',
-    summary:'Test coverage analysis and test plan generation are live. Myco checks what your existing tests cover against the requirements for the change and posts the gaps in an inline GitHub comment.',
+    summary:'Myco checks what your existing tests cover against the requirements for the change and posts the gaps in an inline GitHub comment.',
     indexCopy:'Find coverage gaps and get a test plan in GitHub.',
     sections:[
       ['See what your tests miss','The PR comment calls out how many cases are missing and which behaviours need a check. Reviewers can see what still needs coverage before they approve the change.'],

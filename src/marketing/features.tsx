@@ -26,11 +26,9 @@ function FeatureDetail({index}: {index:number}) {
   const next=features[(index+1)%features.length]
   const [title,emphasis]=feature.title
   const isPRReview=feature.slug==='pr-review'
+  const isTesting=feature.slug==='testing'
+  const hasReviewChecks=isPRReview || isTesting
   const example=<>
-    {index===1 && <div className="feature-layout-checkout-copy">
-      <h2>What should happen when a customer enters a $0 discount?</h2>
-      <p>An explicit $0 discount should leave the order at full price. Myco flags the missing coverage and includes a proposed test for that scenario in the test plan linked from the GitHub pull request.</p>
-    </div>}
     <div className="feature-layout-visual"><Sample index={index}/></div>
     <p className="feature-layout-example"><strong>In practice.</strong> {feature.example}</p>
   </>
@@ -47,14 +45,23 @@ function FeatureDetail({index}: {index:number}) {
       </h1>
       <h2 id="feature-explanation">{feature.explanation}</h2>
     </section>
-    {isPRReview ? <PRReviewContext/> : example}
-    <section className="feature-layout-explanation" aria-labelledby={isPRReview ? 'pr-review-checks' : 'feature-explanation'}>
-      {isPRReview && <h2 id="pr-review-checks">Check what should ship and what could break</h2>}
+    {isPRReview ? <PRReviewContext/> : isTesting ? null : example}
+    {isTesting && (
+      <section className="feature-layout-requirement-check" aria-labelledby="testing-example-title">
+        <div className="feature-layout-checkout-copy">
+          <h2 id="testing-example-title">What should happen when a customer enters a $0 discount?</h2>
+          <p>An explicit $0 discount should leave the order at full price. Myco flags this missing test case and includes the expected result in the test plan linked from the GitHub pull request.</p>
+        </div>
+        <div className="feature-layout-visual"><Sample index={index}/></div>
+      </section>
+    )}
+    <section className="feature-layout-explanation" aria-labelledby={hasReviewChecks ? 'feature-checks' : 'feature-explanation'}>
+      {hasReviewChecks && <h2 id="feature-checks">{isTesting ? "See what’s covered and what to test next" : "Check what should ship and what could break"}</h2>}
       <p className="feature-layout-summary">{feature.summary}</p>
       <dl>
         {feature.sections.map(([label,copy,beta])=><div key={label}>
           <dt>{label}{beta && <span className="feature-beta">Beta</span>}</dt>
-          <dd>{isPRReview ? (
+          <dd>{hasReviewChecks ? (
             <ul>{copy.split(/(?<=\.) /).map(point => <li key={point}>{point}</li>)}</ul>
           ) : copy}</dd>
         </div>)}
