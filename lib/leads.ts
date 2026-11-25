@@ -10,26 +10,28 @@ async function sendTrialEmails(lead: TrialLead, apiKey: string): Promise<void> {
   const teamEmail = process.env.TRIAL_REQUEST_TO;
   if (!from || !teamEmail) throw new Error("Trial email addresses are not configured");
 
+  const upgrade = lead.kind === "upgrade";
   const body = JSON.stringify([
     {
       from,
       to: [teamEmail],
       reply_to: lead.workEmail,
-      subject: "New Myco free trial request",
+      subject: upgrade ? "New Myco Pro upgrade request" : "New Myco free trial request",
       text: [
-        "A new free trial request is ready for review.",
+        upgrade ? "A new Pro upgrade request is ready for review." : "A new free trial request is ready for review.",
         "",
         `Name: ${lead.fullName}`,
         `Work email: ${lead.workEmail}`,
         `GitHub username: ${lead.githubUsername}`,
+        ...(upgrade && lead.developerCount ? [`Developers: ${lead.developerCount}`] : []),
       ].join("\n"),
     },
     {
       from,
       to: [lead.workEmail],
       reply_to: teamEmail,
-      subject: "We received your Myco trial request",
-      text: "Thanks for requesting a Myco trial. We’ll review your details and email you an onboarding guide to get started.\n\nThe Myco team",
+      subject: upgrade ? "We received your Myco Pro upgrade request" : "We received your Myco trial request",
+      text: upgrade ? "We’ve received your upgrade request. We’ll follow up at your work email." : "Thanks for requesting a Myco trial. We’ll review your details and email you an onboarding guide to get started.\n\nThe Myco team",
     },
   ]);
   // Keep retries of the same email pair from sending duplicate messages.
@@ -51,7 +53,7 @@ async function sendTrialEmails(lead: TrialLead, apiKey: string): Promise<void> {
 /** Deliver trial requests through Resend when configured, or use the existing lead webhook. */
 export async function deliverLead(payload: Lead): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
-  if ("kind" in payload && payload.kind === "trial" && resendKey) {
+  if ("kind" in payload && (payload.kind === "trial" || payload.kind === "upgrade") && resendKey) {
     return sendTrialEmails(payload, resendKey);
   }
 

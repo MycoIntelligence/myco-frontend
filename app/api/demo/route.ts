@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    const isTrial = body && typeof body === "object" && "kind" in body && body.kind === "trial";
+    const isTrial = body && typeof body === "object" && "kind" in body && (body.kind === "trial" || body.kind === "upgrade");
     const result = (isTrial ? trialRequestSchema : demoFormSchema).safeParse(body);
     if (!result.success) {
       const errors: Record<string, string> = {};
