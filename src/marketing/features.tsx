@@ -55,12 +55,11 @@ function FeatureDetail({index}: {index:number}) {
     </section>
     {isPRReview && (
       <section className="feature-layout-requirement-check" aria-labelledby="checkout-example-title">
-        <div className="feature-layout-visual"><Sample index={index}/></div>
         <div className="feature-layout-checkout-copy">
-          <h2 id="checkout-example-title">An example of reviewing a PR against product requirements</h2>
-          <p>Jira ticket CHECKOUT-17 says the receipt total must match the amount charged. On a $100 order with a $15 discount, the customer pays $85.</p>
-          <p>Myco flags line 40 in <code>receipt.ts</code>. The code returns the original $100 subtotal, so the receipt overstates what the customer paid by $15.</p>
+          <h2 id="checkout-example-title">The customer paid $85. The receipt showed $100</h2>
+          <p>Jira ticket CHECKOUT-17 says the receipt must match the amount charged. Myco flags line 40 in <code>receipt.ts</code>, which returns the original subtotal after a $15 discount.</p>
         </div>
+        <div className="feature-layout-visual"><Sample index={index}/></div>
       </section>
     )}
     <div className="feature-layout-actions">
