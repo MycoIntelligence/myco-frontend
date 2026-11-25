@@ -36,8 +36,8 @@ export default function PricingPage() {
     <DitherFlow className="pricing-dither-flow">
       <main className="pricing-main">
         <section className="pricing-intro" aria-labelledby="pricing-heading">
-          <h1 id="pricing-heading">Simple pricing for engineering teams</h1>
-          <p>Start with contextual PR review. Get in touch if your team needs a broader setup.</p>
+          <h1 id="pricing-heading">Pricing for Myco PR Review</h1>
+          <p>Try 14 days of free code review. Choose per-developer pricing for your team or talk to us about Enterprise.</p>
         </section>
         <section className="pricing-plans" aria-label="Myco plans">
           <fieldset className="billing-period">
