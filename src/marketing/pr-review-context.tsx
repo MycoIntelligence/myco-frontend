@@ -44,6 +44,14 @@ const sources = [
   },
 ];
 
+const mobilePaths = [
+  "M5 34 H1 V231 Q1 258 50 258 V296",
+  "M95 34 H99 V231 Q99 258 50 258 V296",
+  "M5 110 H3 V225 Q3 249 50 249 V296",
+  "M95 110 H97 V225 Q97 249 50 249 V296",
+  "M50 218 V296",
+];
+
 export function PRReviewContext() {
   const [activeIndex, setActiveIndex] = useState(0);
   const reducedMotion = useReducedMotion();
@@ -79,12 +87,19 @@ export function PRReviewContext() {
         </div>
 
         <div className="mc-flow" aria-hidden="true">
-          <svg viewBox="0 0 240 370" preserveAspectRatio="none">
+          <svg className="mc-desktop-paths" viewBox="0 0 240 370" preserveAspectRatio="none">
             {sources.map(({ label, path }, index) => (
               <path key={label} className="mc-connection" data-active={index === activeIndex} d={path} />
             ))}
             <path className="mc-result-line" d="M156 185 H240" />
             <path key={active.label} className="mc-pulse" pathLength="100" d={active.path} />
+          </svg>
+          <svg className="mc-mobile-paths" viewBox="0 0 100 296" preserveAspectRatio="none">
+            {mobilePaths.map((path, index) => (
+              <path key={path} className="mc-connection" data-active={index === activeIndex} d={path} />
+            ))}
+            <path className="mc-result-line" d="M50 256 V296" />
+            <path key={active.label} className="mc-pulse" pathLength="100" d={mobilePaths[activeIndex]} />
           </svg>
           <div className="mc-logo">
             <Image src="/marketing/myco-mark.png" alt="" width={35} height={37} />
