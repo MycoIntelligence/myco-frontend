@@ -27,7 +27,12 @@ function FeatureDetail({index}: {index:number}) {
   const [title,emphasis]=feature.title
   const isPRReview=feature.slug==='pr-review'
   const isTesting=feature.slug==='testing'
-  const hasReviewChecks=isPRReview || isTesting
+  const checksHeading = {
+    'pr-review': 'A green PR can still miss the requirement',
+    testing: 'Passing tests can leave critical behavior untested',
+    'pre-prod-validation': 'A change can pass review and still fail in staging',
+    'production-monitoring': 'When behavior changes after a release, where do you start?',
+  }[feature.slug]
   const example=<>
     <div className="feature-layout-visual"><Sample index={index}/></div>
     <p className="feature-layout-example"><strong>In practice.</strong> {feature.example}</p>
@@ -55,15 +60,15 @@ function FeatureDetail({index}: {index:number}) {
         <div className="feature-layout-visual"><Sample index={index}/></div>
       </section>
     )}
-    <section className="feature-layout-explanation" aria-labelledby={hasReviewChecks ? 'feature-checks' : 'feature-explanation'}>
-      {hasReviewChecks && <h2 id="feature-checks">{isTesting ? "See what’s covered and what to test next" : "Check what should ship and what could break"}</h2>}
+    <section className="feature-layout-explanation" aria-labelledby="feature-checks">
+      <h2 id="feature-checks">{checksHeading}</h2>
       <p className="feature-layout-summary">{feature.summary}</p>
       <dl>
         {feature.sections.map(([label,copy,beta])=><div key={label}>
           <dt>{label}{beta && <span className="feature-beta">Beta</span>}</dt>
-          <dd>{hasReviewChecks ? (
-            <ul>{copy.split(/(?<=\.) /).map(point => <li key={point}>{point}</li>)}</ul>
-          ) : copy}</dd>
+          <dd>
+            <ul role="list">{copy.split(/(?<=\.) /).map(point => <li key={point}>{point}</li>)}</ul>
+          </dd>
         </div>)}
       </dl>
     </section>
