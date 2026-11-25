@@ -543,6 +543,8 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   margin-top: 4px;
 }
 .bento-review-flow .bento-demo { min-width: 0; margin-top: 0; }
+.bento-jira-ticket { display: inline-flex; align-items: center; gap: 6px; }
+.bento-jira-ticket img { display: block; flex: none; object-fit: contain; }
 .bento-review-connector { height: 2px; background: #5380a7; }
 .bento-review-line {
   display: block;

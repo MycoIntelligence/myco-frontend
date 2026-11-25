@@ -39,7 +39,7 @@ export function FeatureIcon({index}: {index:number}) {
 function BentoDemo({index}: {index:number}) {
   if (index===0) return <div className="bento-review-flow">
     <div className="bento-demo bento-review-context">
-      <div className="bento-demo-header"><span>Jira · CHECKOUT-17</span></div>
+      <div className="bento-demo-header"><span className="bento-jira-ticket"><img src="/brands/jira.svg" alt="Jira" width="14" height="14" /> CHECKOUT-17</span></div>
       <div className="bento-review-finding">
         <strong>Receipt total must match the amount charged</strong>
       </div>
