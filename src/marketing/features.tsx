@@ -27,6 +27,10 @@ function FeatureDetail({index}: {index:number}) {
   const [title,emphasis]=feature.title
   const isPRReview=feature.slug==='pr-review'
   const example=<>
+    {index===1 && <div className="feature-layout-checkout-copy">
+      <h2>What should happen when a customer enters a $0 discount?</h2>
+      <p>An explicit $0 discount should leave the order at full price. Myco flags the missing coverage and includes a proposed test for that scenario in the test plan linked from the GitHub pull request.</p>
+    </div>}
     <div className="feature-layout-visual"><Sample index={index}/></div>
     <p className="feature-layout-example"><strong>In practice.</strong> {feature.example}</p>
   </>
@@ -57,7 +61,7 @@ function FeatureDetail({index}: {index:number}) {
       <section className="feature-layout-requirement-check" aria-labelledby="checkout-example-title">
         <div className="feature-layout-checkout-copy">
           <h2 id="checkout-example-title">The customer paid $85. The receipt showed $100</h2>
-          <p>Jira ticket CHECKOUT-17 says the receipt must match the amount charged. Myco flags line 40 in <code>receipt.ts</code>, which returns the original subtotal after a $15 discount.</p>
+          <p>Jira ticket CHECKOUT-17 says the receipt must match the amount charged. Myco flags line 40 in <code>receipt.ts</code>, which returns the original subtotal after a $15 discount. The inline finding in GitHub connects that line to the requirement and explains why the receipt total is wrong.</p>
         </div>
         <div className="feature-layout-visual"><Sample index={index}/></div>
       </section>
