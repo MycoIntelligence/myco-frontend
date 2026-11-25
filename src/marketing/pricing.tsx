@@ -1,5 +1,6 @@
 'use client'
 
+import {TrialRequestButton,TrialRequestDialog} from './trial-request'
 import {useState} from 'react'
 import {SiteHeader,SiteFooter} from './home-sections'
 import {DitherFlow} from './dither-flow'
@@ -36,8 +37,8 @@ export default function PricingPage() {
     <DitherFlow className="pricing-dither-flow">
       <main className="pricing-main">
         <section className="pricing-intro" aria-labelledby="pricing-heading">
-          <h1 id="pricing-heading">Simple pricing for engineering teams</h1>
-          <p>Start with contextual PR review. Get in touch if your team needs a broader setup.</p>
+          <h1 id="pricing-heading">Pricing for Myco PR Review</h1>
+          <p>Try 14 days of free code review. Choose per-developer pricing for your team or talk to us about Enterprise.</p>
         </section>
         <section className="pricing-plans" aria-label="Myco plans">
           <fieldset className="billing-period">
@@ -51,7 +52,7 @@ export default function PricingPage() {
               <p className="plan-summary">For engineering teams getting started with contextual review.</p>
               <div className="plan-price" aria-live="polite"><div><strong>${annual ? yearlyMonthly : monthly}</strong><span> / developer / month</span></div><p>{annual ? '$192 per developer, billed annually.' : 'Billed monthly.'}</p></div>
               <PlanFeatures features={['Contextual GitHub pull request review','Review against available requirements and authorized code','14-day trial with no credit card required']}/>
-              <a className="plan-button plan-primary" href="https://app.mycointelligence.com">Upgrade to Pro <Arrow/></a>
+              <TrialRequestButton kind="upgrade" className="plan-button plan-primary">Upgrade to Pro <Arrow/></TrialRequestButton>
             </article>
             <article className="plan plan-glare">
               <div className="plan-heading"><h2>Enterprise</h2></div>
@@ -71,5 +72,6 @@ export default function PricingPage() {
       </main>
     </DitherFlow>
     <SiteFooter pricing />
+    <TrialRequestDialog kind="upgrade" />
   </>
 }

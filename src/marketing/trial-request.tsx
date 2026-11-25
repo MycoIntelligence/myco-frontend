@@ -4,10 +4,11 @@ import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import { trialEmailSchema, trialGitHubUsernameSchema, trialRequestSchema } from "@/lib/schema";
 import "./trial-request.css";
 
-const dialogId = "free-trial-request";
+type RequestKind = "trial" | "upgrade";
 const intro = "Share your details and we’ll review your request. We’ll email you an onboarding guide to get started.";
 
-export function TrialRequestButton({ className, children }: { className: string; children?: ReactNode }) {
+export function TrialRequestButton({ className, children, kind = "trial" }: { className: string; children?: ReactNode; kind?: RequestKind }) {
+  const dialogId = `free-${kind}-request`;
   function openForm() {
     const dialog = document.getElementById(dialogId);
     if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
@@ -20,7 +21,9 @@ export function TrialRequestButton({ className, children }: { className: string;
   );
 }
 
-export function TrialRequestDialog() {
+export function TrialRequestDialog({ kind = "trial" }: { kind?: RequestKind }) {
+  const upgrade = kind === "upgrade";
+  const dialogId = `free-${kind}-request`;
   const dialog = useRef<HTMLDialogElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const pending = useRef(false);
@@ -39,7 +42,7 @@ export function TrialRequestDialog() {
 
   function fieldFeedback(name: string) {
     return fieldErrors[name] && (
-      <p id={`trial-error-${name}`} className="trial-dialog-field-error" role="alert">{fieldErrors[name]}</p>
+      <p id={`${dialogId}-error-${name}`} className="trial-dialog-field-error" role="alert">{fieldErrors[name]}</p>
     );
   }
 
@@ -47,7 +50,7 @@ export function TrialRequestDialog() {
     return {
       name,
       "aria-invalid": fieldErrors[name] ? true : undefined,
-      "aria-describedby": fieldErrors[name] ? `trial-error-${name}` : undefined,
+      "aria-describedby": fieldErrors[name] ? `${dialogId}-error-${name}` : undefined,
       onChange: () => setFieldErrors((previous) => (
         previous[name] ? { ...previous, [name]: undefined } : previous
       )),
@@ -59,7 +62,7 @@ export function TrialRequestDialog() {
     event.preventDefault();
     if (pending.current) return;
     const form = event.currentTarget;
-    const payload = { ...Object.fromEntries(new FormData(form)), kind: "trial" };
+    const payload = { ...Object.fromEntries(new FormData(form)), kind };
     const validation = trialRequestSchema.safeParse(payload);
     setError("");
 
@@ -107,48 +110,54 @@ export function TrialRequestDialog() {
       id={dialogId}
       ref={dialog}
       className="trial-dialog"
-      aria-labelledby="trial-dialog-title"
-      aria-describedby="trial-dialog-intro"
+      aria-labelledby={`${dialogId}-title`}
+      aria-describedby={`${dialogId}-intro`}
       onClose={() => { if (sent) setSent(false); }}
     >
-      <button ref={closeButton} type="button" className="trial-dialog-close" aria-label="Close free trial form" onClick={() => dialog.current?.close()}>
+      <button ref={closeButton} type="button" className="trial-dialog-close" aria-label={upgrade ? "Close upgrade form" : "Close free trial form"} onClick={() => dialog.current?.close()}>
         <span aria-hidden="true">×</span>
       </button>
-      <p className="trial-dialog-badge">14 days of free code review</p>
-      <h2 id="trial-dialog-title">{sent ? "Request received" : "Request a free trial"}</h2>
-      <p id="trial-dialog-intro" role={sent ? "status" : undefined}>
-        {sent ? "We’ll review your details and email you an onboarding guide." : intro}
+      {!upgrade && <p className="trial-dialog-badge">14 days of free code review</p>}
+      <h2 id={`${dialogId}-title`}>{sent ? "Request received" : upgrade ? "Upgrade to Pro" : "Request a free trial"}</h2>
+      <p className="trial-dialog-intro" id={`${dialogId}-intro`} role={sent ? "status" : undefined}>
+        {upgrade ? (sent ? "We’ve received your upgrade request. We’ll follow up at your work email." : "Tell us where to reach you. We’ll email you the next steps for upgrading your team to Myco Pro.") : sent ? "We’ll review your details and email you an onboarding guide." : intro}
       </p>
       {!sent && (
         <form onSubmit={submit} method="post" noValidate>
           <div className="trial-dialog-name-fields">
             <div>
-              <label htmlFor="free-trial-first-name">First name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-              <input id="free-trial-first-name" {...fieldAttributes("firstName")} autoComplete="given-name" placeholder="Alex" required maxLength={60} />
+              <label htmlFor={`${dialogId}-first-name`}>First name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+              <input id={`${dialogId}-first-name`} {...fieldAttributes("firstName")} autoComplete="given-name" placeholder="Alex" required maxLength={60} />
               {fieldFeedback("firstName")}
             </div>
             <div>
-              <label htmlFor="free-trial-last-name">Last name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-              <input id="free-trial-last-name" {...fieldAttributes("lastName")} autoComplete="family-name" placeholder="Jones" required maxLength={60} />
+              <label htmlFor={`${dialogId}-last-name`}>Last name<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+              <input id={`${dialogId}-last-name`} {...fieldAttributes("lastName")} autoComplete="family-name" placeholder="Jones" required maxLength={60} />
               {fieldFeedback("lastName")}
             </div>
           </div>
 
-          <label htmlFor="free-trial-email">Work email<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-          <input id="free-trial-email" {...fieldAttributes("workEmail")} type="email" autoComplete="email" placeholder="alex@acme.com" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={254} />
+          <label htmlFor={`${dialogId}-email`}>Work email<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+          <input id={`${dialogId}-email`} {...fieldAttributes("workEmail")} type="email" autoComplete="email" placeholder="alex@acme.com" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={254} />
           {fieldFeedback("workEmail")}
 
-          <label htmlFor="free-trial-github">GitHub username or profile URL<span className="trial-dialog-required" aria-hidden="true">*</span></label>
-          <input id="free-trial-github" {...fieldAttributes("githubUsername")} autoCapitalize="off" spellCheck={false} placeholder="alex-jones or github.com/alex-jones" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={256} />
+          <label htmlFor={`${dialogId}-github`}>GitHub username or profile URL<span className="trial-dialog-required" aria-hidden="true">*</span></label>
+          <input id={`${dialogId}-github`} {...fieldAttributes("githubUsername")} autoCapitalize="off" spellCheck={false} placeholder="alex-jones or github.com/alex-jones" onBlur={(event) => validateOnBlur(event.currentTarget)} required maxLength={256} />
           {fieldFeedback("githubUsername")}
 
+          {upgrade && <>
+            <label htmlFor={`${dialogId}-developers`}>Number of developers</label>
+            <input id={`${dialogId}-developers`} {...fieldAttributes("developerCount")} inputMode="numeric" maxLength={9} placeholder="e.g. 5" />
+            {fieldFeedback("developerCount")}
+          </>}
+
           <div className="trial-dialog-trap" aria-hidden="true">
-            <label htmlFor="free-trial-website">Website</label>
-            <input id="free-trial-website" name="website" tabIndex={-1} autoComplete="off" />
+            <label htmlFor={`${dialogId}-website`}>Website</label>
+            <input id={`${dialogId}-website`} name="website" tabIndex={-1} autoComplete="off" />
           </div>
 
           <button className="trial-dialog-submit" type="submit" disabled={sending}>
-            {sending ? "Sending…" : "Request a free trial"} <span aria-hidden="true">→</span>
+            {sending ? "Sending…" : upgrade ? "Request an upgrade" : "Request a free trial"} <span aria-hidden="true">→</span>
           </button>
           {error && <p className="trial-dialog-error" role="alert">{error}</p>}
         </form>

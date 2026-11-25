@@ -40,7 +40,8 @@ const leadFields = z.object({
 const companySchema = z.string({ required_error: "Company name is required." }).trim().min(1, "Company name is required.").max(200);
 
 export const trialRequestSchema = leadFields.omit({ fullName: true, message: true }).extend({
-  kind: z.literal("trial"),
+  kind: z.enum(["trial", "upgrade"]),
+  developerCount: z.string().refine((value) => value === "" || /^[1-9][0-9]{0,8}$/.test(value), "Enter a positive whole number.").optional(),
   firstName: z.string({ required_error: "First name is required." }).trim().min(1, "First name is required.").max(60),
   lastName: z.string({ required_error: "Last name is required." }).trim().min(1, "Last name is required.").max(60),
   workEmail: trialEmailSchema,
