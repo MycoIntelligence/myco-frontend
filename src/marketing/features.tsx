@@ -48,20 +48,23 @@ function FeatureDetail({index}: {index:number}) {
       <h2 id="feature-explanation">{feature.explanation}</h2>
     </section>
     {isPRReview ? <PRReviewContext/> : example}
-    <section className="feature-layout-explanation" aria-labelledby="feature-explanation">
+    <section className="feature-layout-explanation" aria-labelledby={isPRReview ? 'pr-review-checks' : 'feature-explanation'}>
+      {isPRReview && <h2 id="pr-review-checks">Check what should ship and what could break</h2>}
       <p className="feature-layout-summary">{feature.summary}</p>
       <dl>
         {feature.sections.map(([label,copy,beta])=><div key={label}>
           <dt>{label}{beta && <span className="feature-beta">Beta</span>}</dt>
-          <dd>{copy}</dd>
+          <dd>{isPRReview ? (
+            <ul>{copy.split(/(?<=\.) /).map(point => <li key={point}>{point}</li>)}</ul>
+          ) : copy}</dd>
         </div>)}
       </dl>
     </section>
     {isPRReview && (
       <section className="feature-layout-requirement-check" aria-labelledby="checkout-example-title">
         <div className="feature-layout-checkout-copy">
-          <h2 id="checkout-example-title">The customer paid $85. The receipt showed $100</h2>
-          <p>Jira ticket CHECKOUT-17 says the receipt must match the amount charged. Myco flags line 40 in <code>receipt.ts</code>, which returns the original subtotal after a $15 discount. The inline finding in GitHub connects that line to the requirement and explains why the receipt total is wrong.</p>
+          <h2 id="checkout-example-title">Example: Catch a receipt total that breaks the checkout requirement</h2>
+          <p>The customer paid $85 after a $15 discount, but the receipt showed $100. Myco flags line 40 in <code>receipt.ts</code> and links it to the Jira requirement that the receipt must show the amount charged.</p>
         </div>
         <div className="feature-layout-visual"><Sample index={index}/></div>
       </section>
