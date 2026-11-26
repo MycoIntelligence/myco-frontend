@@ -20,9 +20,9 @@ export function AuthForm({ mode, intent, configured }: {
 
   return (
     <>
-      <h1 id="account-heading">{isSignup ? "Create your account" : "Sign in to Myco"}</h1>
+      <h1 id="account-heading">{isSignup ? "Create your Myco account" : "Sign in to Myco"}</h1>
       <p className={styles.intro}>
-        {isSignup ? "Get started with Myco code review." : "Enter your email and password to continue."}
+        {isSignup ? "Get started with Myco PR Review." : "Enter your email and password to continue."}
       </p>
       <form action={action} className={styles.form}>
         <input type="hidden" name="intent" value={intent} />
