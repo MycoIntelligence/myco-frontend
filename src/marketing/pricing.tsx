@@ -34,12 +34,13 @@ export default function PricingPage() {
   return <>
     {!reduceMotion && <SmoothCursor />}
     <SiteHeader pricing />
-    <DitherFlow className="pricing-dither-flow">
-      <main className="pricing-main">
+    <main className="pricing-main">
+      <DitherFlow>
         <section className="pricing-intro" aria-labelledby="pricing-heading">
           <h1 id="pricing-heading">Pricing for Myco PR Review</h1>
           <p>Try 14 days of free code review. Choose per-developer pricing for your team or talk to us about Enterprise.</p>
         </section>
+      </DitherFlow>
         <section className="pricing-plans" aria-label="Myco plans">
           <fieldset className="billing-period">
             <legend className="sr">Billing period</legend>
@@ -69,8 +70,7 @@ export default function PricingPage() {
             {faqs.map(([question,answer])=><details key={question}><summary>{question}<span aria-hidden="true">+</span></summary><p>{answer}</p></details>)}
           </div>
         </section>
-      </main>
-    </DitherFlow>
+    </main>
     <SiteFooter pricing />
     <TrialRequestDialog kind="upgrade" />
   </>

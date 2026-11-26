@@ -206,3 +206,105 @@
   padding: 0;
   list-style: none;
 }
+
+.pr-story-hero > p {
+  max-width: 72ch;
+  margin: 20px auto;
+  color: var(--subtle);
+  font-size: clamp(16px, 2vw, 21px);
+}
+
+.pr-story-section {
+  margin-block: clamp(44px, 7vw, 88px);
+}
+
+.pr-story-section > h2 {
+  margin: 0 0 16px;
+  font-size: clamp(25px, 4vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -.045em;
+}
+
+.pr-story-section > p,
+.pr-story-faq details p {
+  margin: 0 0 16px;
+  color: var(--subtle);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.pr-story-section > .feature-layout-visual { margin-top: 24px; }
+
+.pr-story-faq details {
+  border-top: 1px solid #293442;
+  padding-block: 14px;
+}
+
+.pr-story-faq summary {
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.pr-story-faq details p { margin: 10px 0 0; }
+.pr-story-section strong { color: var(--text); }
+
+.pr-story-review-rows { margin-top: 24px; }
+
+.pr-story-review-row {
+  display: grid;
+  grid-template-columns: clamp(44px, 10vw, 104px) minmax(0, 1fr);
+  gap: clamp(14px, 3vw, 36px);
+  align-items: start;
+  padding-block: 24px;
+}
+
+.pr-story-review-row + .pr-story-review-row { border-top: 1px solid #293442; }
+
+.pr-story-review-icon {
+  display: block;
+  width: 100%;
+  height: auto;
+  align-self: center;
+}
+
+.pr-story-review-row h3 {
+  margin: 0 0 8px;
+  font-size: clamp(18px, 2.4vw, 25px);
+  line-height: 1.25;
+}
+
+.pr-story-review-row p { margin: 0; color: var(--subtle); line-height: 1.6; }
+.pr-story-review-row .pr-story-draft-note { margin-top: 8px; font-size: 13px; }
+
+.feature-layout .pr-story-hero h1 {
+  max-width: none;
+}
+
+.pr-story-wide-copy > p {
+  max-width: none;
+  text-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .feature-layout .pr-story-hero h1 > :is(span, em) {
+    white-space: normal;
+  }
+}
+
+.pr-story-review-row ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  color: var(--subtle);
+  line-height: 1.6;
+  list-style: none;
+}
+
+.pr-story-closing {
+  text-align: center;
+}
+
+.pr-story-closing > p {
+  max-width: none;
+}

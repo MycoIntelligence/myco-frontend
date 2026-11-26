@@ -2,7 +2,7 @@ import {useReducedMotion} from 'motion/react'
 import {FeatureWalkthrough} from './feature-walkthrough'
 import {Terminal} from './terminal'
 
-const preProdSteps=['Deploy candidate','Acceptance checks','Load test','Release decision']
+const preProdSteps=['Deploy candidate','Resume checkout','Inspect receipt','Release decision']
 
 function FindingHeading({title}:{title:string}){
   return <div className="monitor-card-heading">
@@ -24,13 +24,13 @@ export function TestingDemo(){
 }
 
 const releaseChecks=[
-  {name:'Customer acceptance', detail:'Receipt matches the discounted charge', result:'Passed', className:'quality-pass', stage:1},
-  {name:'Integration check', detail:'Checkout sends the correct total to billing', result:'Passed', className:'quality-pass', stage:1},
-  {name:'Checkout latency under load', detail:'420 ms p95 · 350 ms limit · 100 checkouts/min', result:'Failed', className:'quality-fail', stage:2},
+  {name:'Resume checkout', detail:'Test cart restored after leaving checkout', result:'Passed', className:'quality-pass', stage:1},
+  {name:'Integration check', detail:'Billing recorded the discounted charge of $85', result:'Passed', className:'quality-pass', stage:1},
+  {name:'Receipt total', detail:'Expected $85 · Shown $100', result:'Failed', className:'quality-fail', stage:2},
 ]
 
 export function PreProdDemo(){
-  return <FeatureWalkthrough label="Illustrative Myco pre-production validation walkthrough" context="Checkout API / Isolated pre-production" title="Release quality report" steps={preProdSteps}>
+  return <FeatureWalkthrough label="Illustrative Myco pre-production validation walkthrough" context="Checkout API / Staging with test data" title="Release quality report" steps={preProdSteps}>
     {step=><div className="monitor-body preprod-body">
       <section className="preprod-candidate" aria-labelledby="preprod-candidate">
         <h3 id="preprod-candidate">Release candidate</h3>
@@ -38,7 +38,7 @@ export function PreProdDemo(){
           <strong><code>v2.8.0-rc.1</code></strong>
           <p>Checkout API</p>
           <dl>
-            <div><dt>Environment</dt><dd>Pre-production</dd></div>
+            <div><dt>Environment</dt><dd>Staging</dd></div>
             <div><dt>Baseline</dt><dd><code>v2.7.4</code></dd></div>
             <div><dt>Run</dt><dd><code>PP-1842</code></dd></div>
           </dl>
@@ -59,10 +59,10 @@ export function PreProdDemo(){
             <FindingHeading title="Myco finding"/>
             <span className="preprod-hold" data-visible={step===3}>Hold recommended</span>
           </div>
-          <strong>Checkout exceeded the latency limit.</strong>
-          <p>p95 rose from <code>245 ms</code> to <code>420 ms</code> under the same load. The agreed limit is <code>350 ms</code>.</p>
-          <div className="monitor-evidence"><code>LOAD-018</code></div>
-          <p className="preprod-handoff" data-visible={step===3}>Inspect the slow checkout traces and rerun the load check before release sign-off.</p>
+          <strong>Receipt shows the full price after checkout resumes.</strong>
+          <p>Apply a <code>$15</code> discount to a <code>$100</code> cart. Leave checkout, return, and complete a test payment. Billing records <code>$85</code>, but the receipt shows <code>$100</code>.</p>
+          <div className="monitor-evidence"><code>PP-1842</code></div>
+          <p className="preprod-handoff" data-visible={step===3}>Inspect how the receipt total is calculated and rerun the checkout scenario before release sign-off.</p>
         </section>
       </div>
     </div>}

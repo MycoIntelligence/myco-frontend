@@ -19,10 +19,6 @@
 .blog-dither-flow {
   background: transparent;
 }
-.blog-dither-flow .flow-dither {
-  height: 100%;
-  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
-}
 .blog-heading {
   display: grid;
   justify-items: center;

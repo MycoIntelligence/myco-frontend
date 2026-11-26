@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { demoFormSchema, trialGitHubUsernameError, trialRequestSchema } from "@/lib/schema";
+import { betaRequestSchema, demoFormSchema, trialGitHubUsernameError, trialRequestSchema } from "@/lib/schema";
 import { deliverLead } from "@/lib/leads";
 import { allowRequest, readJsonLimited, RequestTooLarge } from "@/lib/request-security";
 
@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
     }
 
     const isTrial = body && typeof body === "object" && "kind" in body && (body.kind === "trial" || body.kind === "upgrade");
-    const result = (isTrial ? trialRequestSchema : demoFormSchema).safeParse(body);
+    const isBeta = body && typeof body === "object" && "kind" in body && body.kind === "beta";
+    const result = (isBeta ? betaRequestSchema : isTrial ? trialRequestSchema : demoFormSchema).safeParse(body);
     if (!result.success) {
       const errors: Record<string, string> = {};
       result.error.issues.forEach((issue) => {

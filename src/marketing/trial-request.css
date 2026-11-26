@@ -77,7 +77,7 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
   font-weight: 600;
 }
 
-.trial-dialog input {
+.trial-dialog :is(input, textarea) {
   display: block;
   width: 100%;
   min-height: 44px;
@@ -93,7 +93,7 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
 
 .trial-dialog label .trial-dialog-required { color: var(--blue); font-weight: 700; }
 .trial-dialog input::placeholder { color: #8794a6; opacity: 1; }
-.trial-dialog :is(input, button):focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.trial-dialog :is(input, textarea, button):focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 .trial-dialog .trial-dialog-submit {
   display: flex;
@@ -113,7 +113,7 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
 
 .trial-dialog .trial-dialog-submit:hover:enabled { background: #bbe0ff; }
 .trial-dialog .trial-dialog-submit:disabled { opacity: .75; }
-.trial-dialog input[aria-invalid="true"] { border-color: #ffb4aa; margin-bottom: 6px; }
+.trial-dialog :is(input, textarea)[aria-invalid="true"] { border-color: #ffb4aa; margin-bottom: 6px; }
 .trial-dialog .trial-dialog-field-error { margin: 0 0 16px; color: #ffb4aa; font-size: 13px; }
 .trial-dialog .trial-dialog-error { margin: 10px 0 0; color: #ffb4aa; font-size: 14px; }
 .trial-dialog-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
