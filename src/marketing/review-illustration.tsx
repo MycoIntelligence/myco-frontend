@@ -1,12 +1,13 @@
 import {
   BellRing, ClipboardList, Database, FileDiff, ListChecks,
-  RotateCcw, Route, TableProperties, Activity,
+  RotateCcw, Route, TableProperties, Activity, Bug,
 } from 'lucide-react'
 
 const featureSymbols = {
   coverage: ListChecks,
   testPlan: TableProperties,
   testCase: ClipboardList,
+  testFailure: Bug,
   scenario: Route,
   stagingData: Database,
   rerun: RotateCcw,

@@ -158,9 +158,17 @@ function TestingStory() {
             </ul>
           </div>
         </div>
+        <div className="pr-story-review-row">
+          <FeatureIllustration kind="testFailure"/>
+          <div>
+            <h3>Test failure analysis <span className="feature-beta">Beta</span></h3>
+            <ul role="list">
+              <li>When an existing test fails, Myco investigates why it failed and recommends a fix that addresses the cause.</li>
+            </ul>
+            <p className="pr-story-draft-note">[Confirm which test runners and CI outputs are supported, and how teams get beta access.]</p>
+          </div>
+        </div>
       </div>
-      <h3>Test failure analysis <span className="feature-beta">Beta</span></h3>
-      <p>When an existing test fails, Myco investigates why it failed and recommends a fix that addresses the cause. [Confirm which test runners and CI outputs are supported, and how teams get beta access.]</p>
     </section>
     <section className="pr-story-section pr-story-closing">
       <h2>Try it on a PR your team is about to merge</h2>

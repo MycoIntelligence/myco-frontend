@@ -7,7 +7,7 @@ import {PreProdDemo} from './quality-demos'
 const staging = {
   title: 'Try the customer workflow',
   emphasis: 'before you ship it',
-  intro: 'A PR can pass review and CI, and the customer journey can still fail when the services run together. Myco is building staging validation that turns requirements into workflows your team can run against a release candidate.',
+  intro: 'Myco is building staging validation that turns requirements into workflows your team can run against a release candidate.',
   problem: 'The first real checkout shouldn’t happen after deploy',
   problemCopy: [
     'The checkout PR is approved. Billing’s tests pass. The release owner asks, “Has anyone tried applying a discount, leaving checkout, and coming back?”',
@@ -36,7 +36,7 @@ const staging = {
 const monitoring = {
   title: 'Give on-call a place to start',
   emphasis: 'when a release changes behavior',
-  intro: 'An alert tells you checkout is slow. The next question is what changed. Myco is building post-deploy validation to help engineers connect unexpected behavior to a rollout and investigate with the context of what the team shipped.',
+  intro: 'Myco is building post-deploy validation to help engineers connect unexpected behavior to a rollout and investigate with the context of what the team shipped.',
   problem: 'You know what’s broken. You’re still figuring out where to look',
   problemCopy: [
     'Checkout latency climbs after a deployment. The dashboard shows when it started. The deploy history shows what went out. To work out which change matters, on-call still has to open the merged PRs, check the affected paths, and ask who touched them.',
