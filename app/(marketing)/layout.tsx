@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "@/src/marketing/preview.css";
 import { TrialRequestDialog } from "@/src/marketing/trial-request";
+import { WebsiteSessionProvider } from "@/src/marketing/website-session";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.mycointelligence.com"),
@@ -16,8 +17,10 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {children}
-        <TrialRequestDialog />
+        <WebsiteSessionProvider>
+          {children}
+          <TrialRequestDialog />
+        </WebsiteSessionProvider>
       </body>
     </html>
   );
