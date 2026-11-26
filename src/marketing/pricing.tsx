@@ -1,6 +1,6 @@
 'use client'
 
-import {TrialRequestButton,TrialRequestDialog} from './trial-request'
+import {RazorpayButton} from './razorpay-button'
 import {useState} from 'react'
 import {SiteHeader,SiteFooter} from './home-sections'
 import {DitherFlow} from './dither-flow'
@@ -53,7 +53,7 @@ export default function PricingPage() {
               <p className="plan-summary">For engineering teams getting started with contextual review.</p>
               <div className="plan-price" aria-live="polite"><div><strong>${annual ? yearlyMonthly : monthly}</strong><span> / developer / month</span></div><p>{annual ? '$192 per developer, billed annually.' : 'Billed monthly.'}</p></div>
               <PlanFeatures features={['Contextual GitHub pull request review','Review against available requirements and authorized code','14-day trial with no credit card required']}/>
-              <TrialRequestButton kind="upgrade" className="plan-button plan-primary">Upgrade to Pro <Arrow/></TrialRequestButton>
+              <RazorpayButton annual={annual}>Upgrade to Pro <Arrow/></RazorpayButton>
             </article>
             <article className="plan plan-glare">
               <div className="plan-heading"><h2>Enterprise</h2></div>
@@ -72,6 +72,5 @@ export default function PricingPage() {
         </section>
     </main>
     <SiteFooter pricing />
-    <TrialRequestDialog kind="upgrade" />
   </>
 }
