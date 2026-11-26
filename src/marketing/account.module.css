@@ -223,23 +223,51 @@ button.button {
   color: #ffced6;
 }
 
-.details {
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-block: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.avatar {
   display: grid;
-  gap: 4px;
-  margin: 0 0 20px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 50%;
+  background: #24415d;
+  color: #d4ebff;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.profileIdentity {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.profileIdentity > span {
+  color: var(--subtle);
   font-size: 14px;
 }
 
-.details dt {
-  color: var(--subtle);
+.profile + .error { margin-bottom: 14px; }
+
+.profileSignOut {
+  margin-top: 16px;
+  text-align: center;
 }
 
-.details dd {
-  margin: 0;
-  overflow-wrap: anywhere;
+.profileSignOut .textButton {
+  color: var(--subtle);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 @media (max-width: 480px) {
