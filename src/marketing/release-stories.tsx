@@ -69,7 +69,7 @@ export function ReleaseStory({isMonitoring}: {isMonitoring: boolean}) {
     ? (['releaseIntent', 'rollout', 'alert'] as const)
     : (['scenario', 'stagingData', 'rerun'] as const)
   return <>
-    <DitherFlow>
+    <DitherFlow className="feature-hero-flow">
       <section className="feature-layout-intro pr-story-hero">
         <h1><span>{story.title}</span> <br className="feature-layout-break"/><em>{story.emphasis}</em></h1>
         <span className="feature-beta">Beta</span>

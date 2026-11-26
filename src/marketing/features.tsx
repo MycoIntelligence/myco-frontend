@@ -4,13 +4,12 @@ import Link from "next/link"
 import {Arrow} from './feature-bento'
 import {features,href} from './feature-data'
 import {useReducedMotion} from 'motion/react'
-import {SiteHeader,SiteFooter} from './home-sections'
+import {PilotLink,SiteHeader,SiteFooter} from './home-sections'
 import {TestingDemo} from './quality-demos'
 import {FeatureIllustration, ReviewIllustration} from './review-illustration'
 import {ReleaseStory} from './release-stories'
 import {DitherFlow} from './dither-flow'
 import {SmoothCursor} from './smooth-cursor'
-import {TrialRequestButton} from './trial-request'
 import {PRReviewContext} from './pr-review-context'
 
 function ReviewSample() {
@@ -22,11 +21,11 @@ function ReviewSample() {
 
 function PRReviewStory() {
   return <>
-    <DitherFlow>
+    <DitherFlow className="feature-hero-flow">
     <section className="feature-layout-intro pr-story-hero">
       <h1><span>Catch what your PR gets wrong</span> <br className="feature-layout-break"/><em>before you merge</em></h1>
       <p>Myco checks GitHub pull requests against the behavior your team agreed to ship. When a change misses a requirement or could break an existing workflow, Myco shows you the line to look at and why it matters.</p>
-      <TrialRequestButton className="pilot"/>
+      <PilotLink/>
     </section>
     </DitherFlow>
     <section className="pr-story-section pr-story-wide-copy">
@@ -81,7 +80,7 @@ function PRReviewStory() {
     <section className="pr-story-section pr-story-closing">
       <h2>Try it on a PR your team already reviewed</h2>
       <p>Pick a change with a clear requirement or a dependency you had to double-check. Run Myco on it and see whether the findings point to something your team can verify directly in GitHub.</p>
-      <TrialRequestButton className="pilot"/>
+      <PilotLink/>
     </section>
     <section className="pr-story-section pr-story-faq" aria-labelledby="pr-story-faq-title">
       <h2 id="pr-story-faq-title">Frequently asked questions</h2>
@@ -107,11 +106,11 @@ function PRReviewStory() {
 
 function TestingStory() {
   return <>
-    <DitherFlow>
+    <DitherFlow className="feature-hero-flow">
       <section className="feature-layout-intro pr-story-hero">
         <h1><span>Find the tests your PR is missing</span><br className="feature-layout-break"/> <em>before you merge</em></h1>
         <p>Myco checks your existing tests against what the change is supposed to do. It flags missing scenarios in GitHub and gives you a test plan with the cases to add and the results to assert.</p>
-        <TrialRequestButton className="pilot"/>
+        <PilotLink/>
       </section>
     </DitherFlow>
     <section className="pr-story-section pr-story-wide-copy">
@@ -166,7 +165,7 @@ function TestingStory() {
     <section className="pr-story-section pr-story-closing">
       <h2>Try it on a PR your team is about to merge</h2>
       <p>Pick a change with a clear requirement and a passing test suite. See whether Myco surfaces a scenario your team would want covered before shipping.</p>
-      <TrialRequestButton className="pilot"/>
+      <PilotLink/>
     </section>
     <section className="pr-story-section pr-story-faq" aria-labelledby="testing-faq-title">
       <h2 id="testing-faq-title">Frequently asked questions</h2>

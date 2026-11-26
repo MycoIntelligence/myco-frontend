@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getWebsiteCustomerSession } from "@/lib/supabase/server";
-import { ArrowRight } from "lucide-react";
 import { CredentialsFrame } from "@/src/marketing/credentials-frame";
-import { TrialRequestButton } from "@/src/marketing/trial-request";
+import { PilotLink } from "@/src/marketing/home-sections";
 import styles from "@/src/marketing/account.module.css";
 import { signOut } from "../auth/actions";
 
@@ -42,9 +41,7 @@ export default async function AccountPage() {
         </div>
       )}
       {error && <p className={styles.error} role="alert">We couldn’t load your profile. Refresh the page to try again.</p>}
-      <TrialRequestButton className={styles.button}>
-        Request a free trial <ArrowRight size={17} aria-hidden="true" />
-      </TrialRequestButton>
+      <PilotLink />
       <form action={signOut} className={styles.profileSignOut}>
         <button className={styles.textButton}>Sign out</button>
       </form>

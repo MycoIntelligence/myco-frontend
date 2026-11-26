@@ -308,3 +308,20 @@
 .pr-story-closing > p {
   max-width: none;
 }
+
+
+.feature-main.feature-layout {
+  --feature-gutter: max(25px, calc((100% - 1130px) / 2));
+  max-width: none;
+  padding-inline: var(--feature-gutter);
+}
+
+.feature-layout .feature-hero-flow {
+  background: transparent;
+  margin-inline: calc(-1 * var(--feature-gutter));
+  padding-inline: var(--feature-gutter);
+}
+
+@media (max-width: 760px) {
+  .feature-main.feature-layout { --feature-gutter: 18px; }
+}

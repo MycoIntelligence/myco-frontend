@@ -770,7 +770,7 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   grid-template-rows: auto auto;
 }
 
-.home-dither-flow > .hero-review-flow { --flow-overlap: clamp(140px, 18vw, 215px); }
+.home-dither-flow > .hero-review-flow, .feature-hero-flow.hero-review-flow { --flow-overlap: clamp(140px, 18vw, 215px); }
 .home-dither-flow > .review-story { background: transparent; }
 .contact-dither-flow { --flow-overlap: 0px; }
 
@@ -930,3 +930,5 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   .nav { margin-inline: 12px; }
   .nav .nav-pilot { padding-inline: 9px; font-size: 13px; }
 }
+
+.nav-pilot.trial-request-button { border-radius: 999px; }
