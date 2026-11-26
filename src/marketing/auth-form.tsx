@@ -22,25 +22,25 @@ export function AuthForm({ mode, intent, configured }: {
     <>
       <h1 id="account-heading">{isSignup ? "Create your Myco account" : "Sign in to Myco"}</h1>
       <p className={styles.intro}>
-        {isSignup ? "Get started with Myco PR Review." : "Enter your email and password to continue."}
+        {isSignup ? "Get started with Myco PR Review." : "Enter your work email and password to continue."}
       </p>
       <form action={action} className={styles.form}>
         <input type="hidden" name="intent" value={intent} />
         {isSignup && (
           <div className={styles.field}>
-            <label htmlFor="fullName">Full name</label>
+            <label htmlFor="fullName">Full name <span className={styles.required} aria-hidden="true">*</span></label>
             <input id="fullName" name="fullName" autoComplete="name" required maxLength={100}
               value={fullName} onChange={(event) => setFullName(event.target.value)} />
           </div>
         )}
         <div className={styles.field}>
-          <label htmlFor="email">Email address</label>
+          <label htmlFor="email">Work email <span className={styles.required} aria-hidden="true">*</span></label>
           <input id="email" name="email" type="email" autoComplete="email" autoCapitalize="none"
             spellCheck={false} required maxLength={254}
             value={email} onChange={(event) => setEmail(event.target.value)} />
         </div>
         <div className={styles.field}>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Password <span className={styles.required} aria-hidden="true">*</span></label>
           <div className={styles.password}>
             <input id="password" name="password" type={passwordVisible ? "text" : "password"}
               autoComplete={isSignup ? "new-password" : "current-password"} required
@@ -51,7 +51,7 @@ export function AuthForm({ mode, intent, configured }: {
               {passwordVisible ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          {isSignup && <span id="password-hint" className={styles.hint}>Use at least 8 characters.</span>}
+          {isSignup && <span id="password-hint" className={styles.hint}>Use at least 8 characters, including an uppercase letter and a special character.</span>}
         </div>
         {state.error && <p className={styles.error} role="alert">{state.error}</p>}
         {!configured && <p className={styles.notice} id="auth-unavailable">This preview can’t create accounts or sign you in yet.</p>}

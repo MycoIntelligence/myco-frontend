@@ -315,3 +315,5 @@ button.button {
     padding: 18px 16px 40px;
   }
 }
+
+.required { color: var(--blue); }
