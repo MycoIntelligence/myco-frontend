@@ -3,6 +3,15 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authCookieOptions, getSupabaseConfig } from "@/lib/supabase/config";
 
 export async function middleware(request: NextRequest) {
+  const hasAuthCookie = request.cookies.getAll().some((cookie) => cookie.name.startsWith("sb-"));
+  if (!hasAuthCookie) {
+    const response = request.nextUrl.pathname === "/account"
+      ? NextResponse.redirect(new URL("/login", request.url))
+      : NextResponse.next({ request });
+    response.headers.set("Cache-Control", "private, no-store");
+    return response;
+  }
+
   const config = getSupabaseConfig();
   if (!config) return NextResponse.next();
 

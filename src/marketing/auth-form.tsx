@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
-import { confirmEmail, submitCredentials } from "@/app/(marketing)/auth/actions";
+import { confirmEmail, signOut, submitCredentials } from "@/app/(marketing)/auth/actions";
 import { accountPath, type AccountIntent } from "@/lib/account-paths";
+import { clearWebsiteSessionCache, setWebsiteSessionProfile } from "./website-session";
 import styles from "./account.module.css";
 
 export function AuthForm({ mode, intent, configured }: {
@@ -24,7 +26,7 @@ export function AuthForm({ mode, intent, configured }: {
       <p className={styles.intro}>
         {isSignup ? "Get started with Myco code review." : "Enter your email and password to continue."}
       </p>
-      <form action={action} className={styles.form}>
+      <form action={action} className={styles.form} onSubmit={clearWebsiteSessionCache}>
         <input type="hidden" name="intent" value={intent} />
         {isSignup && (
           <div className={styles.field}>
@@ -79,7 +81,7 @@ export function ConfirmEmailForm({ token, code, configured }: {
   const [state, action, pending] = useActionState(confirmEmail, {});
 
   return (
-    <form action={action} className={styles.form}>
+    <form action={action} className={styles.form} onSubmit={clearWebsiteSessionCache}>
       {token && <input type="hidden" name="token" value={token} />}
       {code && <input type="hidden" name="code" value={code} />}
       {!configured && <p className={styles.notice}>Account confirmation is unavailable right now.</p>}
@@ -87,6 +89,23 @@ export function ConfirmEmailForm({ token, code, configured }: {
       <button className={styles.button} disabled={pending || !configured}>
         {pending ? "Confirming…" : "Confirm email"} <ArrowRight size={17} aria-hidden="true" />
       </button>
+    </form>
+  );
+}
+
+function SignOutSubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button className={styles.textButton} type="submit" disabled={pending}>
+      {pending ? "Signing out…" : "Sign out"}
+    </button>
+  );
+}
+
+export function SignOutForm() {
+  return (
+    <form action={signOut} className={styles.switch} onSubmit={() => setWebsiteSessionProfile(null)}>
+      <SignOutSubmitButton />
     </form>
   );
 }

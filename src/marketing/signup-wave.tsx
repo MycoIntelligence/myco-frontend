@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const FRAME_INTERVAL = 1000 / 30;
+const FRAME_INTERVAL = 1000 / 20;
 const PARTICLE_COLORS = [
   "#0964ad38", "#087ac66c", "#008ce598", "#05a3f2c5",
   "#20b8fff0", "#52ceff", "#a2e6ff",
@@ -32,8 +32,8 @@ export function SignupWave({ className }: { className: string }) {
     function draw() {
       if (!context || !width || !height) return;
       const compact = width < 760;
-      const rows = compact ? 30 : 59;
-      const columns = compact ? 57 : 117;
+      const rows = compact ? 24 : 42;
+      const columns = compact ? 44 : 82;
       const paths = PARTICLE_COLORS.map(() => new Path2D());
       context.clearRect(0, 0, width, height);
 

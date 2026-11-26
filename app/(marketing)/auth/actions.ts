@@ -1,6 +1,7 @@
 "use server";
 
 import { createHmac } from "node:crypto";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { afterWebsiteAuth, getAccountIntent } from "@/lib/account-paths";
@@ -136,6 +137,17 @@ export async function confirmEmail(
 
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
-  if (supabase) await supabase.auth.signOut({ scope: "local" });
+  if (supabase) {
+    await Promise.race([
+      supabase.auth.signOut({ scope: "local" }).catch(() => undefined),
+      new Promise<void>((resolve) => setTimeout(resolve, 350)),
+    ]);
+  }
+  const cookieStore = await cookies();
+  for (const cookie of cookieStore.getAll()) {
+    if (cookie.name.startsWith("sb-")) {
+      cookieStore.delete(cookie.name);
+    }
+  }
   redirect("/");
 }
