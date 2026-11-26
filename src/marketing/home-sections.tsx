@@ -4,6 +4,7 @@ import {BorderBeam} from './border-beam-local'
 import {contactEmail} from './contact-email'
 import {FeaturesNavigation} from './features-navigation'
 import {TrialRequestButton} from './trial-request'
+import {WebsiteAccountNav} from './website-account-nav'
 
 function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'}) {
   const paths={
@@ -114,7 +115,10 @@ export function SiteHeader({pricing=false,featuresPage=false,securityPage=false,
         <Link href="/security/" aria-current={securityPage ? 'page' : undefined}>Security</Link>
         <Link href="/pricing/" aria-current={pricing ? 'page' : undefined}>Pricing</Link>
       </nav>
-      <TrialRequestButton className="nav-pilot" />
+      <div className="nav-account-actions">
+        <WebsiteAccountNav />
+        <TrialRequestButton className="nav-pilot" />
+      </div>
     </div>
   </header>
   </>

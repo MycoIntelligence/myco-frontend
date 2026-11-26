@@ -1,6 +1,9 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { trialLoginHref, trialResumeHref } from "@/lib/account-paths";
+import { useWebsiteSession } from "./website-session";
 import { trialEmailSchema, trialGitHubUsernameSchema, trialRequestSchema } from "@/lib/schema";
 import "./trial-request.css";
 
@@ -8,20 +11,43 @@ type RequestKind = "trial" | "upgrade";
 const intro = "Share your details and we’ll review your request. We’ll email you an onboarding guide to get started.";
 
 export function TrialRequestButton({ className, children, kind = "trial" }: { className: string; children?: ReactNode; kind?: RequestKind }) {
+  const profile = useWebsiteSession();
+  const router = useRouter();
   const dialogId = `free-${kind}-request`;
+  const isTrial = kind === "trial";
+
   function openForm() {
+    if (isTrial) {
+      if (!profile) {
+        router.push(trialLoginHref);
+        return;
+      }
+
+      window.location.assign(trialResumeHref);
+      return;
+    }
+
     const dialog = document.getElementById(dialogId);
     if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
   }
 
   return (
-    <button type="button" className={`trial-request-button ${className}`} aria-haspopup="dialog" aria-controls={dialogId} onClick={openForm}>
-      {children ?? "Request a free trial"}
+    <button
+      type="button"
+      className={`trial-request-button ${className}`}
+      aria-haspopup={isTrial ? undefined : "dialog"}
+      aria-controls={isTrial ? undefined : dialogId}
+      onClick={openForm}
+    >
+      {children ?? (isTrial ? "Request a free trial" : "Upgrade to Pro")}
     </button>
   );
 }
 
 export function TrialRequestDialog({ kind = "trial" }: { kind?: RequestKind }) {
+  const profile = useWebsiteSession();
+  const router = useRouter();
+  const pathname = usePathname();
   const upgrade = kind === "upgrade";
   const dialogId = `free-${kind}-request`;
   const dialog = useRef<HTMLDialogElement>(null);
@@ -31,6 +57,17 @@ export function TrialRequestDialog({ kind = "trial" }: { kind?: RequestKind }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<string, string>>>({});
+
+  useEffect(() => {
+    if (!profile || pathname !== "/" || !dialog.current) return;
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("trial") !== "open") return;
+
+    if (!dialog.current.open) dialog.current.showModal();
+    url.searchParams.delete("trial");
+    window.history.replaceState(null, "", url);
+  }, [pathname, profile]);
 
   function validateOnBlur(input: HTMLInputElement) {
     const schema = input.name === "workEmail" ? trialEmailSchema : trialGitHubUsernameSchema;
@@ -88,6 +125,12 @@ export function TrialRequestDialog({ kind = "trial" }: { kind?: RequestKind }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (response.status === 401) {
+        dialog.current?.close();
+        router.push(trialLoginHref);
+        return;
+      }
+
       const result = await response.json();
       if (response.ok && result.ok) {
         if (dialog.current?.open) closeButton.current?.focus();

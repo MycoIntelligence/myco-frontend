@@ -1,7 +1,8 @@
-import { AccountPage } from "@/src/marketing/account-page";
+import type { Metadata } from "next";
+import { CredentialsPage, type AccountPageProps } from "@/src/marketing/website-credentials-page";
 
-export const metadata = { title: "Sign up", robots: { index: false } };
+export const metadata: Metadata = { title: "Create an account", robots: { index: false, follow: false } };
 
-export default function SignupPage() {
-  return <AccountPage mode="signup" />;
+export default function SignupPage(props: AccountPageProps) {
+  return <CredentialsPage mode="signup" {...props} />;
 }

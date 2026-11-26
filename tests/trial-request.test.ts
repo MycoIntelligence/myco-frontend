@@ -2,8 +2,12 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/demo/route";
 import { deliverLead } from "@/lib/leads";
+import { getWebsiteCustomerSession } from "@/lib/supabase/server";
 
 vi.mock("@/lib/leads", () => ({ deliverLead: vi.fn() }));
+vi.mock("@/lib/supabase/server", () => ({
+  getWebsiteCustomerSession: vi.fn(() => Promise.resolve({ user: { id: "test-user" } })),
+}));
 
 const trial = {
   kind: "trial",
@@ -42,6 +46,15 @@ describe("Free trial requests", () => {
       id: expect.any(String),
       timestamp: expect.any(String),
     });
+  });
+
+  it("requires sign-in before looking up GitHub accounts or delivering a trial request", async () => {
+    vi.mocked(getWebsiteCustomerSession).mockResolvedValueOnce(null);
+    const response = await POST(request(trial));
+    expect(response.status).toBe(401);
+    expect(await response.json()).toMatchObject({ ok: false });
+    expect(lookup).not.toHaveBeenCalled();
+    expect(deliverLead).not.toHaveBeenCalled();
   });
 
   it("requires both names, work email, and GitHub username", async () => {
