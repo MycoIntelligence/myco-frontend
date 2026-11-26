@@ -26,6 +26,13 @@ function FeatureDetail({index}: {index:number}) {
   const next=features[(index+1)%features.length]
   const [title,emphasis]=feature.title
   const isPRReview=feature.slug==='pr-review'
+  const isTesting=feature.slug==='testing'
+  const checksHeading = {
+    'pr-review': 'A green PR can still miss the requirement',
+    testing: 'Passing tests can leave critical behavior untested',
+    'pre-prod-validation': 'A change can pass review and still fail in staging',
+    'production-monitoring': 'When behavior changes after a release, where do you start?',
+  }[feature.slug]
   const example=<>
     <div className="feature-layout-visual"><Sample index={index}/></div>
     <p className="feature-layout-example"><strong>In practice.</strong> {feature.example}</p>
@@ -43,17 +50,37 @@ function FeatureDetail({index}: {index:number}) {
       </h1>
       <h2 id="feature-explanation">{feature.explanation}</h2>
     </section>
-    {isPRReview ? <PRReviewContext/> : example}
-    <section className="feature-layout-explanation" aria-labelledby="feature-explanation">
+    {isPRReview ? <PRReviewContext/> : isTesting ? null : example}
+    {isTesting && (
+      <section className="feature-layout-requirement-check" aria-labelledby="testing-example-title">
+        <div className="feature-layout-checkout-copy">
+          <h2 id="testing-example-title">What should happen when a customer enters a $0 discount?</h2>
+          <p>An explicit $0 discount should leave the order at full price. Myco flags this missing test case and includes the expected result in the test plan linked from the GitHub pull request.</p>
+        </div>
+        <div className="feature-layout-visual"><Sample index={index}/></div>
+      </section>
+    )}
+    <section className="feature-layout-explanation" aria-labelledby="feature-checks">
+      <h2 id="feature-checks">{checksHeading}</h2>
       <p className="feature-layout-summary">{feature.summary}</p>
       <dl>
         {feature.sections.map(([label,copy,beta])=><div key={label}>
           <dt>{label}{beta && <span className="feature-beta">Beta</span>}</dt>
-          <dd>{copy}</dd>
+          <dd>
+            <ul role="list">{copy.split(/(?<=\.) /).map(point => <li key={point}>{point}</li>)}</ul>
+          </dd>
         </div>)}
       </dl>
     </section>
-    {isPRReview && <div className="feature-layout-requirement-check">{example}</div>}
+    {isPRReview && (
+      <section className="feature-layout-requirement-check" aria-labelledby="checkout-example-title">
+        <div className="feature-layout-checkout-copy">
+          <h2 id="checkout-example-title">Example: Catch a receipt total that breaks the checkout requirement</h2>
+          <p>The customer paid $85 after a $15 discount, but the receipt showed $100. Myco flags line 40 in <code>receipt.ts</code> and links it to the Jira requirement that the receipt must show the amount charged.</p>
+        </div>
+        <div className="feature-layout-visual"><Sample index={index}/></div>
+      </section>
+    )}
     <div className="feature-layout-actions">
       <Link className="eyebrow feature-layout-next" href={href(next.slug)}>
         {next.label} <Arrow/>

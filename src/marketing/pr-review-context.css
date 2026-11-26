@@ -286,6 +286,8 @@ body[style*="cursor: none"] .pr-context button { cursor: none; }
   color: var(--mc-blue);
 }
 
+.pr-context .mc-flow > .mc-mobile-paths { display: none; }
+
 @media (max-width: 670px) {
   .pr-context .mc-workflow {
     grid-template-columns: minmax(0, 1fr);
@@ -293,7 +295,17 @@ body[style*="cursor: none"] .pr-context button { cursor: none; }
 
   .pr-context .mc-inputs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 7px;
+    gap: 8px;
+    grid-auto-rows: 68px;
+    padding-inline: 5%;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pr-context .mc-input:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - 8px) / 2);
   }
 
   .pr-context .mc-input {
@@ -316,17 +328,16 @@ body[style*="cursor: none"] .pr-context button { cursor: none; }
     height: 78px;
   }
 
-  .pr-context .mc-flow > svg {
+  .pr-context .mc-flow > .mc-desktop-paths {
     display: none;
   }
 
-  .pr-context .mc-flow::before {
-    content: "";
+  .pr-context .mc-flow > .mc-mobile-paths {
+    display: block;
     position: absolute;
-    left: 50%;
-    height: 100%;
-    width: 1px;
-    background: #78b5ee;
+    bottom: 0;
+    height: 296px;
+    pointer-events: none;
   }
 
   .pr-context .mc-logo {

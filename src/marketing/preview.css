@@ -556,6 +556,48 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   background: #101216;
   font-size: 13px;
 }
+.bento-review-flow {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) 22px minmax(0, 1.35fr);
+  align-items: center;
+  margin-top: 4px;
+}
+.bento-review-flow .bento-demo { min-width: 0; margin-top: 0; }
+.bento-jira-ticket { display: inline-flex; align-items: center; gap: 6px; }
+.bento-jira-ticket img { display: block; flex: none; object-fit: contain; }
+.bento-review-connector { height: 2px; background: #5380a7; }
+.bento-review-line {
+  display: block;
+  margin-top: 8px;
+  padding: 4px 6px;
+  border-left: 2px solid #da3633;
+  background: #da36331f;
+  color: #f0aaa3;
+  font: 11px/1.5 ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bento-review-connector {
+    background-image: linear-gradient(90deg, transparent, #b9dfff, transparent);
+    background-repeat: no-repeat;
+    background-size: 60% 100%;
+    animation: bento-review-trace 2.8s ease-in-out infinite;
+  }
+}
+@keyframes bento-review-trace {
+  from { background-position: -180% 0; }
+  to { background-position: 280% 0; }
+}
+@media (max-width: 740px) {
+  .bento-review-flow { grid-template-columns: minmax(0, 1fr); }
+  .bento-review-connector {
+    justify-self: center;
+    width: 2px;
+    height: 16px;
+    background-image: none;
+    animation: none;
+  }
+}
 .bento-demo-header {
   display: flex;
   flex-wrap: wrap;

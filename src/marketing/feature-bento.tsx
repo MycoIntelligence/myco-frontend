@@ -37,14 +37,24 @@ export function FeatureIcon({index}: {index:number}) {
 }
 
 function BentoDemo({index}: {index:number}) {
-  if (index===0) return <div className="bento-demo bento-review-demo">
-    <div className="bento-demo-header"><span>GitHub · PR #214</span><code>receipt.ts:40</code></div>
-    <div className="bento-review-finding">
-      <strong>Receipt total doesn’t match the spec</strong>
-      <dl className="bento-review-values">
-        <div><dt>Expected</dt><dd>$85.00</dd></div>
-        <div className="bento-result"><dt>Returned</dt><dd className="bento-failure">$100.00</dd></div>
-      </dl>
+  if (index===0) return <div className="bento-review-flow">
+    <div className="bento-demo bento-review-context">
+      <div className="bento-demo-header"><span className="bento-jira-ticket"><img src="/brands/jira.svg" alt="Jira" width="14" height="14" /> CHECKOUT-17</span></div>
+      <div className="bento-review-finding">
+        <strong>Receipt total must match the amount charged</strong>
+      </div>
+    </div>
+    <div className="bento-review-connector" aria-hidden="true"/>
+    <div className="bento-demo bento-review-demo">
+      <div className="bento-demo-header"><span>GitHub · PR #214</span><code>receipt.ts:40</code></div>
+      <div className="bento-review-finding">
+        <strong>Receipt shows the pre-discount total</strong>
+        <code className="bento-review-line">return {'{ total: subtotal }'};</code>
+        <dl className="bento-review-values">
+          <div><dt>Expected</dt><dd>$85.00</dd></div>
+          <div><dt>Returned</dt><dd className="bento-failure">$100.00</dd></div>
+        </dl>
+      </div>
     </div>
   </div>
 

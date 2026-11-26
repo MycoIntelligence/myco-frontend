@@ -22,14 +22,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    const isTrial = body && typeof body === "object" && "kind" in body && body.kind === "trial";
-    if (isTrial && !(await getWebsiteCustomerSession())) {
+    const requestKind = body && typeof body === "object" && "kind" in body ? body.kind : undefined;
+    if (requestKind === "trial" && !(await getWebsiteCustomerSession())) {
       return NextResponse.json({
         ok: false,
         message: "Sign in to request a free trial.",
       }, { status: 401 });
     }
 
+    const isTrial = requestKind === "trial" || requestKind === "upgrade";
     const result = (isTrial ? trialRequestSchema : demoFormSchema).safeParse(body);
     if (!result.success) {
       const errors: Record<string, string> = {};

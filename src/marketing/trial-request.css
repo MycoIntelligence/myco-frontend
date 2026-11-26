@@ -53,7 +53,7 @@ body:has(.trial-dialog[open]) [data-myco-smooth-cursor] { visibility: hidden; }
   font-weight: 700;
 }
 
-.trial-dialog #trial-dialog-intro {
+.trial-dialog .trial-dialog-intro {
   margin: 0;
   color: var(--subtle);
   font-size: 15px;

@@ -5,6 +5,7 @@ import { TrialRequestDialog } from "@/src/marketing/trial-request";
 import { WebsiteSessionProvider } from "@/src/marketing/website-session";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.mycointelligence.com"),
   title: { default: "Myco | Software Quality Infrastructure", template: "%s | Myco" },
   description: "Review GitHub pull requests against product requirements and see which changes could break before you ship.",
   icons: { icon: "/marketing/myco-mark.png" },
