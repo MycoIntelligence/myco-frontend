@@ -1,10 +1,12 @@
 import {createHmac, timingSafeEqual} from 'node:crypto'
 import Razorpay from 'razorpay'
 
+export class CheckoutConfigurationError extends Error {}
+
 export function paymentGateway() {
   const keyId = process.env.RAZORPAY_KEY_ID
   const secret = process.env.RAZORPAY_KEY_SECRET
-  if (!keyId || !secret) throw new Error('Razorpay is not configured')
+  if (!keyId || !secret) throw new CheckoutConfigurationError('Missing Razorpay credentials')
   return {client: new Razorpay({key_id: keyId, key_secret: secret}), keyId, secret}
 }
 
@@ -12,7 +14,7 @@ export function checkoutAmount(period: 'monthly' | 'annual') {
   const amount = Number(period === 'annual'
     ? process.env.RAZORPAY_ANNUAL_AMOUNT_PAISE
     : process.env.RAZORPAY_MONTHLY_AMOUNT_PAISE)
-  if (!Number.isSafeInteger(amount) || amount < 100) throw new Error('Invalid checkout pricing')
+  if (!Number.isSafeInteger(amount) || amount < 100) throw new CheckoutConfigurationError(`Invalid Razorpay ${period} amount`)
   return amount
 }
 

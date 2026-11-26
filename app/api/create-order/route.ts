@@ -3,7 +3,7 @@ import {NextRequest, NextResponse} from 'next/server'
 import {z} from 'zod'
 import {getWebsiteCustomerSession} from '@/lib/supabase/server'
 import {allowRequest, readJsonLimited, RequestTooLarge} from '@/lib/request-security'
-import {checkoutAmount, orderProof, paymentGateway} from '@/lib/razorpay-checkout'
+import {CheckoutConfigurationError, checkoutAmount, orderProof, paymentGateway} from '@/lib/razorpay-checkout'
 
 const schema = z.object({period: z.enum(['monthly', 'annual'])}).strict()
 
@@ -24,6 +24,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof RequestTooLarge) return NextResponse.json({message: 'Request is too large.'}, {status: 413})
     if (error instanceof SyntaxError) return NextResponse.json({message: 'Invalid checkout request.'}, {status: 400})
+    if (error instanceof CheckoutConfigurationError) {
+      console.error('Checkout configuration error:', error.message)
+    } else {
+      const status = error && typeof error === 'object' && 'statusCode' in error && typeof error.statusCode === 'number'
+        ? error.statusCode : undefined
+      console.error('Checkout order creation failed', {upstreamStatus: status})
+    }
     return NextResponse.json({message: 'Checkout is unavailable. Please try again.'}, {status: 500})
   }
 }
