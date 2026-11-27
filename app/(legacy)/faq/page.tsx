@@ -7,6 +7,9 @@ const questions = [
   ["Does Myco make release decisions?", "Engineers own fixes, sign-off and releases. Permissions for actions such as commenting, changing code or affecting a merge are separate from read access."],
   ["How do we evaluate Myco?", "Start with one important workflow, agree what useful feedback means, and compare results with your current process. Discuss pricing and evaluation terms with the team."],
   ["How is customer data handled?", "Data handling, model routing, deployment and security terms should be confirmed for your environment during evaluation."],
+  ["How does PRD verification check pull requests against requirements?", "When a pull request description links a requirements document, Myco reads the document, extracts individual requirements, checks the code changes and the wider repository against them, and reports requirements that are missing, partly done or contradicted, with code evidence. Engineers decide what each mismatch means."],
+  ["Which document sources can Myco read for requirements?", "Myco supports GitHub documents, Jira tickets, Confluence pages, Google Docs, Notion pages, and other readable web pages. Access to documents is strictly read-only, and a document that cannot be read is reported without stopping the review."],
+  ["Does PRD verification create Jira tickets or block merges?", "Myco never creates tickets on its own and never blocks a merge. When Jira is enabled, Myco can create a ticket to update the PRD or fix the implementation only after explicit engineer confirmation. Findings are presented for human review."],
 ];
 export default function FaqPage() {
   return <PageShell eyebrow="FAQ" title="Questions, answered" lead="The essentials about Myco’s pull request review and evaluation.">

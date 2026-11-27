@@ -6326,6 +6326,398 @@
   }
 }
 
+/* =========================================================================
+   PRD Verification - Engineer Decision Panel
+   ========================================================================= */
+.prd-decision-panel {
+  background: rgba(14, 38, 26, 0.7);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-family: var(--site-sans);
+}
+
+.prd-decision-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.prd-decision-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prd-decision-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #34d399;
+}
+
+.prd-decision-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.prd-decision-badge {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  color: #6ee7b7;
+}
+
+.prd-decision-subtitle {
+  font-size: 11.5px;
+  color: #c2d9cc;
+  line-height: 1.5;
+  margin: 0 0 10px 0;
+}
+
+.prd-decision-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.prd-decision-btn {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: var(--site-sans);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.prd-decision-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #ffffff;
+}
+
+.prd-decision-btn:focus-visible {
+  outline: 2px solid #34d399;
+  outline-offset: 2px;
+}
+
+.prd-decision-btn.is-selected {
+  background: rgba(52, 211, 153, 0.18);
+  border-color: #34d399;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.prd-decision-result {
+  margin-top: 8px;
+}
+
+.prd-decision-prompt {
+  font-size: 11px;
+  color: #8fa398;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.prd-decision-recorded {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.prd-recorded-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+
+.prd-recorded-label {
+  font-size: 9.5px;
+  color: #8fa398;
+  letter-spacing: 0.03em;
+}
+
+.prd-recorded-val {
+  font-size: 11.5px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.prd-decision-meaning {
+  font-size: 11.5px;
+  color: #c2d9cc;
+  line-height: 1.5;
+  margin: 6px 0 10px 0;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.prd-ticket-action-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  flex-wrap: wrap;
+}
+
+.prd-ticket-action-note {
+  font-size: 10.5px;
+  color: #8fa398;
+}
+
+.prd-ticket-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #22c55e;
+  border: 1px solid #16a34a;
+  color: #0d2818;
+  font-weight: 600;
+  font-size: 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--site-sans);
+}
+
+.prd-ticket-confirm-btn:hover {
+  background: #4ade80;
+  color: #051c0e;
+}
+
+.prd-ticket-confirm-btn:focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 2px;
+}
+
+.prd-ticket-card {
+  background: rgba(14, 38, 26, 0.9);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.prd-ticket-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.prd-ticket-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prd-ticket-type {
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(52, 211, 153, 0.2);
+  color: #6ee7b7;
+}
+
+.prd-ticket-key {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.prd-ticket-status {
+  font-size: 9.5px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.prd-ticket-summary {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.prd-ticket-desc {
+  font-size: 11px;
+  color: #c2d9cc;
+  line-height: 1.45;
+  margin: 0 0 6px 0;
+}
+
+.prd-ticket-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 10px;
+  color: #8fa398;
+  flex-wrap: wrap;
+}
+
+.prd-clarification-banner {
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-top: 6px;
+}
+
+.prd-clarification-header {
+  margin-bottom: 4px;
+}
+
+.prd-clarification-badge {
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+}
+
+.prd-clarification-text {
+  font-size: 11px;
+  color: #fef08a;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.prd-decision-footnote {
+  font-size: 10px;
+  color: #71877a;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-panel {
+  background: #f4f6f0;
+  border-color: #dbe4d5;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-title {
+  color: #173e2b;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-subtitle {
+  color: #3f5e4d;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-btn {
+  background: #ffffff;
+  border-color: #dbe4d5;
+  color: #173e2b;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-btn:hover {
+  background: #edf2e4;
+  border-color: #173e2b;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-btn.is-selected {
+  background: #e2edd8;
+  border-color: #173e2b;
+  color: #173e2b;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-recorded {
+  background: #ffffff;
+  border-color: #dbe4d5;
+}
+
+[data-ide-theme="vscode-light"] .prd-recorded-val {
+  color: #173e2b;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-meaning {
+  color: #3f5e4d;
+  border-top-color: #e5ede0;
+}
+
+[data-ide-theme="vscode-light"] .prd-ticket-card {
+  background: #ffffff;
+  border-color: #dbe4d5;
+}
+
+[data-ide-theme="vscode-light"] .prd-ticket-key,
+[data-ide-theme="vscode-light"] .prd-ticket-summary {
+  color: #173e2b;
+}
+
+[data-ide-theme="vscode-light"] .prd-ticket-desc {
+  color: #3f5e4d;
+}
+
+[data-ide-theme="vscode-light"] .prd-decision-footnote {
+  color: #6d8477;
+  border-top-color: #e5ede0;
+}
+
+@media (max-width: 600px) {
+  .prd-decision-panel {
+    padding: 10px 10px;
+  }
+  .prd-decision-btn {
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+  .prd-ticket-action-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prd-decision-btn,
+  .prd-ticket-confirm-btn {
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .prd-decision-panel,
+  .prd-ticket-card,
+  .prd-clarification-banner {
+    border: 1px solid CanvasText;
+  }
+  .prd-decision-btn.is-selected {
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+}
+
+
 
 
 

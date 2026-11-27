@@ -27,21 +27,22 @@ export function answerQuestion(question:string):AssistantAnswer {
   if(/\b(compare|comparison|competitor|coderabbit|greptile|codeant|vs\.?|versus)\b/i.test(q))return unknown;
   if (/\b(?:what (?:is|does) myco(?: do)?|how does myco work)\s+(?:and|also|plus)\b/i.test(q)) return unknown;
   // Unknown product/tool/financial requests must not be answered merely because they mention Myco.
-  if(/\b(refund|cancel|cancellation|tax|invoice|discount|hipaa|iso\s?27001|uptime|sla|aws|gcp|bitbucket|azure|jenkins|webhook|stripe|jira cloud)\b/i.test(q)) return unknown;
+  if(/\b(refund|cancel|cancellation|tax|invoice|discount|hipaa|iso\s?27001|uptime|sla|aws|gcp|bitbucket|azure|jenkins|webhook|stripe|jira cloud|sharepoint)\b/i.test(q)) return unknown;
+  if (/\b(prd|prds|requirements?|specs?|specification|acceptance criteria)\b/i.test(q) && /\b(linear|sharepoint|asana|monday|clickup|trello|basecamp|coda|box|dropbox)\b/i.test(q)) return unknown;
   const matches=index.filter(({entry})=>entry.questions.some(re=>re.test(q))).map(d=>({...d,score:score(q,d)}));
   if(!matches.length)return unknown;
   // Do not answer a multi-topic request with an excerpt covering only one part.
   // Treat broad overview / availability matches as contextual unless explicitly joined.
-  const concrete = matches.filter(m=>!['overview','live','contact'].includes(m.entry.id));
+  const concrete = matches.filter(m=>!['overview','live','contact','prd'].includes(m.entry.id));
   if (concrete.length > 1 && /\b(and|or|also|plus|with|versus|vs)\b|[?;,]/i.test(q.replace(/\?\s*$/, ''))) return unknown;
-  if (matches.some(m=>m.entry.id==='overview') && concrete.length && /\b(and|also|plus)\b/i.test(q)) return unknown;
+  if (matches.some(m=>['overview','prd'].includes(m.entry.id)) && concrete.filter(c=>!['prd-sources','prd-tickets'].includes(c.entry.id)).length && /\b(and|also|plus)\b/i.test(q)) return unknown;
   // A genuine lexical/subword relevance threshold remains necessary even for a recognized intent.
   const supported = matches.filter(m=>m.score >= 0.12);
   if (!supported.length) return unknown;
   // Prefer specific topics to general overview, while score selects between candidate sources.
-  const ordered=['seats','trial','billing','security','testing','autonomy','integrations','languages','roadmap','workflow','live','overview','contact'];
+  const ordered=['prd-tickets','prd-sources','prd','seats','trial','billing','security','testing','autonomy','integrations','languages','roadmap','workflow','live','overview','contact'];
   supported.sort((a,b)=> {
-    const broad=(id:string)=>['overview','live','contact'].includes(id);
+    const broad=(id:string)=>['overview','live','contact','prd'].includes(id);
     if(broad(a.entry.id)!==broad(b.entry.id)) return broad(a.entry.id)?1:-1;
     return (b.score-a.score) || (ordered.indexOf(a.entry.id)-ordered.indexOf(b.entry.id));
   });

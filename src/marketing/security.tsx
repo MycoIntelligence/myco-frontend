@@ -37,7 +37,7 @@ export default function SecurityPage(){
           </div>
           <dl className="security-detail-permissions">
             <div><dt>Contents: read</dt><dd>Myco reads source code from repositories you authorize.</dd></div>
-            <div><dt>Pull requests: write</dt><dd>GitHub requires this permission to post inline review comments when that output is enabled. Source code access is read-only.</dd></div>
+            <div><dt>Pull requests: write</dt><dd>GitHub requires this permission to post inline review comments when that output is enabled. Source code access is read-only. Access to documents is read-only, and Myco never changes code or documents.</dd></div>
             <div><dt>Stays with your team</dt><dd>Updating source code, pushing commits, and deciding what to merge.</dd></div>
           </dl>
         </section>
