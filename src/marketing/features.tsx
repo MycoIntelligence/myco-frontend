@@ -86,19 +86,23 @@ function PRReviewStory() {
       <h2 id="pr-story-faq-title">Frequently asked questions</h2>
       <details>
         <summary>Does Myco need a linked Jira issue for every PR?</summary>
-        <p>[Confirm what context Myco uses when a PR has no linked requirement and what it does when the available requirements are unclear.]</p>
+        <p>No. For a small fix, you can run a review without linking anything. If the change has acceptance criteria or a specific behavior to match, share the Jira issue, PRD, or relevant notes so Myco can check the implementation against what your team agreed to build.</p>
       </details>
       <details>
         <summary>When does Myco review a PR?</summary>
-        <p>[Confirm what triggers the first review, how draft PRs are handled, and whether pushing a fix triggers another review.]</p>
+        <p>By default, Myco runs through GitHub Actions when a PR is opened, reopened, or updated with a new commit. If your team prefers to review only when a PR is ready, you can configure a label to trigger it.</p>
       </details>
       <details>
         <summary>What GitHub access does Myco need?</summary>
-        <p>[Confirm the permissions needed to read code, inspect authorized repositories, and post inline findings.]</p>
+        <p>Myco needs read access to the repositories you authorise and permission to post findings on pull requests. It does not need permission to edit source code. Optional integrations such as jira, slack etc require their own permissions.</p>
       </details>
       <details>
         <summary>Can we turn a finding into a Jira issue?</summary>
-        <p>[Confirm availability, what triggers issue creation, and what gets copied into the issue.]</p>
+        <p>Yes. Once you connect Jira and choose the target project, Myco can automatically create Jira issues for findings it flags as merge blockers. Suggestions stay in the GitHub review.</p>
+      </details>
+      <details>
+        <summary>How is Myco different from the Claude or GPT agent we already use for code review?</summary>
+        <p>You can set up a general-purpose agent to do these checks. Myco brings them into the same GitHub review: it checks whether the PR matches the requirements you share, follows the change through the code that depends on it, and flags what could break across the repositories you’ve connected. If a backend PR renames a response field, for example, Myco can point your reviewer to the frontend code that still expects the old name.</p>
       </details>
     </section>
   </>
@@ -179,19 +183,19 @@ function TestingStory() {
       <h2 id="testing-faq-title">Frequently asked questions</h2>
       <details>
         <summary>Does Myco write the tests for me?</summary>
-        <p>Myco identifies missing scenarios and proposes test cases with expected results. Your engineers add the tests to the codebase.</p>
+        <p>Myco generates a test plan that shows what your existing tests cover, which scenarios are missing, and what each new test should assert. Your engineers use it to write tests in their existing suite. If you’d like Myco to help implement those tests, we can discuss that as part of a paid engagement.</p>
       </details>
       <details>
         <summary>What does the coverage check look at?</summary>
-        <p>Myco checks whether your existing tests exercise the behavior called for by the change. [Confirm supported test types and whether line coverage is also reported.]</p>
+        <p>Myco compares what your existing tests actually check with the behaviors the PR is meant to deliver. If you share a PRD, Myco uses it to build the test plan. One test can cover several scenarios. Myco marks those as covered and calls out the gaps in the PR.</p>
       </details>
       <details>
         <summary>Where do I find the test plan?</summary>
-        <p>Open the link in Myco’s GitHub PR comment. [Confirm who can open the plan and whether it updates when new tests are pushed.]</p>
+        <p>Open Myco’s inline comment on the GitHub pull request. It links to a spreadsheet where you can see the proposed test cases, the expected results, and which scenarios still need coverage.</p>
       </details>
       <details>
         <summary>When does coverage analysis run?</summary>
-        <p>[Confirm what triggers an analysis and whether it reruns after the author pushes new tests.]</p>
+        <p>By default, it runs in GitHub Actions when a PR is opened, reopened, or updated with a new commit. That includes commits that add or change tests. You can also configure it to run when you add a label.</p>
       </details>
     </section>
   </>

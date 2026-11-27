@@ -28,8 +28,8 @@ const staging = {
   nextCopy: 'Pick a journey that takes coordination to validate today, like resuming checkout, retrying a payment, or completing an approval.',
   faq: [
     ['Do we need a full copy of production?', 'The planned approach uses lightweight staging with mock data. Production-only configuration, customer-specific behavior, and deployment at production scale need their own checks.'],
-    ['Can we use our existing staging environment?', '[Confirm supported environments, setup ownership, and access requirements.]'],
-    ['What happens when a check fails?', '[Confirm what the run report includes, where it appears, and how the engineer reruns the scenario.]'],
+    ['Can we use our existing staging environment?', 'Yes. The private beta is designed to run release checks in the staging environment your team already uses. During onboarding, we’ll work with you to identify which workflows to validate and what test data they need.'],
+    ['What happens when a check fails?', 'The planned release report shows which test cases passed or failed and includes evidence where available, such as a screenshot for a UI failure or a relevant log line for a backend failure. Your engineers can use that evidence to reproduce the issue and decide whether it should block the release.'],
   ],
 }
 
@@ -57,9 +57,9 @@ const monitoring = {
   next: 'Start with a release your team already investigated',
   nextCopy: 'Pick a rollout where the alert was clear but identifying the relevant change took time.',
   faq: [
-    ['Which monitoring tools does Myco connect to?', '[Confirm supported telemetry providers and setup requirements.]'],
-    ['How does Myco link an alert to a rollout?', '[Confirm which deployment metadata is required and how overlapping rollouts are handled.]'],
-    ['Does Myco identify the root cause?', '[Confirm what the beta can establish and when it presents a lead for the engineer to investigate.]'],
+    ['Which monitoring tools does Myco connect to?', 'Grafana is one of the integrations we’re offering in private beta. Tell us what your team uses today, and we’ll confirm what we can connect to during onboarding.'],
+    ['How does Myco link an alert to a rollout?', 'We approach this by comparing when the issue appeared with what changed in recent deployments. If you ship several times a day, checks tied to each rollout can help narrow down which release to investigate first.'],
+    ['Does Myco identify the root cause?', 'It depends on the evidence. If a checkout flow breaks after a release and the logs point to a specific error, Myco is designed to help narrow the investigation. A broad signal like a CPU spike may still need an engineer to trace the cause.'],
   ],
 }
 
