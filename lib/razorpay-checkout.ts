@@ -7,6 +7,12 @@ export function paymentGateway() {
   const keyId = process.env.RAZORPAY_KEY_ID
   const secret = process.env.RAZORPAY_KEY_SECRET
   if (!keyId || !secret) throw new CheckoutConfigurationError('Missing Razorpay credentials')
+  const isTestKey = keyId.startsWith('rzp_test_')
+  const isLiveKey = keyId.startsWith('rzp_live_')
+  if (!isTestKey && !isLiveKey) throw new CheckoutConfigurationError('Invalid Razorpay key ID')
+  if (isLiveKey && process.env.VERCEL_ENV !== 'production') {
+    throw new CheckoutConfigurationError('Live Razorpay credentials require a Vercel Production deployment')
+  }
   return {client: new Razorpay({key_id: keyId, key_secret: secret}), keyId, secret}
 }
 
