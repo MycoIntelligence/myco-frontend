@@ -49,10 +49,9 @@ function PRReviewStory() {
           <div>
             <h3>Check what your team agreed to build</h3>
             <ul role="list">
-              <li>PR descriptions rarely repeat every acceptance criterion.</li>
-              <li>Myco checks the changed code against the requirements available to the review.</li>
+              <li>Share the Jira issue, Google Doc, or Confluence page that describes the change.</li>
+              <li>Myco uses the requirements it can access to check whether the PR implements the behavior your team agreed to ship.</li>
             </ul>
-            <p className="pr-story-draft-note">[Confirm which requirement sources are supported today and how teams make them available to the review.]</p>
           </div>
         </div>
         <div className="pr-story-review-row">
@@ -60,10 +59,9 @@ function PRReviewStory() {
           <div>
             <h3>Follow the change to the code that relies on it</h3>
             <ul role="list">
-              <li>An API can pass its own tests after renaming a field while a service in another repo still expects the old name.</li>
-              <li>Myco traces dependencies across authorized repositories and points reviewers to the affected caller.</li>
+              <li>Give Myco read access to the repositories involved in the change.</li>
+              <li>If a backend PR renames a response field, Myco can point reviewers to the frontend code that still expects the old name.</li>
             </ul>
-            <p className="pr-story-draft-note">[Confirm which kinds of cross-repo dependencies Myco can trace today and how teams grant access.]</p>
           </div>
         </div>
         <div className="pr-story-review-row">
@@ -137,9 +135,9 @@ function TestingStory() {
           <div>
             <h3>Check the behavior behind the change.</h3>
             <ul role="list">
-              <li>Myco looks at the requirements available to the review and compares them with what the existing tests check.</li>
+              <li>Myco uses the requirements you share from Jira, Google Docs, or Confluence to check which scenarios your existing tests cover.</li>
+              <li>A single test can cover several scenarios.</li>
             </ul>
-            <p className="pr-story-draft-note">[Confirm which requirement sources and test frameworks are supported today.]</p>
           </div>
         </div>
         <div className="pr-story-review-row">
@@ -147,9 +145,9 @@ function TestingStory() {
           <div>
             <h3>Show what’s missing where the team is already reviewing.</h3>
             <ul role="list">
-              <li>The GitHub comment lists the missing scenarios and links to an Excel test plan with numbered cases grouped by scenario, expected results, and coverage status.</li>
+              <li>Myco lists missing scenarios in an inline GitHub comment and links to the full test plan.</li>
+              <li>The spreadsheet groups test cases by scenario and shows the expected result and coverage status for each case.</li>
             </ul>
-            <p className="pr-story-draft-note">[Confirm the Excel format and fields available in the current build.]</p>
           </div>
         </div>
         <div className="pr-story-review-row">
@@ -167,9 +165,9 @@ function TestingStory() {
           <div>
             <h3>Test failure analysis <span className="feature-beta">Beta</span></h3>
             <ul role="list">
-              <li>When an existing test fails, Myco investigates why it failed and recommends a fix that addresses the cause.</li>
+              <li>We’re building this to help engineers investigate a failed test and see what to fix.</li>
+              <li>We’re working with GitHub Actions and Jenkins so teams can use the CI setup they already have.</li>
             </ul>
-            <p className="pr-story-draft-note">[Confirm which test runners and CI outputs are supported, and how teams get beta access.]</p>
           </div>
         </div>
       </div>

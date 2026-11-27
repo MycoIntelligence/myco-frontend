@@ -21,8 +21,8 @@ const staging = {
   workflow: 'Give the release owner a check they can rerun',
   steps: [
     ['Start with the behavior you agreed to ship', 'Turn the requirement into a scenario with a starting state, a sequence of actions, and an expected result.'],
-    ['Run it in lightweight staging', 'Use mock data and the services needed for the workflow. That gives the team a practical way to check acceptance criteria and regressions before release. [Confirm who provisions staging and which dependencies Myco can exercise.]'],
-    ['Give engineering a reproducible failure', 'Show which step failed, what was expected, and what happened. The engineer can rerun the same scenario after a fix. [Confirm which evidence the beta captures and how reruns work.]'],
+    ['Run it in lightweight staging', 'The private beta is designed to run release checks in your existing staging environment. Start with a workflow your team checks by hand, using mock data and the services that workflow needs.'],
+    ['Give engineering a reproducible failure', 'The planned release report shows which cases passed or failed. A failed case can include a screenshot of the UI or a relevant backend log line, so the engineer has evidence to work from when reproducing it.'],
   ],
   next: 'Start with one workflow your team checks by hand',
   nextCopy: 'Pick a journey that takes coordination to validate today, like resuming checkout, retrying a payment, or completing an approval.',
@@ -46,13 +46,12 @@ const monitoring = {
   exampleCopy: [
     'Imagine checkout latency rises shortly after a release that changes how shipping rates are cached. Slow requests spend extra time fetching rates. That makes the cache change worth checking, and the engineer can compare cache hit rates and slow traces before and after the rollout to see whether the evidence holds up.',
     'The handoff we’re working toward would show the affected workflow, when it changed, the rollout worth inspecting, and the evidence behind the lead.',
-    '[Confirm which signals and release details Myco can bring together before depicting a beta workflow.]',
   ],
   workflow: 'Carry the context from review into the incident',
   steps: [
-    ['Know what the release was supposed to change', 'Bring the intent behind the PR into the investigation so on-call can tell an expected shift from a possible regression. [Confirm how requirements and PRs are linked to a rollout.]'],
-    ['Put the signal next to the rollout', 'Show what moved and when. Give the engineer a relevant change to check against their monitoring data. [Confirm telemetry sources, comparisons, and alert thresholds.]'],
-    ['Send evidence the engineer can act on', 'The useful alert gives on-call a place to look and enough context to verify the lead. [Confirm where alerts go and what they include.]'],
+    ['Know what the release was supposed to change', 'We rerun key staging checks after deployment so engineers can see whether the workflows they validated still behave as expected in production.'],
+    ['Put the signal next to the rollout', 'The checks look at signals such as latency, CPU and memory use, and service health. For teams that deploy several times a day, running checks after each rollout can help narrow down which release to investigate.'],
+    ['Send evidence the engineer can act on', 'The goal is to show on-call what changed, when it started, and which rollout is worth checking first. If checkout slows down after a deploy, that gives the engineer a specific release and time window to investigate.'],
   ],
   next: 'Start with a release your team already investigated',
   nextCopy: 'Pick a rollout where the alert was clear but identifying the relevant change took time.',
@@ -93,19 +92,17 @@ export function ReleaseStory({isMonitoring}: {isMonitoring: boolean}) {
     <section className="pr-story-section">
       <h2>{story.workflow}</h2>
       <div className="pr-story-review-rows">
-        {story.steps.map(([title, copy], index) => {
-          const [description, note] = copy.split(' [')
-          return <div className="pr-story-review-row" key={title}>
+        {story.steps.map(([title, copy], index) => (
+          <div className="pr-story-review-row" key={title}>
             <FeatureIllustration kind={illustrations[index]}/>
             <div>
               <h3>{title}</h3>
               <ul role="list">
-                {description.split(/(?<=\.) /).map(point => <li key={point}>{point}</li>)}
+                {copy.split(/(?<=\.) /).map(point => <li key={point}>{point}</li>)}
               </ul>
-              {note && <p className="pr-story-draft-note">[{note}</p>}
             </div>
           </div>
-        })}
+        ))}
       </div>
     </section>
     <section className="pr-story-section pr-story-closing">
