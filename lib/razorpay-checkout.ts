@@ -3,6 +3,12 @@ import Razorpay from 'razorpay'
 
 export class CheckoutConfigurationError extends Error {}
 
+export function allowsGuestTestCheckout() {
+  return process.env.VERCEL_ENV === 'preview' &&
+    process.env.VERCEL_GIT_COMMIT_REF === 'grege-dev' &&
+    process.env.RAZORPAY_KEY_ID?.startsWith('rzp_test_') === true
+}
+
 export function paymentGateway() {
   const keyId = process.env.RAZORPAY_KEY_ID
   const secret = process.env.RAZORPAY_KEY_SECRET
@@ -33,6 +39,6 @@ export function signaturesMatch(expected: string, actual: string) {
     timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(actual, 'hex'))
 }
 
-export function orderProof(secret: string, userId: string, orderId: string) {
-  return signPaymentValue(secret, `myco-order|${userId}|${orderId}`)
+export function orderProof(secret: string, owner: string, orderId: string) {
+  return signPaymentValue(secret, `myco-order|${owner}|${orderId}`)
 }

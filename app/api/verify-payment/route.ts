@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from 'next/server'
 import {z} from 'zod'
 import {getWebsiteCustomerSession} from '@/lib/supabase/server'
 import {allowRequest, readJsonLimited, RequestTooLarge} from '@/lib/request-security'
-import {orderProof, paymentGateway, signaturesMatch, signPaymentValue} from '@/lib/razorpay-checkout'
+import {allowsGuestTestCheckout, orderProof, paymentGateway, signaturesMatch, signPaymentValue} from '@/lib/razorpay-checkout'
 
 const schema = z.object({
   order_id: z.string().regex(/^order_[a-z0-9]+$/i).max(64),
@@ -15,15 +15,17 @@ const schema = z.object({
 export async function POST(request: NextRequest) {
   if (!allowRequest('verify-payment', 20)) return NextResponse.json({message: 'Too many requests. Try again shortly.'}, {status: 429})
   try {
-    const session = await getWebsiteCustomerSession({readOnly: true})
-    if (!session) return NextResponse.json({message: 'Sign in to verify your payment.'}, {status: 401})
+    const owner = allowsGuestTestCheckout()
+      ? 'preview-guest'
+      : (await getWebsiteCustomerSession({readOnly: true}))?.user.id
+    if (!owner) return NextResponse.json({message: 'Sign in to verify your payment.'}, {status: 401})
     const input = schema.safeParse(await readJsonLimited(request, 4096))
     if (!input.success) return NextResponse.json({message: 'Payment details are missing or invalid.'}, {status: 400})
     const data = input.data
     const {client, secret} = paymentGateway()
     const signature = signPaymentValue(secret, `${data.order_id}|${data.razorpay_payment_id}`)
     if (data.order_id !== data.razorpay_order_id ||
-      !signaturesMatch(orderProof(secret, session.user.id, data.order_id), data.order_proof) ||
+      !signaturesMatch(orderProof(secret, owner, data.order_id), data.order_proof) ||
       !signaturesMatch(signature, data.razorpay_signature)) {
       return NextResponse.json({message: 'Payment signature could not be verified.'}, {status: 400})
     }
