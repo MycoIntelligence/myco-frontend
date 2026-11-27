@@ -2,6 +2,51 @@
  * Pricing and trial terms are from the existing frontend and must be confirmed before publication. */
 export type KnowledgeEntry = { id: string; title: string; href: string; questions: RegExp[]; answer: string; searchText: string };
 export const knowledge: KnowledgeEntry[] = [
+  {
+    id: 'prd',
+    title: 'PRD verification',
+    href: '/features/pr-review/',
+    questions: [
+      /^(?:what is|what does|how does|explain|describe|tell me about|can you explain)\s+(?:the\s+)?prd(?:\s+verification)?(?:\s+(?:do|work|doing))?[?.!\s]*$/i,
+      /\b(prd|prds)\b/i,
+      /\brequirements?\s*(doc(ument)?s?|verification|check(ing)?|mismatch(es)?)\b/i,
+      /\b(specifications?|acceptance criteria|spec mismatch)\b/i,
+      /\b(specifications?|requirements?)\b.*\b(verify|verification|check(ing)?|mismatch(es)?)\b/i,
+    ],
+    answer:
+      'PRD verification is built into pull request review. When a pull request description links a requirements document, Myco reads the document, extracts individual requirements, checks the code changes and the wider repository against them, and reports requirements that are missing, partly done or contradicted, with code evidence. Engineers decide what each mismatch means.',
+    searchText:
+      'prd verification requirements document specification acceptance criteria mismatch pull request review missing partly done contradicted code evidence human review',
+  },
+  {
+    id: 'prd-sources',
+    title: 'PRD document sources',
+    href: '/features/pr-review/',
+    questions: [
+      /\b(document sources?|document systems?|which documents?|what documents?|source documents?|supported documents?)\b/i,
+      /\b(confluence|google docs|notion)\b/i,
+      /\b(prd|prds|requirements?|specs?)\b.*\b(document sources?|document systems?|which documents?|what documents?|sources?|systems?|read from)\b/i,
+      /\b(document sources?|document systems?|which documents?|what documents?|read from)\b.*\b(prd|prds|requirements?|specs?)\b/i,
+    ],
+    answer:
+      'PRD verification is built into pull request review. Document sources include GitHub documents, Jira tickets, Confluence pages, Google Docs, Notion pages, and other readable web pages. Some need access to be set up by the customer. Access to documents is read-only.',
+    searchText:
+      'prd document sources systems github jira confluence google docs notion readable web pages read only customer setup unreadable document review',
+  },
+  {
+    id: 'prd-tickets',
+    title: 'PRD verification and Jira tickets',
+    href: '/features/pr-review/',
+    questions: [
+      /\b(tickets?|jira)\b.*\b(prd|requirements?|specs?|mismatch)\b/i,
+      /\b(prd|requirements?|specs?|mismatch)\b.*\b(tickets?|jira)\b/i,
+      /\bcreate\s+tickets?\b.*\b(requirements?|spec|mismatch)\b/i,
+    ],
+    answer:
+      'PRD verification is built into pull request review. Jira ticket creation is available only when the customer has enabled Jira. After the engineer confirms, Myco can create a ticket to update the PRD or a ticket to fix the implementation. No ticket is created without explicit confirmation, and none for needs clarification.',
+    searchText:
+      'prd jira tickets ticket creation update prd fix implementation engineer confirmation explicit needs clarification human review',
+  },
   {id:'overview',title:'Myco product overview',href:'/#overview',questions:[/^(?:what is|what does|how does|explain|describe|tell me about|can you explain)\s+myco(?:\s+(?:do|work|doing))?[?.!\s]*$/i],answer:'Myco helps engineers get features ready to ship while they are still working on them. Its live foundation is contextual GitHub pull request review: it assesses proposed changes against relevant code and available requirements, and explains potential problems for engineers to investigate.',searchText:'myco overview product what does myco do contextual code review pull request change engineers'},
   {id:'live',title:'What is available today',href:'/#availability',questions:[/\b(live|available|current|today|currently|support)\b.*\b(feature|capabilit|product|review|myco)\w*/i,/\bmyco\b.*\b(live|available|today|currently)\b/i],answer:'Contextual pull request review in GitHub is the live foundation. Connected sources, repository scope, permissions and supported actions need to be confirmed for each evaluation.',searchText:'live available today current github pull request review feature capability'},
   {id:'workflow',title:'Pull request review workflow',href:'/#workflow',questions:[/\b(how|what|explain)\b.*\b(pull request|pr review|code review|review workflow|review process)\b/i,/\b(pull request|pr review)\b.*\b(how|work|process)\w*/i],answer:'Myco reviews a GitHub pull request against available requirements and relevant authorized code. It checks suspected issues against available evidence and can explain the behaviour at risk and what to investigate. Engineers decide what to fix and when to release.',searchText:'workflow github pull request pr review works requirements code finding evidence'},

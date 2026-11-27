@@ -467,109 +467,116 @@ export const UserProfileBio: React.FC<UserBioProps> = ({ username, bioMarkup }) 
       title: "PRD and Implementation Mismatch",
       shortTitle: "5. Spec Mismatch",
       category: "Specification / Contract Mismatch",
-      repo: "myco-org/billing-engine",
-      branch: "feat/tax-retry-compliance",
-      fileName: "src/services/taxService.ts",
+      repo: "myco-org/auth-service",
+      branch: "feat/account-lockout",
+      fileName: "src/auth/loginService.ts",
       lang: "TypeScript",
       badge: "P1 HIGH",
       badgeClass: "is-p1",
-      description: "Requirement states customer taxExempt status must be re-verified on retry, alongside implementation that omits check.",
+      description: "Users should be locked out after five consecutive failed login attempts. Implementation tracks failed attempts without locking out.",
       prd: {
-        id: "PRD-402",
-        title: "Requirement PRD-402 §3.2: International Tax Compliance",
-        text: `REQUIREMENT (PRD-402 §3.2):
-"Every invoice generation retry MUST re-verify customer taxExempt status against the EU VIES registry before calculating total due, and write an audit event."`
+        id: "PRD-1",
+        title: "Product Spec §4.2 · Account Lockout",
+        text: `REQUIREMENT (Product Spec §4.2 · Account Lockout):
+"Users should be locked out after five consecutive failed login attempts."`
       },
       policy: {
-        id: "TAX-COMPLIANCE",
-        rule: "DENY unverified invoice totals for international cross-border transactions."
+        id: "AUTH-LOCKOUT",
+        rule: "Enforce account lockout after 5 consecutive failed login attempts."
       },
       code: `/**
- * REQUIREMENT (PRD-402: International Tax Compliance §3.2):
- * "Every invoice generation retry MUST re-verify customer taxExempt status
- * against the EU VIES registry before calculating total due, and write an audit event."
+ * REQUIREMENT (Product Spec §4.2 · Account Lockout):
+ * "Users should be locked out after five consecutive failed login attempts."
  */
 
-export async function processInvoiceRetry(invoiceId: string, customerId: string, subtotal: number) {
-  // MISMATCH: Implementation calculates standard VAT directly without re-verifying taxExempt status
-  const standardVatRate = 0.20;
-  const taxAmount = subtotal * standardVatRate;
-  const total = subtotal + taxAmount;
+export async function handleLoginAttempt(user: UserAccount, passwordAttempt: string) {
+  const isValid = await verifyPassword(user.id, passwordAttempt);
+  if (!isValid) {
+    const failedAttempts = await incrementFailedAttempts(user.id);
+    // MISMATCH: Implementation tracks failed login attempts but does not lock out
+    if (failedAttempts >= 5) {
+      recordLoginFailure(user);
+    }
+    return { success: false, error: "INVALID_CREDENTIALS" };
+  }
 
-  await db.invoices.update({
-    where: { id: invoiceId },
-    data: { total, taxAmount, status: "CALCULATED" }
-  });
-
-  return { invoiceId, total, taxAmount };
+  await resetFailedAttempts(user.id);
+  return { success: true };
 }`,
-      targetLine: 10,
+      targetLine: 11,
       targetRange: "L9-L15",
       finding: {
-        id: "SPEC-MISMATCH-TAX-EXEMPT",
-        title: "Specification Mismatch: Missing Tax Exemption Verification on Retry",
-        category: "Specification Compliance / Contract Mismatch",
-        severity: "HIGH",
-        confidence: "94%",
-        filePath: "src/services/taxService.ts",
-        lineStart: 10,
-        lineEnd: 15,
-        evidence: "const taxAmount = subtotal * standardVatRate; // Skips PRD §3.2 check",
-        evidenceRule: "PRD-402 · INTERNATIONAL TAX COMPLIANCE",
-        explanation: "PRD-402 §3.2 requires all invoice generation retries to re-verify customer taxExempt status against the EU VIES registry. The implementation calculates standard 20% VAT directly without performing the verification.",
-        impact: "Tax-exempt European enterprise customers (reverse charge) will be incorrectly billed 20% VAT on retried invoice runs, causing legal non-compliance, financial discrepancies, and customer chargebacks.",
-        suggestedFix: "Implement the required check: query customer tax-exemption status via viesService.checkTaxExemption(customerId), set taxAmount to 0 if exempt, and emit audit event.",
-        suggestedPatch: `  // FIX: Verify customer taxExempt status per PRD-402 §3.2 before calculating tax
-  const isExempt = await viesService.checkTaxExemption(customerId);
-  const taxAmount = isExempt ? 0 : subtotal * standardVatRate;
-  const total = subtotal + taxAmount;
-  await auditLog.emit("TAX_EXEMPT_VERIFIED", { customerId, invoiceId, isExempt });`,
+        id: "PRD-1",
+        title: "Account lockout requirement is not implemented.",
+        category: "Specification Compliance / PRD Verification",
+        resultLabel: "Not implemented",
+        severity: "High",
+        confidence: "High",
+        filePath: "src/auth/loginService.ts",
+        lineStart: 42,
+        lineEnd: 48,
+        evidenceLines: "lines 42–48",
+        evidence: "if (failedAttempts >= 5) { recordLoginFailure(user); }",
+        evidenceRule: "Product Spec §4.2 · Account Lockout",
+        requirement: "Users should be locked out after five consecutive failed login attempts.",
+        documentReference: "Product Spec §4.2 · Account Lockout",
+        expected: "Users should be locked out after five consecutive failed login attempts.",
+        actual: "The implementation tracks failed login attempts but does not prevent further login attempts after five consecutive failures.",
+        explanation: "The implementation tracks failed login attempts but does not prevent further login attempts after five consecutive failures.",
+        impact: "The implementation does not satisfy the documented authentication requirement.",
+        recommendedAction: "Review and implement the missing account lockout behavior.",
+        suggestedFix: "Review and implement the missing account lockout behavior (illustrative suggestion): set user account locked state when failed attempts reach or exceed 5.",
+        suggestedPatch: `  // Illustrative suggestion: Lock user account after 5 consecutive failed attempts
+  if (failedAttempts >= 5) {
+    await lockUserAccount(user.id, { reason: "CONSECUTIVE_FAILED_LOGINS", maxAttempts: 5 });
+    recordLoginFailure(user);
+    return { success: false, error: "ACCOUNT_LOCKED" };
+  }`,
         fixedCode: `/**
- * REQUIREMENT (PRD-402: International Tax Compliance §3.2):
- * "Every invoice generation retry MUST re-verify customer taxExempt status
- * against the EU VIES registry before calculating total due, and write an audit event."
+ * REQUIREMENT (Product Spec §4.2 · Account Lockout):
+ * "Users should be locked out after five consecutive failed login attempts."
  */
 
-export async function processInvoiceRetry(invoiceId: string, customerId: string, subtotal: number) {
-  // FIX: Verify customer taxExempt status per PRD-402 §3.2 before calculating tax
-  const isExempt = await viesService.checkTaxExemption(customerId);
-  const standardVatRate = 0.20;
-  const taxAmount = isExempt ? 0 : subtotal * standardVatRate;
-  const total = subtotal + taxAmount;
+export async function handleLoginAttempt(user: UserAccount, passwordAttempt: string) {
+  const isValid = await verifyPassword(user.id, passwordAttempt);
+  if (!isValid) {
+    const failedAttempts = await incrementFailedAttempts(user.id);
+    // Illustrative suggestion: Lock user account after 5 consecutive failed attempts
+    if (failedAttempts >= 5) {
+      await lockUserAccount(user.id, { reason: "CONSECUTIVE_FAILED_LOGINS", maxAttempts: 5 });
+      recordLoginFailure(user);
+      return { success: false, error: "ACCOUNT_LOCKED" };
+    }
+    return { success: false, error: "INVALID_CREDENTIALS" };
+  }
 
-  await auditLog.emit("TAX_EXEMPT_VERIFIED", { customerId, invoiceId, isExempt });
-
-  await db.invoices.update({
-    where: { id: invoiceId },
-    data: { total, taxAmount, status: "CALCULATED" }
-  });
-
-  return { invoiceId, total, taxAmount };
+  await resetFailedAttempts(user.id);
+  return { success: true };
 }`,
-        mergeBlocking: true,
-        mergeReason: "Merge Blocker: Direct violation of EU international tax compliance specification PRD-402 §3.2."
+        mergeBlocking: false,
+        mergeReason: "Non-blocking: PRD verification findings are provided for human engineering review and do not block merges."
       },
       jiraTicket: {
-        id: "TAX-402",
-        summary: "PRD-402 §3.2 Tax Exemption Verification Omitted in Retry Handler",
+        id: "PRD-1",
+        summary: "Product Spec §4.2 Account Lockout Mechanism Missing",
         priority: "High",
-        type: "Compliance Defect",
-        status: "Created · Assigned",
-        assignee: "Billing Compliance Team",
-        description: "PRD-402 §3.2: Missing VIES tax exemption verification in invoice retry handler. Causes tax overbilling."
+        type: "Requirement Mismatch",
+        status: "Not created yet (waiting for confirmation)",
+        assignee: "Unassigned · Pending Confirmation",
+        description: "Product Spec §4.2: Users should be locked out after five consecutive failed login attempts. Implementation does not prevent further attempts. Ticket pending engineer confirmation."
       },
       slackAlert: {
-        channel: "#billing-alerts",
-        thread: "Compliance-402",
-        preview: "HIGH: Tax exemption check missing in retry handler",
-        severity: "P1 HIGH",
-        detail: "src/services/taxService.ts violates PRD-402 §3.2 specification. Pull request blocked."
+        channel: "#auth-reviews",
+        thread: "PRD-Lockout",
+        preview: "PRD Verification: Account lockout requirement not implemented",
+        severity: "High",
+        detail: "src/auth/loginService.ts violates Product Spec §4.2. Finding posted for review."
       },
       customApp: {
         endpoint: "https://api.internal/v1/compliance-events",
-        event: "SPEC_MISMATCH",
-        payloadSummary: '{"rule":"PRD-402","file":"taxService.ts","severity":"HIGH"}',
-        latency: "37ms"
+        event: "PRD_MISMATCH",
+        payloadSummary: '{"rule":"PRD-1","file":"loginService.ts","severity":"High"}',
+        latency: "31ms"
       }
     },
 
@@ -2575,8 +2582,11 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
 
       if (appName === "Jira") {
         const jira = (details && details.jira) || (activeSample && activeSample.jiraTicket) || { id: "SEC-4827", summary: "High Priority Finding" };
+        if (jira.status && jira.status.toLowerCase().includes("not created")) {
+          statusTag = "PENDING";
+        }
         title = "Jira Software";
-        detailText = `${jira.id} · ${jira.summary || jira.priority || "Ticket Logged"}`;
+        detailText = `${jira.id} · ${jira.status && jira.status.toLowerCase().includes("not created") ? "Not created yet (waiting for confirmation)" : (jira.summary || jira.priority || "Ticket Logged")}`;
         themeClass = "stage-floating-dispatch--jira";
         iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11.57 2.05C11.57 7.28 15.82 11.53 21.05 11.53V2.05h-9.48z" fill="#0052CC"/><path d="M2 11.53c5.23 0 9.48 4.25 9.48 9.48H2v-9.48z" fill="#2684FF"/><path d="M11.57 11.53A9.48 9.48 0 0 1 2.09 2.05H2v18.96h9.57v-9.48z" fill="#0052CC" fill-opacity="0.85"/></svg>`;
       } else if (appName === "Slack") {
@@ -2722,7 +2732,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
       } else if (mode === "JIRA") {
         header = "LIVE CALL [1/3]";
         mainText = `JIRA: ${jira.id}`;
-        subText = `ASSIGNED ${jira.priority || "P0"} · REST v3`;
+        subText = (jira.status && jira.status.toLowerCase().includes("not created")) ? "PENDING CONFIRMATION" : `ASSIGNED ${jira.priority || "P0"} · REST v3`;
         headerColor = "#38bdf8";
         mainColor = "#60a5fa";
         subColor = "#93c5fd";
@@ -3914,6 +3924,179 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
     let activeAnalysisTab = "analysis";
     let currentFindingIdx = 0;
 
+    let prdDecisionState = {
+      selectedChoice: null,
+      ticketCreated: false
+    };
+
+    const getPrdDecisionResultHtml = (choice, ticketDone) => {
+      if (!choice) {
+        return `
+          <div class="prd-decision-prompt mono">
+            Select an engineer decision choice above to view what Myco records and review Jira ticket actions.
+          </div>
+        `;
+      }
+      if (choice === "prd_outdated") {
+        return `
+          <div class="prd-decision-recorded" id="prd-decision-recorded-box">
+            <div class="prd-recorded-item">
+              <span class="prd-recorded-label mono">RECORDED DECISION:</span>
+              <span class="prd-recorded-val">The PRD is outdated or incorrect</span>
+            </div>
+            <div class="prd-recorded-item">
+              <span class="prd-recorded-label mono">RECORDED EXPLANATION:</span>
+              <span class="prd-recorded-val">Product Spec §4.2 being updated to 10 attempts per product requirements review.</span>
+            </div>
+            <p class="prd-decision-meaning">
+              The PRD is outdated or incorrect; Myco records the decision and the engineer’s explanation.
+            </p>
+            ${!ticketDone ? `
+              <div class="prd-ticket-action-box">
+                <span class="prd-ticket-action-note mono">Jira integration enabled · Human confirmation required</span>
+                <button type="button" class="prd-ticket-confirm-btn" id="prd-confirm-ticket-btn" aria-label="Create Jira ticket to update the PRD">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Create Jira ticket</span>
+                </button>
+              </div>
+            ` : `
+              <div class="prd-ticket-card" id="prd-ticket-card" role="status" aria-label="PRD update ticket created">
+                <div class="prd-ticket-card__header">
+                  <div class="prd-ticket-badges">
+                    <span class="prd-ticket-type mono">PRD UPDATE TICKET</span>
+                    <span class="prd-ticket-key mono">PRD-1-UPDATE</span>
+                  </div>
+                  <span class="prd-ticket-status mono">CREATED · ASSIGNED</span>
+                </div>
+                <h5 class="prd-ticket-summary">Update Product Spec §4.2 · Account Lockout</h5>
+                <p class="prd-ticket-desc">
+                  Requirement update ticket created after engineer confirmation on PR #4827. Update account lockout threshold from 5 to 10 attempts.
+                </p>
+                <div class="prd-ticket-meta mono">
+                  <span><strong>Project:</strong> PROD-SPEC</span>
+                  <span><strong>Assignee:</strong> Engineering Lead</span>
+                  <span><strong>Confirmation:</strong> Explicit</span>
+                </div>
+              </div>
+            `}
+          </div>
+        `;
+      }
+      if (choice === "pr_incorrect") {
+        return `
+          <div class="prd-decision-recorded" id="prd-decision-recorded-box">
+            <div class="prd-recorded-item">
+              <span class="prd-recorded-label mono">RECORDED DECISION:</span>
+              <span class="prd-recorded-val">The PR implementation is incorrect</span>
+            </div>
+            <div class="prd-recorded-item">
+              <span class="prd-recorded-label mono">RECORDED EXPLANATION:</span>
+              <span class="prd-recorded-val">Missing account lockout handler in src/auth/loginService.ts needs to be implemented.</span>
+            </div>
+            <p class="prd-decision-meaning">
+              The PR implementation is incorrect; Myco records the decision and the engineer’s explanation.
+            </p>
+            ${!ticketDone ? `
+              <div class="prd-ticket-action-box">
+                <span class="prd-ticket-action-note mono">Jira integration enabled · Human confirmation required</span>
+                <button type="button" class="prd-ticket-confirm-btn" id="prd-confirm-ticket-btn" aria-label="Create Jira ticket to fix the implementation">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Create Jira ticket</span>
+                </button>
+              </div>
+            ` : `
+              <div class="prd-ticket-card" id="prd-ticket-card" role="status" aria-label="Fix implementation ticket created">
+                <div class="prd-ticket-card__header">
+                  <div class="prd-ticket-badges">
+                    <span class="prd-ticket-type mono">FIX IMPLEMENTATION TICKET</span>
+                    <span class="prd-ticket-key mono">PRD-1-FIX</span>
+                  </div>
+                  <span class="prd-ticket-status mono">CREATED · ASSIGNED</span>
+                </div>
+                <h5 class="prd-ticket-summary">Implement account lockout after 5 consecutive failed login attempts</h5>
+                <p class="prd-ticket-desc">
+                  Bug ticket created after engineer confirmation on PR #4827. Enforce account lockout in loginService.ts after 5 consecutive failed attempts per Product Spec §4.2.
+                </p>
+                <div class="prd-ticket-meta mono">
+                  <span><strong>Project:</strong> AUTH-SVC</span>
+                  <span><strong>Assignee:</strong> PR Author</span>
+                  <span><strong>Confirmation:</strong> Explicit</span>
+                </div>
+              </div>
+            `}
+          </div>
+        `;
+      }
+      if (choice === "needs_clarification") {
+        return `
+          <div class="prd-decision-recorded is-clarification" id="prd-decision-recorded-box">
+            <div class="prd-recorded-item">
+              <span class="prd-recorded-label mono">RECORDED DECISION:</span>
+              <span class="prd-recorded-val">Needs clarification</span>
+            </div>
+            <div class="prd-recorded-item">
+              <span class="prd-recorded-label mono">RECORDED EXPLANATION:</span>
+              <span class="prd-recorded-val">Inquire with security team regarding whether rate-limiting or lockout takes precedence.</span>
+            </div>
+            <p class="prd-decision-meaning">
+              Ambiguous or conflicting requirements are flagged for clarification instead of guessed; needs clarification keeps the finding open.
+            </p>
+            <div class="prd-clarification-banner" role="status">
+              <div class="prd-clarification-header">
+                <span class="prd-clarification-badge mono">STATUS: FINDING KEPT OPEN</span>
+              </div>
+              <p class="prd-clarification-text">
+                Finding kept open for clarification. No Jira ticket is created without explicit confirmation, and none for needs clarification.
+              </p>
+            </div>
+          </div>
+        `;
+      }
+      return "";
+    };
+
+    const renderPrdDecisionPanelHtml = (isPrd) => {
+      if (!isPrd) return "";
+      const choice = prdDecisionState.selectedChoice;
+      const ticketDone = prdDecisionState.ticketCreated;
+      return `
+        <div class="prd-decision-panel" id="prd-decision-panel" role="region" aria-label="Engineer decision on requirement mismatch">
+          <div class="prd-decision-header">
+            <div class="prd-decision-title-wrap">
+              <span class="prd-decision-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <h4 class="prd-decision-title">Engineer decision</h4>
+            </div>
+            <span class="prd-decision-badge mono">ILLUSTRATIVE EXAMPLE</span>
+          </div>
+          <p class="prd-decision-subtitle">
+            PRD verification presents findings for human engineering review. Select what this mismatch means:
+          </p>
+
+          <div class="prd-decision-options" role="group" aria-label="Decision choices">
+            <button type="button" class="prd-decision-btn ${choice === 'prd_outdated' ? 'is-selected' : ''}" data-choice="prd_outdated" aria-pressed="${choice === 'prd_outdated'}">
+              The PRD is outdated or incorrect
+            </button>
+            <button type="button" class="prd-decision-btn ${choice === 'pr_incorrect' ? 'is-selected' : ''}" data-choice="pr_incorrect" aria-pressed="${choice === 'pr_incorrect'}">
+              The PR implementation is incorrect
+            </button>
+            <button type="button" class="prd-decision-btn ${choice === 'needs_clarification' ? 'is-selected' : ''}" data-choice="needs_clarification" aria-pressed="${choice === 'needs_clarification'}">
+              Needs clarification
+            </button>
+          </div>
+
+          <div class="prd-decision-result" id="prd-decision-result" aria-live="polite" aria-atomic="true">
+            ${getPrdDecisionResultHtml(choice, ticketDone)}
+          </div>
+
+          <div class="prd-decision-footnote mono">
+            Illustrative example · Demonstrates human engineering review on pull requests. Myco never alters code or creates tickets on its own.
+          </div>
+        </div>
+      `;
+    };
+
     const tabIssuesCount = document.getElementById("analysis-tab-issues-count");
     if (tabIssuesCount) {
       tabIssuesCount.textContent = `Issues (${findings.length})`;
@@ -3922,6 +4105,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
     const renderActiveFinding = (idx) => {
       currentFindingIdx = idx;
       const f = findings[idx] || findings[0];
+      const isPrdFinding = (f.id === "PRD-1") || (f.resultLabel === "Not implemented") || (f.evidenceRule && f.evidenceRule.indexOf("Product Spec") !== -1);
       const sevClass = f.severity === "CRITICAL" ? "is-p0" : f.severity === "HIGH" ? "is-p1" : "is-p2";
       const blockerTag = f.mergeBlocking ? '<span class="report-blocker-tag mono">MERGE BLOCKER</span>' : '';
       const fileNameOnly = (f.filePath || "agent-runner.ts").split("/").pop();
@@ -4021,7 +4205,7 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
                 <div class="insight-card">
                   <div class="insight-card__label mono">SIGNALS COORDINATED</div>
                   <div class="insight-card__val">4 Channels Active</div>
-                  <p class="insight-card__desc">GitHub, Jira (${escapeHtml(jira.id || "SEC-4827")}), Slack, Custom Webhook.</p>
+                  <p class="insight-card__desc">GitHub, Jira (${escapeHtml(jira.id || "SEC-4827")}${jira.status && jira.status.toLowerCase().includes("not created") ? " · Pending Confirmation" : ""}), Slack, Custom Webhook.</p>
                 </div>
               </div>
             </div>
@@ -4089,6 +4273,8 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
               </div>
             ` : ""}
 
+            ${renderPrdDecisionPanelHtml(isPrdFinding)}
+
             <div class="report-dropdowns-group">
               ${f.evidence ? `
                 <details class="report-dropdown-item" id="dropdown-evidence">
@@ -4148,15 +4334,24 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
                       </div>
                       <span class="int-card__desc">Inline review comment</span>
                     </div>
-                    <div class="int-card">
+                    <div class="int-card" id="int-card-jira">
                       <div class="int-card__top">
                         <span class="int-card__title-wrap">
                           <img src="assets/integration-jira.svg" width="14" height="14" alt="Jira">
                           <span>Jira Software</span>
                         </span>
-                        <span class="int-card__badge">SYNCED</span>
+                        <span class="int-card__badge" id="int-jira-badge">${
+                          isPrdFinding && prdDecisionState.ticketCreated ? "CREATED" :
+                          isPrdFinding && prdDecisionState.selectedChoice === "needs_clarification" ? "OPEN" :
+                          (jira.status && jira.status.toLowerCase().includes("not created") ? "PENDING" : "SYNCED")
+                        }</span>
                       </div>
-                      <span class="int-card__desc">${escapeHtml(jira.id || "SEC-4827")}: Created</span>
+                      <span class="int-card__desc" id="int-jira-desc">${
+                        isPrdFinding && prdDecisionState.ticketCreated && prdDecisionState.selectedChoice === "prd_outdated" ? "PRD-1-UPDATE: Created · Assigned" :
+                        isPrdFinding && prdDecisionState.ticketCreated && prdDecisionState.selectedChoice === "pr_incorrect" ? "PRD-1-FIX: Created · Assigned" :
+                        isPrdFinding && prdDecisionState.selectedChoice === "needs_clarification" ? "PRD-1: Open for clarification (no ticket)" :
+                        `${escapeHtml(jira.id || "SEC-4827")}: ${jira.status && jira.status.toLowerCase().includes("not created") ? "Not created yet (waiting for confirmation)" : "Created"}`
+                      }</span>
                     </div>
                     <div class="int-card">
                       <div class="int-card__top">
@@ -4254,6 +4449,71 @@ export async function handlePaymentWebhook(eventPayload: any, signature: string)
           }, 1800);
         });
       }
+      // Attach PRD decision listeners if PRD finding
+      if (isPrdFinding) {
+        const panel = container.querySelector("#prd-decision-panel");
+        if (panel) {
+          const updateJiraSignalCard = () => {
+            const badgeEl = container.querySelector("#int-jira-badge");
+            const descEl = container.querySelector("#int-jira-desc");
+            if (!badgeEl || !descEl) return;
+            const choice = prdDecisionState.selectedChoice;
+            const ticketDone = prdDecisionState.ticketCreated;
+            if (choice === "prd_outdated" && ticketDone) {
+              badgeEl.textContent = "CREATED";
+              descEl.textContent = "PRD-1-UPDATE: Created · Assigned";
+            } else if (choice === "pr_incorrect" && ticketDone) {
+              badgeEl.textContent = "CREATED";
+              descEl.textContent = "PRD-1-FIX: Created · Assigned";
+            } else if (choice === "needs_clarification") {
+              badgeEl.textContent = "OPEN";
+              descEl.textContent = "PRD-1: Open for clarification (no ticket)";
+            } else {
+              badgeEl.textContent = "PENDING";
+              descEl.textContent = `${jira.id || "PRD-1"}: Not created yet (waiting for confirmation)`;
+            }
+          };
+
+          const wireConfirmButton = () => {
+            const confirmBtn = panel.querySelector("#prd-confirm-ticket-btn");
+            if (confirmBtn) {
+              confirmBtn.addEventListener("click", () => {
+                prdDecisionState.ticketCreated = true;
+                const resultEl = panel.querySelector("#prd-decision-result");
+                if (resultEl) {
+                  resultEl.innerHTML = getPrdDecisionResultHtml(prdDecisionState.selectedChoice, true);
+                }
+                updateJiraSignalCard();
+              });
+            }
+          };
+
+          const choiceBtns = panel.querySelectorAll(".prd-decision-btn");
+          choiceBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+              const chosen = btn.getAttribute("data-choice");
+              prdDecisionState.selectedChoice = chosen;
+              prdDecisionState.ticketCreated = false;
+
+              choiceBtns.forEach(b => {
+                const isSelected = b.getAttribute("data-choice") === chosen;
+                b.classList.toggle("is-selected", isSelected);
+                b.setAttribute("aria-pressed", String(isSelected));
+              });
+
+              const resultEl = panel.querySelector("#prd-decision-result");
+              if (resultEl) {
+                resultEl.innerHTML = getPrdDecisionResultHtml(chosen, false);
+                wireConfirmButton();
+              }
+              updateJiraSignalCard();
+            });
+          });
+
+          wireConfirmButton();
+        }
+      }
+
       // Analysis tabs switcher (Analysis, Issues, Insights, Fixes)
       const atabs = document.querySelectorAll(".analysis-tab-btn");
       atabs.forEach(btn => {

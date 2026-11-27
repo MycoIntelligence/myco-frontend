@@ -1,3 +1,5 @@
+import { prdCopy } from './prd-verification-copy'
+
 export const features = [
   {
     slug:'pr-review', label:'PR Review', beta:false,
@@ -9,6 +11,7 @@ export const features = [
       ['Review against the behavior you agreed to ship','Requirements can live in a PRD, a ticket, meeting notes, or a Slack conversation. Myco checks the implementation against the requirements available to the review. If an expectation is unclear, reviewers can see what needs clarification before they approve a change based on an assumption.'],
       ['Follow the change into other repositories','A change can work in the repository where it was written and still break a service that depends on it. Myco follows those dependencies across authorized repositories and points reviewers to the affected consumer. That helps the author bring the right service owner into the PR while there’s still time to coordinate the fix.'],
       ["Resolve the issue in the PR","The author can see the expected behavior, the line responsible, and what could break in the same review. That can cut down on messages to clarify a finding and follow-up PRs to repair a regression after merge."],
+      [prdCopy.featureSection.heading, `${prdCopy.featureSection.paragraph1} ${prdCopy.featureSection.paragraph2}`, false],
     ],
     example:'Checkout correctly charges $85 after a discount, but the receipt still shows $100. Myco connects the discrepancy to the requirement that the receipt must match the charge and points to the line that uses the original subtotal.',
   },
