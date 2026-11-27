@@ -9,7 +9,7 @@ export function accountPath(path: "/login" | "/signup" | "/account", intent: Acc
 }
 
 export const mycoDashboardUrl = (
-  process.env.NEXT_PUBLIC_MYCO_DASHBOARD_URL || "https://myco-deploy.onrender.com"
+  process.env.NEXT_PUBLIC_MYCO_DASHBOARD_URL || "https://myco-backend-8t13.onrender.com"
 ).replace(/\/+$/, "");
 
 export const dashboardOnboardingUrl = `${mycoDashboardUrl}/#/onboarding`;
