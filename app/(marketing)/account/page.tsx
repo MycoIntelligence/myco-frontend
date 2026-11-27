@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getWebsiteCustomerSession } from "@/lib/supabase/server";
-import { AccountFrame } from "@/src/marketing/account-frame";
 import { SignOutForm } from "@/src/marketing/auth-form";
-import { TrialRequestButton } from "@/src/marketing/trial-request";
+import { CredentialsFrame } from "@/src/marketing/credentials-frame";
+import { PilotLink } from "@/src/marketing/home-sections";
 import styles from "@/src/marketing/account.module.css";
 
 export const metadata: Metadata = { title: "Your account", robots: { index: false, follow: false } };
@@ -35,19 +35,26 @@ export default async function AccountPage() {
       : profile?.email ?? contactEmail ?? user.email;
   }
 
+  const name = typeof fullName === "string" ? fullName.trim() : "";
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2)
+    .map((part) => Array.from(part)[0]).join("").toUpperCase()
+    || contactEmail?.charAt(0).toUpperCase();
+
   return (
-    <AccountFrame>
+    <CredentialsFrame>
       <h1 id="account-heading">Your account</h1>
-      <p className={styles.intro}>You’re signed in to Myco.</p>
-      {(contactEmail || (typeof fullName === "string" && fullName.trim())) && (
-        <dl className={styles.details}>
-          {typeof fullName === "string" && fullName.trim() && <><dt>Full name</dt><dd>{fullName}</dd></>}
-          {contactEmail && <><dt>Email address</dt><dd>{contactEmail}</dd></>}
-        </dl>
+      {(name || contactEmail) && (
+        <div className={styles.profile}>
+          <span className={styles.avatar} aria-hidden="true">{initials}</span>
+          <div className={styles.profileIdentity}>
+            {name && <strong>{name}</strong>}
+            {contactEmail && <span>{contactEmail}</span>}
+          </div>
+        </div>
       )}
       {profileError && <p className={styles.error} role="alert">We couldn’t load your profile. Refresh the page to try again.</p>}
-      <TrialRequestButton className={styles.button} />
+      <PilotLink />
       <SignOutForm />
-    </AccountFrame>
+    </CredentialsFrame>
   );
 }

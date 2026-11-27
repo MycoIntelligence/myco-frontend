@@ -36,7 +36,8 @@ export default function Preview() {
     {!reduceMotion && <SmoothCursor />}
     <SiteHeader />
     <main>
-      <DitherFlow className="home-dither-flow">
+      <div className="home-dither-flow">
+      <DitherFlow>
         <section className="hero" aria-label="Myco overview">
         <div className="hero-copy">
           <div className="eyebrow"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 1.8 10 5.5-10 5.5L2 7.3z"/><path d="m3 12 9 5 9-5M3 16.7l9 5 9-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"/></svg>Software Quality Infrastructure</div>
@@ -47,8 +48,9 @@ export default function Preview() {
           </div>
           <PilotLogos />
         </section>
-        <ReviewSection />
       </DitherFlow>
+        <ReviewSection />
+      </div>
       <FeatureBento />
       <LiveWorkflowSection />
       <LiveSecuritySection />

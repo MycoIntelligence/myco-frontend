@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { demoFormSchema, trialGitHubUsernameError, trialRequestSchema } from "@/lib/schema";
+import { betaRequestSchema, demoFormSchema, trialGitHubUsernameError, trialRequestSchema } from "@/lib/schema";
 import { deliverLead } from "@/lib/leads";
 import { getWebsiteCustomerSession } from "@/lib/supabase/server";
 import { allowRequest, readJsonLimited, RequestTooLarge } from "@/lib/request-security";
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     const isTrial = requestKind === "trial" || requestKind === "upgrade";
-    const result = (isTrial ? trialRequestSchema : demoFormSchema).safeParse(body);
+    const result = (requestKind === "beta" ? betaRequestSchema : isTrial ? trialRequestSchema : demoFormSchema).safeParse(body);
     if (!result.success) {
       const errors: Record<string, string> = {};
       result.error.issues.forEach((issue) => {

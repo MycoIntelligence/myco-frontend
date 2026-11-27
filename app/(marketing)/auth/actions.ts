@@ -5,18 +5,22 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { afterWebsiteAuth, getAccountIntent } from "@/lib/account-paths";
+import { trialEmailSchema } from "@/lib/schema";
 import { allowRequest } from "@/lib/request-security";
 import { createSupabaseServerClient, createWebsiteSignupAdmin } from "@/lib/supabase/server";
 
 type AccountActionState = { error?: string };
 
 const signInFields = z.object({
-  email: z.string().trim().email("Enter a valid email address.").max(254),
+  email: trialEmailSchema,
   password: z.string().min(1, "Enter your password.").max(1024),
 });
 const signUpFields = signInFields.extend({
   fullName: z.string().trim().min(1, "Enter your full name.").max(100),
-  password: z.string().min(8, "Use at least 8 characters for your password.").refine(
+  password: z.string().min(8, "Use at least 8 characters for your password.")
+    .regex(/[A-Z]/, "Include at least one uppercase letter in your password.")
+    .regex(/[\p{P}\p{S}]/u, "Include at least one special character in your password.")
+    .refine(
     (password) => new TextEncoder().encode(password).length <= 72,
     "Your password is too long. Use fewer characters and try again.",
   ),

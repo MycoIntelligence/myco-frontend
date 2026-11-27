@@ -1,6 +1,5 @@
 .security-detail{max-width:1120px;margin:auto;padding:0 24px 80px}
 .security-hero-flow{background:var(--page)}
-.security-hero-flow .flow-dither{height:100%;mask-image:linear-gradient(to bottom,#000 62%,transparent 100%)}
 .security-detail-hero{text-align:center;max-width:1120px;margin:auto;padding:clamp(50px,7vw,90px) 24px clamp(36px,5.7vw,70px)}
 .security-detail-hero h1{max-width:900px;margin:0 auto;font-size:clamp(38px,7vw,76px);line-height:1.02;letter-spacing:-.064em;text-wrap:balance}
 .security-detail-hero h1 em{font-style:normal;color:var(--blue)}

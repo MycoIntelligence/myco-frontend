@@ -255,11 +255,11 @@ body[style*="cursor: none"] a{cursor:none}
 }
 
 /* Keep the same dither canvas behind the hero and the top of the review section. */
-.hero-review-flow{--flow-hero-height: max(617px,calc(100svh - 70px));position:relative;isolation:isolate}
+.hero-review-flow{--flow-overlap:clamp(112px,14vw,176px);--flow-hero-height: max(617px,calc(100svh - 70px));position:relative;isolation:isolate}
 .hero-review-flow .hero{background:transparent;min-height:var(--flow-hero-height)}
 .hero-review-flow .review-story{background:transparent;border-top:0}
 .hero-review-flow .review-story .story-chapters{background:#fff}
-.flow-dither{position:absolute;inset:0 0 auto;height:calc(var(--flow-hero-height) + 215px);max-height:100%;overflow:clip;opacity:.82;z-index:-1;isolation:isolate;pointer-events:none;mask-image:linear-gradient(to bottom,#000 0%,#000 calc(100% - 240px),#0008 calc(100% - 100px),transparent 100%)}
+.flow-dither{position:absolute;inset:0 0 calc(-1 * var(--flow-overlap));overflow:clip;opacity:.82;z-index:-1;isolation:isolate;pointer-events:none;mask-image:linear-gradient(to bottom,#000 0%,#000 max(0px,calc(100% - var(--flow-overlap) - 115px)),#0005 calc(100% - var(--flow-overlap)),transparent 100%)}
 .flow-dither>div{position:absolute;inset:0}
 .flow-dither canvas{position:absolute;top:0;left:0;opacity:0;transition:opacity .7s;image-rendering:pixelated}
 .flow-dither canvas[data-ready]{opacity:1}
@@ -366,7 +366,6 @@ nav a:hover,.footer-inner nav a:hover,.footer-social:hover{color:var(--blue)}
 .pilot-close{background:radial-gradient(ellipse 510px 205px at 50% 77%,#15284266,transparent 95%),var(--page)}
 .footer-wordmark span{background:linear-gradient(180deg,#72849a 0%,#3b4a5e 47%,#1c2632 80%,#090a0c 100%);background-clip:text}
 .footer-wordmark span::after{background:linear-gradient(180deg,#6b7b90,#344357 50%,transparent);background-clip:text;mix-blend-mode:lighten;filter:drop-shadow(0 1px 0 #000)}
-.pricing-dither-flow{--flow-hero-height:clamp(340px,58svh,490px)}
 .pricing-main{color:var(--text)}
 .billing-period{background:#121923;border-color:var(--line)}
 .billing-period label,.billing-period small{color:var(--subtle)}
@@ -771,13 +770,9 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   grid-template-rows: auto auto;
 }
 
-.home-dither-flow .flow-dither {
-  grid-area: 1 / 1 / 2 / 2;
-  inset: 0 0 -215px;
-  height: auto;
-  max-height: none;
-  mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 380px), #0005 calc(100% - 145px), transparent 100%);
-}
+.home-dither-flow > .hero-review-flow, .feature-hero-flow.hero-review-flow { --flow-overlap: clamp(140px, 18vw, 215px); }
+.home-dither-flow > .review-story { background: transparent; }
+.contact-dither-flow { --flow-overlap: 0px; }
 
 .pilot-logos {
   max-width: 1240px;
@@ -935,3 +930,5 @@ body[style*="cursor: none"] .features-trigger{cursor:none}
   .nav { margin-inline: 12px; }
   .nav .nav-pilot { padding-inline: 9px; font-size: 13px; }
 }
+
+.nav-pilot.trial-request-button { border-radius: 999px; }

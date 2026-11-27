@@ -1,6 +1,6 @@
 'use client'
 
-import {TrialRequestButton,TrialRequestDialog} from './trial-request'
+import {RazorpayButton} from './razorpay-button'
 import {useState} from 'react'
 import {SiteHeader,SiteFooter} from './home-sections'
 import {DitherFlow} from './dither-flow'
@@ -34,12 +34,13 @@ export default function PricingPage() {
   return <>
     {!reduceMotion && <SmoothCursor />}
     <SiteHeader pricing />
-    <DitherFlow className="pricing-dither-flow">
-      <main className="pricing-main">
+    <main className="pricing-main">
+      <DitherFlow>
         <section className="pricing-intro" aria-labelledby="pricing-heading">
           <h1 id="pricing-heading">Pricing for Myco PR Review</h1>
           <p>Try 14 days of free code review. Choose per-developer pricing for your team or talk to us about Enterprise.</p>
         </section>
+      </DitherFlow>
         <section className="pricing-plans" aria-label="Myco plans">
           <fieldset className="billing-period">
             <legend className="sr">Billing period</legend>
@@ -52,7 +53,7 @@ export default function PricingPage() {
               <p className="plan-summary">For engineering teams getting started with contextual review.</p>
               <div className="plan-price" aria-live="polite"><div><strong>${annual ? yearlyMonthly : monthly}</strong><span> / developer / month</span></div><p>{annual ? '$192 per developer, billed annually.' : 'Billed monthly.'}</p></div>
               <PlanFeatures features={['Contextual GitHub pull request review','Review against available requirements and authorized code','14-day trial with no credit card required']}/>
-              <TrialRequestButton kind="upgrade" className="plan-button plan-primary">Upgrade to Pro <Arrow/></TrialRequestButton>
+              <RazorpayButton annual={annual}>Upgrade to Pro <Arrow/></RazorpayButton>
             </article>
             <article className="plan plan-glare">
               <div className="plan-heading"><h2>Enterprise</h2></div>
@@ -69,9 +70,7 @@ export default function PricingPage() {
             {faqs.map(([question,answer])=><details key={question}><summary>{question}<span aria-hidden="true">+</span></summary><p>{answer}</p></details>)}
           </div>
         </section>
-      </main>
-    </DitherFlow>
+    </main>
     <SiteFooter pricing />
-    <TrialRequestDialog kind="upgrade" />
   </>
 }

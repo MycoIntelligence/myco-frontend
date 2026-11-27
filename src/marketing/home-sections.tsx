@@ -18,10 +18,10 @@ function Icon({name}: {name:'branch'|'document'|'lock'|'shield'|'layers'|'arrow'
   return <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round"><path d={paths[name]}/></svg>
 }
 
-export function PilotLink() {
-  return <TrialRequestButton className="pilot">
+export function PilotLink({inNav = false}: {inNav?: boolean} = {}) {
+  return <TrialRequestButton className={inNav ? "nav-pilot" : "pilot"}>
     Request a free trial <span aria-hidden="true">→</span>
-    <BorderBeam size={57} duration={5} initialOffset={15} colorFrom="#5aa9f2" colorTo="#c9e8ff" borderWidth={1.5} />
+    {!inNav && <BorderBeam size={57} duration={5} initialOffset={15} colorFrom="#5aa9f2" colorTo="#c9e8ff" borderWidth={1.5} />}
   </TrialRequestButton>
 }
 
@@ -117,7 +117,7 @@ export function SiteHeader({pricing=false,featuresPage=false,securityPage=false,
       </nav>
       <div className="nav-account-actions">
         <WebsiteAccountNav />
-        <TrialRequestButton className="nav-pilot" />
+        <PilotLink inNav />
       </div>
     </div>
   </header>

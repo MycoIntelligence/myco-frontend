@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { siteContent } from "@/lib/content";
-import { SiteHeader } from "./home-sections";
-import { TrialRequestButton } from "./trial-request";
+import { PilotLink, SiteHeader } from "./home-sections";
 import "./account-page.css";
 
 export function AccountPage({ mode }: { mode: "login" | "signup" }) {
@@ -21,7 +20,7 @@ export function AccountPage({ mode }: { mode: "login" | "signup" }) {
               Continue with GitHub
             </a>
           ) : (
-            <TrialRequestButton className="nav-pilot account-continue" />
+            <PilotLink />
           )}
           <p className="account-switch">
             {isLogin ? <>New to Myco? <Link href="/signup/">Sign up</Link></> : <>Already have an account? <Link href="/login/">Log in</Link></>}

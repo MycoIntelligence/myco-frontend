@@ -12,7 +12,7 @@ export default function ContactPage(){
   return <>
     {!reduced&&<SmoothCursor/>}
     <SiteHeader contactPage/>
-    <DitherFlow>
+    <DitherFlow className="contact-dither-flow">
       <main className="contact-detail">
         <span className="eyebrow">Contact</span>
         <h1>Talk to <em>Myco</em></h1>

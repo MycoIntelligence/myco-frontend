@@ -81,3 +81,13 @@ export const demoFormSchema = leadFields.extend({
 
 export type DemoFormData = z.infer<typeof demoFormSchema>;
 export type TrialRequestData = z.infer<typeof trialRequestSchema>;
+
+
+export const betaRequestSchema = leadFields.extend({
+  kind: z.literal("beta"),
+  feature: z.enum(["Pre-Prod Validation", "Production Monitoring"]),
+  workEmail: trialEmailSchema,
+  message: z.string().trim().min(1, "Tell us what you’d like to try.").max(600),
+});
+
+export type BetaRequestData = z.infer<typeof betaRequestSchema>;
