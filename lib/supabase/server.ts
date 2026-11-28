@@ -113,5 +113,5 @@ export async function getWebsiteCustomerSession({ readOnly = false } = {}) {
     auth: { token },
     env: { url: config.url, publishableKeys: { default: config.key } },
   });
-  return { user, supabase };
+  return { user, supabase, accessToken: token };
 }

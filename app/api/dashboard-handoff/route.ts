@@ -16,10 +16,15 @@ export async function GET(request: Request) {
     );
   }
 
-  const { data: { session } } = await sessionResult.supabase.auth.getSession();
+  let accessToken: string | undefined = sessionResult.accessToken;
+  if (!accessToken && sessionResult.supabase?.auth?.getSession) {
+    const { data: { session } } = await sessionResult.supabase.auth.getSession();
+    accessToken = session?.access_token;
+  }
+
   const baseTarget = `${dashboardUrl}/?source=website`;
-  const targetUrl = session?.access_token
-    ? `${baseTarget}#sso_token=${encodeURIComponent(session.access_token)}`
+  const targetUrl = accessToken
+    ? `${baseTarget}#sso_token=${encodeURIComponent(accessToken)}`
     : `${baseTarget}#/onboarding`;
 
   return NextResponse.redirect(targetUrl);
